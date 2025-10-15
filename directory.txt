@@ -1,0 +1,608 @@
+.
+├── custom_dashboards
+│   ├── app.py
+│   ├── Dockerfile.custom-dashboards
+│   ├── requirements.txt
+│   ├── routes
+│   │   ├── drop_performance.py
+│   │   ├── home.py
+│   │   └── __init__.py
+│   ├── services
+│   │   └── query_utils.py
+│   ├── static
+│   │   ├── css
+│   │   │   └── style.css
+│   │   └── js
+│   │       └── main.js
+│   └── templates
+│       ├── base..html
+│       ├── drop_perfomance.html
+│       └── home.html
+├── dbt
+│   ├── dbt_packages
+│   │   └── dbt_utils
+│   │       ├── CHANGELOG.md
+│   │       ├── .circleci
+│   │       │   └── config.yml
+│   │       ├── CONTRIBUTING.md
+│   │       ├── dbt_project.yml
+│   │       ├── dev-requirements.txt
+│   │       ├── docker-compose.yml
+│   │       ├── docs
+│   │       │   └── decisions
+│   │       │       ├── adr-0000-documenting-architecture-decisions.md
+│   │       │       ├── adr-0001-decision-record-format.md
+│   │       │       ├── adr-0002-cross-database-utils.md
+│   │       │       └── README.md
+│   │       ├── etc
+│   │       │   └── dbt-logo.png
+│   │       ├── .github
+│   │       │   ├── CODEOWNERS
+│   │       │   ├── ISSUE_TEMPLATE
+│   │       │   │   ├── bug_report.md
+│   │       │   │   ├── dbt_minor_release.md
+│   │       │   │   ├── feature_request.md
+│   │       │   │   └── utils_minor_release.md
+│   │       │   ├── pull_request_template.md
+│   │       │   └── workflows
+│   │       │       └── create-table-of-contents.yml
+│   │       ├── .gitignore
+│   │       ├── integration_tests
+│   │       │   ├── ci
+│   │       │   │   └── sample.profiles.yml
+│   │       │   ├── data
+│   │       │   │   ├── datetime
+│   │       │   │   │   └── data_date_spine.csv
+│   │       │   │   ├── etc
+│   │       │   │   │   └── data_people.csv
+│   │       │   │   ├── geo
+│   │       │   │   │   ├── data_haversine_km.csv
+│   │       │   │   │   └── data_haversine_mi.csv
+│   │       │   │   ├── .gitkeep
+│   │       │   │   ├── schema_tests
+│   │       │   │   │   ├── data_cardinality_equality_a.csv
+│   │       │   │   │   ├── data_cardinality_equality_b.csv
+│   │       │   │   │   ├── data_not_null_proportion.csv
+│   │       │   │   │   ├── data_test_accepted_range.csv
+│   │       │   │   │   ├── data_test_at_least_one.csv
+│   │       │   │   │   ├── data_test_equal_rowcount.csv
+│   │       │   │   │   ├── data_test_expression_is_true.csv
+│   │       │   │   │   ├── data_test_fewer_rows_than_table_1.csv
+│   │       │   │   │   ├── data_test_fewer_rows_than_table_2.csv
+│   │       │   │   │   ├── data_test_mutually_exclusive_ranges_no_gaps.csv
+│   │       │   │   │   ├── data_test_mutually_exclusive_ranges_with_gaps.csv
+│   │       │   │   │   ├── data_test_mutually_exclusive_ranges_with_gaps_zero_length.csv
+│   │       │   │   │   ├── data_test_not_accepted_values.csv
+│   │       │   │   │   ├── data_test_not_constant.csv
+│   │       │   │   │   ├── data_test_relationships_where_table_1.csv
+│   │       │   │   │   ├── data_test_relationships_where_table_2.csv
+│   │       │   │   │   ├── data_test_sequential_timestamps.csv
+│   │       │   │   │   ├── data_test_sequential_values.csv
+│   │       │   │   │   ├── data_unique_combination_of_columns.csv
+│   │       │   │   │   └── schema.yml
+│   │       │   │   ├── sql
+│   │       │   │   │   ├── data_deduplicate.csv
+│   │       │   │   │   ├── data_deduplicate_expected.csv
+│   │       │   │   │   ├── data_events_20180101.csv
+│   │       │   │   │   ├── data_events_20180102.csv
+│   │       │   │   │   ├── data_events_20180103.csv
+│   │       │   │   │   ├── data_filtered_columns_in_relation.csv
+│   │       │   │   │   ├── data_filtered_columns_in_relation_expected.csv
+│   │       │   │   │   ├── data_generate_series.csv
+│   │       │   │   │   ├── data_generate_surrogate_key.csv
+│   │       │   │   │   ├── data_get_column_values.csv
+│   │       │   │   │   ├── data_get_column_values_dropped.csv
+│   │       │   │   │   ├── data_get_column_values_where.csv
+│   │       │   │   │   ├── data_get_column_values_where_expected.csv
+│   │       │   │   │   ├── data_get_query_results_as_dict.csv
+│   │       │   │   │   ├── data_get_single_value.csv
+│   │       │   │   │   ├── data_nullcheck_table.csv
+│   │       │   │   │   ├── data_pivot.csv
+│   │       │   │   │   ├── data_pivot_expected_apostrophe.csv
+│   │       │   │   │   ├── data_pivot_expected.csv
+│   │       │   │   │   ├── data_safe_add.csv
+│   │       │   │   │   ├── data_safe_divide.csv
+│   │       │   │   │   ├── data_safe_divide_denominator_expressions.csv
+│   │       │   │   │   ├── data_safe_divide_numerator_expressions.csv
+│   │       │   │   │   ├── data_safe_subtract.csv
+│   │       │   │   │   ├── data_star_aggregate.csv
+│   │       │   │   │   ├── data_star_aggregate_expected.csv
+│   │       │   │   │   ├── data_star.csv
+│   │       │   │   │   ├── data_star_expected.csv
+│   │       │   │   │   ├── data_star_prefix_suffix_expected.csv
+│   │       │   │   │   ├── data_star_quote_identifiers.csv
+│   │       │   │   │   ├── data_union_events_expected.csv
+│   │       │   │   │   ├── data_union_exclude_expected.csv
+│   │       │   │   │   ├── data_union_expected.csv
+│   │       │   │   │   ├── data_union_table_1.csv
+│   │       │   │   │   ├── data_union_table_2.csv
+│   │       │   │   │   ├── data_unpivot_bool.csv
+│   │       │   │   │   ├── data_unpivot_bool_expected.csv
+│   │       │   │   │   ├── data_unpivot.csv
+│   │       │   │   │   ├── data_unpivot_expected.csv
+│   │       │   │   │   ├── data_unpivot_original_api_expected.csv
+│   │       │   │   │   └── data_width_bucket.csv
+│   │       │   │   └── web
+│   │       │   │       ├── data_url_host.csv
+│   │       │   │       ├── data_url_path.csv
+│   │       │   │       └── data_urls.csv
+│   │       │   ├── dbt_project.yml
+│   │       │   ├── .env
+│   │       │   │   ├── bigquery.env
+│   │       │   │   ├── postgres.env
+│   │       │   │   ├── redshift.env
+│   │       │   │   └── snowflake.env
+│   │       │   ├── .gitignore
+│   │       │   ├── macros
+│   │       │   │   ├── assert_equal_values.sql
+│   │       │   │   ├── .gitkeep
+│   │       │   │   ├── limit_zero.sql
+│   │       │   │   └── tests.sql
+│   │       │   ├── models
+│   │       │   │   ├── datetime
+│   │       │   │   │   ├── schema.yml
+│   │       │   │   │   └── test_date_spine.sql
+│   │       │   │   ├── generic_tests
+│   │       │   │   │   ├── recency_time_excluded.sql
+│   │       │   │   │   ├── recency_time_included.sql
+│   │       │   │   │   ├── schema.yml
+│   │       │   │   │   ├── test_equal_column_subset.sql
+│   │       │   │   │   ├── test_equal_rowcount.sql
+│   │       │   │   │   └── test_fewer_rows_than.sql
+│   │       │   │   ├── geo
+│   │       │   │   │   ├── schema.yml
+│   │       │   │   │   ├── test_haversine_distance_km.sql
+│   │       │   │   │   └── test_haversine_distance_mi.sql
+│   │       │   │   ├── sql
+│   │       │   │   │   ├── schema.yml
+│   │       │   │   │   ├── test_deduplicate.sql
+│   │       │   │   │   ├── test_generate_series.sql
+│   │       │   │   │   ├── test_generate_surrogate_key.sql
+│   │       │   │   │   ├── test_get_column_values.sql
+│   │       │   │   │   ├── test_get_column_values_where.sql
+│   │       │   │   │   ├── test_get_filtered_columns_in_relation.sql
+│   │       │   │   │   ├── test_get_relations_by_pattern.sql
+│   │       │   │   │   ├── test_get_relations_by_prefix_and_union.sql
+│   │       │   │   │   ├── test_get_single_value_default.sql
+│   │       │   │   │   ├── test_get_single_value.sql
+│   │       │   │   │   ├── test_groupby.sql
+│   │       │   │   │   ├── test_not_empty_string_failing.sql
+│   │       │   │   │   ├── test_not_empty_string_passing.sql
+│   │       │   │   │   ├── test_nullcheck_table.sql
+│   │       │   │   │   ├── test_pivot_apostrophe.sql
+│   │       │   │   │   ├── test_pivot.sql
+│   │       │   │   │   ├── test_safe_add.sql
+│   │       │   │   │   ├── test_safe_divide.sql
+│   │       │   │   │   ├── test_safe_subtract.sql
+│   │       │   │   │   ├── test_star_aggregate.sql
+│   │       │   │   │   ├── test_star_no_columns.sql
+│   │       │   │   │   ├── test_star_prefix_suffix.sql
+│   │       │   │   │   ├── test_star_quote_identifiers.sql
+│   │       │   │   │   ├── test_star.sql
+│   │       │   │   │   ├── test_star_uppercase.sql
+│   │       │   │   │   ├── test_union_base.sql
+│   │       │   │   │   ├── test_union_exclude_base_lowercase.sql
+│   │       │   │   │   ├── test_union_exclude_base_uppercase.sql
+│   │       │   │   │   ├── test_union_exclude_lowercase.sql
+│   │       │   │   │   ├── test_union_exclude_uppercase.sql
+│   │       │   │   │   ├── test_union_no_source_column.sql
+│   │       │   │   │   ├── test_union.sql
+│   │       │   │   │   ├── test_union_where_base.sql
+│   │       │   │   │   ├── test_union_where.sql
+│   │       │   │   │   ├── test_unpivot_bool.sql
+│   │       │   │   │   ├── test_unpivot.sql
+│   │       │   │   │   └── test_width_bucket.sql
+│   │       │   │   └── web
+│   │       │   │       ├── schema.yml
+│   │       │   │       ├── test_url_host.sql
+│   │       │   │       ├── test_url_path.sql
+│   │       │   │       └── test_urls.sql
+│   │       │   ├── packages.yml
+│   │       │   ├── README.md
+│   │       │   └── tests
+│   │       │       ├── assert_get_query_results_as_dict_objects_equal.sql
+│   │       │       ├── generic
+│   │       │       │   └── expect_table_columns_to_match_set.sql
+│   │       │       ├── jinja_helpers
+│   │       │       │   ├── assert_pretty_output_msg_is_string.sql
+│   │       │       │   ├── assert_pretty_time_is_string.sql
+│   │       │       │   └── test_slugify.sql
+│   │       │       └── sql
+│   │       │           ├── test_get_column_values_use_default.sql
+│   │       │           └── test_get_single_value_multiple_rows.sql
+│   │       ├── LICENSE
+│   │       ├── macros
+│   │       │   ├── generic_tests
+│   │       │   │   ├── accepted_range.sql
+│   │       │   │   ├── at_least_one.sql
+│   │       │   │   ├── cardinality_equality.sql
+│   │       │   │   ├── equality.sql
+│   │       │   │   ├── equal_rowcount.sql
+│   │       │   │   ├── expression_is_true.sql
+│   │       │   │   ├── fewer_rows_than.sql
+│   │       │   │   ├── mutually_exclusive_ranges.sql
+│   │       │   │   ├── not_accepted_values.sql
+│   │       │   │   ├── not_constant.sql
+│   │       │   │   ├── not_empty_string.sql
+│   │       │   │   ├── not_null_proportion.sql
+│   │       │   │   ├── recency.sql
+│   │       │   │   ├── relationships_where.sql
+│   │       │   │   ├── sequential_values.sql
+│   │       │   │   └── unique_combination_of_columns.sql
+│   │       │   ├── jinja_helpers
+│   │       │   │   ├── _is_ephemeral.sql
+│   │       │   │   ├── _is_relation.sql
+│   │       │   │   ├── log_info.sql
+│   │       │   │   ├── pretty_log_format.sql
+│   │       │   │   ├── pretty_time.sql
+│   │       │   │   └── slugify.sql
+│   │       │   ├── sql
+│   │       │   │   ├── date_spine.sql
+│   │       │   │   ├── deduplicate.sql
+│   │       │   │   ├── generate_series.sql
+│   │       │   │   ├── generate_surrogate_key.sql
+│   │       │   │   ├── get_column_values.sql
+│   │       │   │   ├── get_filtered_columns_in_relation.sql
+│   │       │   │   ├── get_query_results_as_dict.sql
+│   │       │   │   ├── get_relations_by_pattern.sql
+│   │       │   │   ├── get_relations_by_prefix.sql
+│   │       │   │   ├── get_single_value.sql
+│   │       │   │   ├── get_tables_by_pattern_sql.sql
+│   │       │   │   ├── get_tables_by_prefix_sql.sql
+│   │       │   │   ├── get_table_types_sql.sql
+│   │       │   │   ├── groupby.sql
+│   │       │   │   ├── haversine_distance.sql
+│   │       │   │   ├── nullcheck.sql
+│   │       │   │   ├── nullcheck_table.sql
+│   │       │   │   ├── pivot.sql
+│   │       │   │   ├── safe_add.sql
+│   │       │   │   ├── safe_divide.sql
+│   │       │   │   ├── safe_subtract.sql
+│   │       │   │   ├── star.sql
+│   │       │   │   ├── surrogate_key.sql
+│   │       │   │   ├── union.sql
+│   │       │   │   ├── unpivot.sql
+│   │       │   │   └── width_bucket.sql
+│   │       │   └── web
+│   │       │       ├── get_url_host.sql
+│   │       │       ├── get_url_parameter.sql
+│   │       │       └── get_url_path.sql
+│   │       ├── Makefile
+│   │       ├── pytest.ini
+│   │       ├── README.md
+│   │       ├── RELEASE.md
+│   │       ├── run_functional_test.sh
+│   │       ├── run_test.sh
+│   │       └── tests
+│   │           ├── conftest.py
+│   │           └── __init__.py
+│   ├── dbt_project.yml
+│   ├── macros
+│   │   └── generate_schema_name.sql
+│   ├── models
+│   │   ├── core
+│   │   │   ├── klaviyo
+│   │   │   │   ├── email_clicked.sql
+│   │   │   │   ├── email_open.sql
+│   │   │   │   ├── klaviyo_campaigns.sql
+│   │   │   │   ├── received_email.sql
+│   │   │   │   └── schema.yml
+│   │   │   └── shopify
+│   │   │       ├── schema.yml
+│   │   │       ├── shopify_discounts.sql
+│   │   │       ├── shopify_order_lines.sql
+│   │   │       ├── shopify_orders.sql
+│   │   │       ├── shopify_products.sql
+│   │   │       ├── shopify_product_tags.sql
+│   │   │       ├── shopify_tax_lines.sql
+│   │   │       └── shopify_variants.sql
+│   │   ├── mart
+│   │   │   ├── campaign_performance.sql
+│   │   │   ├── schema.yml
+│   │   │   ├── shopify_product_performance.sql
+│   │   │   ├── shopify_sales_breakdown.sql
+│   │   │   └── shopify_tag_performance.sql
+│   │   └── sources.yml
+│   ├── package-lock.yml
+│   ├── packages.yml
+│   ├── profiles.yml
+│   ├── target
+│   │   ├── compiled
+│   │   │   └── lotus
+│   │   │       ├── dbt_project.yml
+│   │   │       │   └── hooks
+│   │   │       │       ├── lotus-on-run-start-0.sql
+│   │   │       │       └── lotus-on-run-start-1.sql
+│   │   │       └── models
+│   │   │           ├── core
+│   │   │           │   ├── klaviyo
+│   │   │           │   │   ├── email_clicked.sql
+│   │   │           │   │   ├── email_open.sql
+│   │   │           │   │   ├── klaviyo_campaigns.sql
+│   │   │           │   │   └── received_email.sql
+│   │   │           │   └── shopify
+│   │   │           │       ├── shopify_discounts.sql
+│   │   │           │       ├── shopify_order_lines.sql
+│   │   │           │       ├── shopify_orders.sql
+│   │   │           │       ├── shopify_products.sql
+│   │   │           │       ├── shopify_product_tags.sql
+│   │   │           │       ├── shopify_tax_lines.sql
+│   │   │           │       └── shopify_variants.sql
+│   │   │           └── mart
+│   │   │               ├── campaign_performance.sql
+│   │   │               ├── shopify_product_performance.sql
+│   │   │               ├── shopify_sales_breakdown.sql
+│   │   │               └── shopify_tag_performance.sql
+│   │   ├── graph.gpickle
+│   │   ├── graph_summary.json
+│   │   ├── manifest.json
+│   │   ├── partial_parse.msgpack
+│   │   ├── run_results.json
+│   │   └── semantic_manifest.json
+│   ├── target_klaviyo_campaign
+│   │   ├── compiled
+│   │   │   └── lotus
+│   │   │       ├── dbt_project.yml
+│   │   │       │   └── hooks
+│   │   │       │       ├── lotus-on-run-start-0.sql
+│   │   │       │       └── lotus-on-run-start-1.sql
+│   │   │       └── models
+│   │   │           └── core
+│   │   │               └── klaviyo
+│   │   │                   └── klaviyo_campaigns.sql
+│   │   ├── graph.gpickle
+│   │   ├── graph_summary.json
+│   │   ├── manifest.json
+│   │   ├── partial_parse.msgpack
+│   │   ├── run_results.json
+│   │   └── semantic_manifest.json
+│   ├── target_klaviyo_campaign_performance_mart
+│   │   ├── compiled
+│   │   │   └── lotus
+│   │   │       ├── dbt_project.yml
+│   │   │       │   └── hooks
+│   │   │       │       ├── lotus-on-run-start-0.sql
+│   │   │       │       └── lotus-on-run-start-1.sql
+│   │   │       └── models
+│   │   │           └── mart
+│   │   │               └── campaign_performance.sql
+│   │   ├── graph.gpickle
+│   │   ├── graph_summary.json
+│   │   ├── manifest.json
+│   │   ├── partial_parse.msgpack
+│   │   ├── run_results.json
+│   │   └── semantic_manifest.json
+│   ├── target_klaviyo_email_clicked
+│   │   ├── compiled
+│   │   │   └── lotus
+│   │   │       ├── dbt_project.yml
+│   │   │       │   └── hooks
+│   │   │       │       ├── lotus-on-run-start-0.sql
+│   │   │       │       └── lotus-on-run-start-1.sql
+│   │   │       └── models
+│   │   │           └── core
+│   │   │               └── klaviyo
+│   │   │                   └── email_clicked.sql
+│   │   ├── graph.gpickle
+│   │   ├── graph_summary.json
+│   │   ├── manifest.json
+│   │   ├── partial_parse.msgpack
+│   │   ├── run_results.json
+│   │   └── semantic_manifest.json
+│   ├── target_klaviyo_email_open
+│   │   ├── compiled
+│   │   │   └── lotus
+│   │   │       ├── dbt_project.yml
+│   │   │       │   └── hooks
+│   │   │       │       ├── lotus-on-run-start-0.sql
+│   │   │       │       └── lotus-on-run-start-1.sql
+│   │   │       └── models
+│   │   │           └── core
+│   │   │               └── klaviyo
+│   │   │                   └── email_open.sql
+│   │   ├── graph.gpickle
+│   │   ├── graph_summary.json
+│   │   ├── manifest.json
+│   │   ├── partial_parse.msgpack
+│   │   ├── run_results.json
+│   │   └── semantic_manifest.json
+│   ├── target_klaviyo_received_email
+│   │   ├── compiled
+│   │   │   └── lotus
+│   │   │       ├── dbt_project.yml
+│   │   │       │   └── hooks
+│   │   │       │       ├── lotus-on-run-start-0.sql
+│   │   │       │       └── lotus-on-run-start-1.sql
+│   │   │       └── models
+│   │   │           └── core
+│   │   │               └── klaviyo
+│   │   │                   └── received_email.sql
+│   │   ├── graph.gpickle
+│   │   ├── graph_summary.json
+│   │   ├── manifest.json
+│   │   ├── partial_parse.msgpack
+│   │   ├── run_results.json
+│   │   └── semantic_manifest.json
+│   ├── target_shopify_orders
+│   │   ├── compiled
+│   │   │   └── lotus
+│   │   │       ├── dbt_project.yml
+│   │   │       │   └── hooks
+│   │   │       │       ├── lotus-on-run-start-0.sql
+│   │   │       │       └── lotus-on-run-start-1.sql
+│   │   │       └── models
+│   │   │           └── core
+│   │   │               └── shopify
+│   │   │                   ├── shopify_discounts.sql
+│   │   │                   ├── shopify_order_lines.sql
+│   │   │                   ├── shopify_orders.sql
+│   │   │                   └── shopify_tax_lines.sql
+│   │   ├── graph.gpickle
+│   │   ├── graph_summary.json
+│   │   ├── manifest.json
+│   │   ├── partial_parse.msgpack
+│   │   ├── run_results.json
+│   │   └── semantic_manifest.json
+│   ├── target_shopify_orders_mart
+│   │   ├── compiled
+│   │   │   └── lotus
+│   │   │       ├── dbt_project.yml
+│   │   │       │   └── hooks
+│   │   │       │       ├── lotus-on-run-start-0.sql
+│   │   │       │       └── lotus-on-run-start-1.sql
+│   │   │       └── models
+│   │   │           └── mart
+│   │   │               └── shopify_sales_breakdown.sql
+│   │   ├── graph.gpickle
+│   │   ├── graph_summary.json
+│   │   ├── manifest.json
+│   │   ├── partial_parse.msgpack
+│   │   ├── run_results.json
+│   │   └── semantic_manifest.json
+│   ├── target_shopify_product_performance_mart
+│   │   ├── compiled
+│   │   │   └── lotus
+│   │   │       ├── dbt_project.yml
+│   │   │       │   └── hooks
+│   │   │       │       ├── lotus-on-run-start-0.sql
+│   │   │       │       └── lotus-on-run-start-1.sql
+│   │   │       └── models
+│   │   │           └── mart
+│   │   │               └── shopify_product_performance.sql
+│   │   ├── graph.gpickle
+│   │   ├── graph_summary.json
+│   │   ├── manifest.json
+│   │   ├── partial_parse.msgpack
+│   │   ├── run_results.json
+│   │   └── semantic_manifest.json
+│   ├── target_shopify_products
+│   │   ├── compiled
+│   │   │   └── lotus
+│   │   │       ├── dbt_project.yml
+│   │   │       │   └── hooks
+│   │   │       │       ├── lotus-on-run-start-0.sql
+│   │   │       │       └── lotus-on-run-start-1.sql
+│   │   │       └── models
+│   │   │           └── core
+│   │   │               └── shopify
+│   │   │                   ├── shopify_products.sql
+│   │   │                   ├── shopify_product_tags.sql
+│   │   │                   └── shopify_variants.sql
+│   │   ├── graph.gpickle
+│   │   ├── graph_summary.json
+│   │   ├── manifest.json
+│   │   ├── partial_parse.msgpack
+│   │   ├── run_results.json
+│   │   └── semantic_manifest.json
+│   ├── target_shopify_tag_performance_mart
+│   │   ├── compiled
+│   │   │   └── lotus
+│   │   │       ├── dbt_project.yml
+│   │   │       │   └── hooks
+│   │   │       │       ├── lotus-on-run-start-0.sql
+│   │   │       │       └── lotus-on-run-start-1.sql
+│   │   │       └── models
+│   │   │           └── mart
+│   │   │               └── shopify_tag_performance.sql
+│   │   ├── graph.gpickle
+│   │   ├── graph_summary.json
+│   │   ├── manifest.json
+│   │   ├── partial_parse.msgpack
+│   │   ├── run_results.json
+│   │   └── semantic_manifest.json
+│   └── .user.yml
+├── .gitignore
+├── infra
+│   ├── Caddyfile
+│   ├── dagster.yaml
+│   ├── docker-compose.yml
+│   ├── .env
+│   ├── .env.example
+│   ├── ingestion_state.sql
+│   ├── spark-defaults.conf
+│   └── trino-catalog.properties
+├── Makefile
+├── orchestration
+│   ├── Dockerfile.orchestration
+│   ├── __init__.py
+│   ├── lotus_dagster
+│   │   ├── assets
+│   │   │   ├── ingest
+│   │   │   │   ├── factories
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── make_extractor.py
+│   │   │   │   │   ├── make_flow.py
+│   │   │   │   │   ├── make_get_last_sync.py
+│   │   │   │   │   ├── make_iceberg_loader.py
+│   │   │   │   │   ├── make_s3_loader.py
+│   │   │   │   │   └── make_update_last_sync.py
+│   │   │   │   ├── klaviyo
+│   │   │   │   │   ├── campaigns.py
+│   │   │   │   │   ├── email_clicked.py
+│   │   │   │   │   ├── email_open.py
+│   │   │   │   │   ├── received_email.py
+│   │   │   │   │   └── test_klaviyo
+│   │   │   │   │       ├── test_campaigns.py
+│   │   │   │   │       ├── test_email_clicked.py
+│   │   │   │   │       ├── test_opened_email_events.py
+│   │   │   │   │       ├── test_output
+│   │   │   │   │       │   ├── campaigns.csv
+│   │   │   │   │       │   ├── campaigns_raw.json
+│   │   │   │   │       │   ├── email_clicked.csv
+│   │   │   │   │       │   ├── email_clicked_raw.json
+│   │   │   │   │       │   ├── purchase_events.csv
+│   │   │   │   │       │   ├── purchase_events_raw.json
+│   │   │   │   │       │   ├── received_email.csv
+│   │   │   │   │       │   ├── received_email_events.csv
+│   │   │   │   │       │   └── received_email_raw.json
+│   │   │   │   │       └── test_received_email.py
+│   │   │   │   └── shopify
+│   │   │   │       ├── orders.py
+│   │   │   │       ├── products.py
+│   │   │   │       └── test_shopify
+│   │   │   │           ├── shopify_products_output.json
+│   │   │   │           └── test_products.py
+│   │   │   └── model
+│   │   │       ├── dbt_assets.py
+│   │   │       └── __init__.py
+│   │   ├── definitions.py
+│   │   ├── __init__.py
+│   │   ├── jobs.py
+│   │   ├── resources
+│   │   │   ├── connectors
+│   │   │   │   ├── klaviyo_resource.py
+│   │   │   │   └── shop_resource.py
+│   │   │   ├── last_sync
+│   │   │   │   ├── last_sync.py
+│   │   │   │   └── postgres_resource.py
+│   │   │   └── load
+│   │   │       ├── iceberg_loader.py
+│   │   │       ├── load_s3.py
+│   │   │       ├── schema_converters.py
+│   │   │       └── test_load.py
+│   │   └── schedules.py
+│   └── requirements.txt
+├── README.md
+├── requirements.txt
+├── shared
+│   ├── config.py
+│   └── __init__.py
+├── spark
+│   ├── Dockerfile.spark-base
+│   ├── Dockerfile.spark-master
+│   ├── Dockerfile.spark-worker
+│   └── jobs
+│       ├── run-append.py
+│       └── run-init.sh
+├── sql
+│   ├── raw_email_clicked.sql
+│   ├── raw_email_open.sql
+│   ├── raw_klaviyo_campaign.sql
+│   ├── raw_received_email.sql
+│   ├── raw_shopify_orders.sql
+│   └── raw_shopify_products.sql
+├── tests
+│   └── test_connections.py
+└── workspace.yaml
+
+157 directories, 448 files

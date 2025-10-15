@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: klaviyo_email_open
+    description: "Deduplicated Klaviyo email open events"
+    columns:
+      - name: event_id
+        tests:
+          - not_null
+          - unique
+      - name: email
+        tests:
+          - not_null
+      - name: event_datetime
+        tests:
+          - not_null
+
+  - name: klaviyo_campaigns
+    description: "Deduplicated Klaviyo campaign metadata"
+    columns:
+      - name: campaign_id
+        tests:
+          - not_null
+          - unique
+      - name: campaign_name
+        tests:
+          - not_null
+      - name: updated_at
+        tests:
+          - not_null

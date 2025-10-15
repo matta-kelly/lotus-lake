@@ -1,0 +1,79 @@
+version: 2
+
+models:
+  - name: shopify_sales_breakdown
+    description: "Aggregated Shopify sales metrics by time period, built from cleaned order and discount data."
+    columns:
+      - name: hour
+        description: "Hour-level aggregation timestamp"
+        meta:
+          dimension: { type: timestamp }
+
+      - name: day
+        description: "Date of the order"
+        meta:
+          dimension: { type: date }
+
+      - name: week
+        description: "Week-level aggregation date"
+        meta:
+          dimension: { type: date }
+
+      - name: month
+        description: "Month-level aggregation date"
+        meta:
+          dimension: { type: date }
+
+      - name: year
+        description: "Year-level aggregation date"
+        meta:
+          dimension: { type: date }
+
+      - name: gross_sales
+        description: "Total gross sales (before discounts)"
+        meta:
+          dimension: { type: number }
+          metrics:
+            total_gross_sales: { type: sum }
+
+      - name: discounts
+        description: "Total discounts applied across all orders"
+        meta:
+          dimension: { type: number }
+          metrics:
+            total_discounts: { type: sum }
+
+      - name: net_sales
+        description: "Gross sales minus discounts"
+        meta:
+          dimension: { type: number }
+          metrics:
+            total_net_sales: { type: sum }
+
+      - name: shipping_charges
+        description: "Total shipping fees"
+        meta:
+          dimension: { type: number }
+          metrics:
+            total_shipping: { type: sum }
+
+      - name: taxes
+        description: "Total taxes collected"
+        meta:
+          dimension: { type: number }
+          metrics:
+            total_taxes: { type: sum }
+
+      - name: total_sales
+        description: "Final total including tax and shipping"
+        meta:
+          dimension: { type: number }
+          metrics:
+            total_sales: { type: sum }
+
+      - name: order_count
+        description: "Number of unique orders"
+        meta:
+          dimension: { type: number }
+          metrics:
+            total_orders: { type: sum }

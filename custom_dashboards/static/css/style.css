@@ -1,0 +1,10 @@
+body { font-family: Arial, sans-serif; margin: 0; display: flex; }
+.sidebar {
+  width: 200px; background: #1e1e2f; color: white; height: 100vh; padding: 1rem;
+}
+.sidebar a {
+  color: #cfd2da; text-decoration: none; display: block; margin: 0.5rem 0;
+}
+.sidebar a:hover { color: #fff; }
+.content { padding: 2rem; flex: 1; }
+h1 { color: #333; }

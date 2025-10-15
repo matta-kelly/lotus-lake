@@ -1,0 +1,44 @@
+FROM python:3.11-slim-bookworm
+
+ENV PYTHONUNBUFFERED=1 \
+    DAGSTER_HOME=/opt/dagster/dagster_home
+
+WORKDIR /opt/dagster/app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY orchestration/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install Java + pyspark
+RUN apt-get update && \
+    apt-get install -y openjdk-17-jre-headless && \
+    pip install pyspark==3.4.2 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Download S3 + ICEBERG JARs
+RUN curl -fsSL -o /usr/local/lib/python3.11/site-packages/pyspark/jars/hadoop-aws-3.3.4.jar \
+      https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar && \
+    curl -fsSL -o /usr/local/lib/python3.11/site-packages/pyspark/jars/aws-java-sdk-bundle-1.12.262.jar \
+      https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.262/aws-java-sdk-bundle-1.12.262.jar && \
+    curl -fsSL -o /usr/local/lib/python3.11/site-packages/pyspark/jars/iceberg-spark-runtime-3.4_2.12-1.5.2.jar \
+      https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-spark-runtime-3.4_2.12/1.5.2/iceberg-spark-runtime-3.4_2.12-1.5.2.jar
+
+COPY spark/jobs/run-append.py /opt/spark/jobs/run-append.py
+COPY orchestration/lotus_dagster ./orchestration/lotus_dagster
+COPY orchestration/__init__.py ./orchestration/__init__.py
+COPY shared ./shared
+COPY dbt ./dbt
+COPY workspace.yaml ./workspace.yaml
+
+# Install dbt packages and compile manifest in container
+RUN cd dbt && dbt deps
+
+RUN mkdir -p /opt/dagster/dagster_home
+
+EXPOSE 3000
+
+CMD ["dagster-webserver", "-h", "0.0.0.0", "-p", "3000", "-w", "/opt/dagster/app/workspace.yaml"]

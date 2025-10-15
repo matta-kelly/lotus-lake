@@ -1,0 +1,13 @@
+lotus:
+  target: dev
+  outputs:
+    dev:
+      type: trino
+      method: none
+      user: dagster
+      catalog: iceberg      # For dbt-trino
+      host: trino
+      port: 8080
+      schema: core
+      threads: 4
+      http_scheme: http

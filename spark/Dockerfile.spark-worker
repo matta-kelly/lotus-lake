@@ -1,0 +1,13 @@
+FROM lotus-spark-base:latest
+
+ENV SPARK_MODE=worker \
+    SPARK_MASTER_URL=spark://spark-master:7077 \
+    SPARK_WORKER_CORES=2 \
+    SPARK_WORKER_MEMORY=2G \
+    SPARK_WORKER_PORT=7078 \
+    SPARK_WORKER_WEBUI_PORT=8081
+
+EXPOSE 8081
+
+CMD ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", \
+     "spark://spark-master:7077", "--webui-port", "8081"]

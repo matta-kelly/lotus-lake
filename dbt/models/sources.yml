@@ -1,0 +1,32 @@
+version: 2
+
+sources:
+  - name: shopify
+    description: "Shopify raw data ingested from GraphQL API"
+    database: iceberg
+    schema: shopify
+    freshness:
+      warn_after: {count: 2, period: day}
+      error_after: {count: 3, period: day}
+    tables:
+      - name: orders_raw
+        description: "Raw Shopify order data including nested customer and line-item details"
+      - name: products_raw
+        description: "Raw Shopify product, variant, and tag data ingested from the unified GraphQL extraction flow"
+
+  - name: klaviyo
+    description: "Klaviyo data sources (email opens, campaigns, etc.)"
+    database: iceberg
+    schema: klaviyo
+    freshness:
+      warn_after: {count: 2, period: day}
+      error_after: {count: 3, period: day}
+    tables:
+      - name: email_open_raw
+        description: "Raw Klaviyo email open events ingested from API"
+      - name: campaign_raw
+        description: "Raw Klaviyo campaign metadata ingested from API"
+      - name: received_email_raw 
+        description: "Raw Klaviyo received email (send) events ingested from API"
+      - name: email_clicked_raw
+        description: "Raw Klaviyo email click events ingested from API"

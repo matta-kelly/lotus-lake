@@ -1,0 +1,55 @@
+# dagster.yaml
+run_coordinator:
+  module: dagster.core.run_coordinator
+  class: QueuedRunCoordinator
+  config:
+    max_concurrent_runs: 5
+    tag_concurrency_limits:
+      - key: "dbt_layer"
+        value: "core"
+        limit: 4  # Only 1 core dbt job at a time
+      - key: "dbt_layer"
+        value: "mart"
+        limit: 3  # Only 1 mart dbt job at a time
+
+run_storage:
+  module: dagster_postgres.run_storage
+  class: PostgresRunStorage
+  config:
+    postgres_db:
+      hostname: ingestion-state-db
+      username:
+        env: DB_USER_PROD
+      password:
+        env: DB_PASSWORD_PROD
+      db_name:
+        env: DB_NAME_PROD
+      port: 5432
+
+event_log_storage:
+  module: dagster_postgres.event_log
+  class: PostgresEventLogStorage
+  config:
+    postgres_db:
+      hostname: ingestion-state-db
+      username:
+        env: DB_USER_PROD
+      password:
+        env: DB_PASSWORD_PROD
+      db_name:
+        env: DB_NAME_PROD
+      port: 5432
+
+schedule_storage:
+  module: dagster_postgres.schedule_storage
+  class: PostgresScheduleStorage
+  config:
+    postgres_db:
+      hostname: ingestion-state-db
+      username:
+        env: DB_USER_PROD
+      password:
+        env: DB_PASSWORD_PROD
+      db_name:
+        env: DB_NAME_PROD
+      port: 5432

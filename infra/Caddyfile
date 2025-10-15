@@ -1,0 +1,55 @@
+# Global configuration
+{
+    email matthew.kelly@lotusandluna.com
+    acme_ca https://acme-v02.api.letsencrypt.org/directory
+}
+
+customdash.localhost {
+    reverse_proxy custom-dashboards:5000
+}
+
+# -----------------------------
+# Dagster
+# -----------------------------
+dagster.localhost {
+    reverse_proxy lotus-dagster:3000
+}
+
+# -----------------------------
+# Superset
+# -----------------------------
+#superset.localhost {
+#    reverse_proxy lotus-superset:8088
+#}
+
+# -----------------------------
+# Trino (optional, admin only)
+# -----------------------------
+trino.localhost {
+    reverse_proxy lotus-trino:8080
+}
+
+# -----------------------------
+# Spark UIs (optional)
+# -----------------------------
+spark-master.localhost {
+    reverse_proxy lotus-spark-master:8080
+}
+
+spark-worker.localhost {
+    reverse_proxy lotus-spark-worker:8081
+}
+
+# -----------------------------
+# Nessie Catalog (optional)
+# -----------------------------
+nessie.localhost {
+    reverse_proxy lotus-nessie:19120
+}
+
+# -----------------------------
+# MinIO Console (optional)
+# -----------------------------
+minio.localhost {
+    reverse_proxy lotus-datalake-storage:9001
+}
