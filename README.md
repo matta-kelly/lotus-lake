@@ -1,3 +1,3 @@
-# Lotus & Luna Data Platform
+# Lotus Lakehouse
 
 More to come

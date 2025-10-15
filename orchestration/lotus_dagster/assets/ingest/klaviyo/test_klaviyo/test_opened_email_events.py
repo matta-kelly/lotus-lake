@@ -12,24 +12,31 @@ from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 
-# --- Path Setup & Project-Specific Imports ---
-# This block adds the project's root directory to Python's path,
-# allowing us to use absolute imports for our project's modules.
-# This must come before we try to import any project files.
+
+
+
+# --------------------------------------------------------------------
+# Import Project Dependencies
+# --------------------------------------------------------------------
 try:
-    # Navigate up from the current file to the project root ('db3')
-    project_root = Path(__file__).resolve().parent.parent.parent.parent.parent.parent
+    # Compute project root dynamically (top-level "db3" directory)
+    project_root = Path(__file__).resolve()
+    # Step up 7 levels from this file to reach "db3/"
+    for _ in range(7):
+        project_root = project_root.parent
+
     if str(project_root) not in sys.path:
         sys.path.append(str(project_root))
-    
-    # Now, use absolute imports starting from the project root
+
+    # Now imports will resolve correctly from project root
     from orchestration.lotus_dagster.assets.ingest.klaviyo.email_open import extract_email_open_query_fn
     from orchestration.lotus_dagster.resources.connectors.klaviyo_resource import KlaviyoClient
 
+
 except ImportError as e:
-    print(f"❌ ERROR: Failed to import project modules. \n"
-          f"Please ensure you run this script as a module from your project's root directory (`db3`). \n"
-          f"Example: python -m orchestration.lotus_dagster.assets.ingest.klaviyo.test_purchase_events\n"
+    print(f"❌ ERROR: Failed to import project modules.\n"
+          f"Please run from project root: "
+          f"`python -m orchestration.lotus_dagster.assets.ingest.klaviyo.test_klaviyo.test_campaigns`\n"
           f"Details: {e}")
     sys.exit(1)
 
@@ -78,14 +85,14 @@ def main():
             output_dir.mkdir(exist_ok=True)
 
             # Save raw JSON
-            json_path = output_dir / "purchase_events_raw.json"
+            json_path = output_dir / "open_events_raw.json"
             with open(json_path, "w") as f:
                 json.dump(result['records'], f, indent=2, default=str)
             logging.info(f"Saved raw JSON to: {json_path}")
 
             # Save flattened CSV
             df = pd.json_normalize(result['records'])
-            csv_path = output_dir / "purchase_events.csv"
+            csv_path = output_dir / "open_events.csv"
             df.to_csv(csv_path, index=False)
             logging.info(f"Saved all {len(df)} events to: {csv_path}")
             

@@ -15,7 +15,7 @@ NAMESPACE = "klaviyo"
 TABLE = "email_clicked"
 UPDATED_FIELD = "datetime"
 MAX_PAGES_PER_RUN = 20
-DEFAULT_TIME_WINDOW_HOURS = 24
+DEFAULT_TIME_WINDOW_HOURS = 120
 
 METRIC_ID_EMAIL_CLICKED = "TteUhh"
 
@@ -43,6 +43,7 @@ EMAIL_CLICKED_SCHEMA = pa.schema([
 FIELD_CONVERTERS = {
     'datetime': schema_converters.convert_timestamp,
     'timestamp_utc': schema_converters.convert_timestamp,
+    '_load_timestamp': schema_converters.convert_timestamp,
 }
 
 
@@ -59,7 +60,8 @@ def build_email_clicked_assets():
 # --------------------------------------------------------------------
 def extract_email_clicked_query_fn(client, last_sync: datetime) -> Dict:
     """
-    Extracts 'Email Clicked' events from Klaviyo within a specific time window.
+    Extracts 'Email Clicked' events from Klaviyo within a specific time window,
+    following pagination links until exhaustion or MAX_PAGES_PER_RUN.
     """
     all_events = []
     page_count = 0
@@ -71,56 +73,73 @@ def extract_email_clicked_query_fn(client, last_sync: datetime) -> Dict:
 
     logger.info(f"Extracting Klaviyo EMAIL CLICKED events from {start_iso} to {end_iso}")
 
-    # Using the original, correct filter syntax.
+    # Using the correct Klaviyo filter syntax with metric_id
     combined_filter = (
+        f"and("
         f"equals(metric_id,'{METRIC_ID_EMAIL_CLICKED}'),"
         f"greater-than(datetime,{start_iso}),"
         f"less-than(datetime,{end_iso})"
+        f")"
     )
 
     params = {"filter": combined_filter, "sort": "datetime"}
 
     def flatten_event(event: Dict) -> Dict:
         """
-        Flattens the nested API response, preserving the raw timestamp string
-        by using the correct 'datetime_' field name from the SDK.
+        Flattens the nested API response, preserving the raw timestamp string.
+        Conversion is handled later via FIELD_CONVERTERS.
         """
         data = event.get("attributes", {}) or {}
         relationships = event.get("relationships", {}) or {}
         event_props = data.get("event_properties", {}) or {}
         profile_data = relationships.get("profile", {}).get("data", {}) or {}
 
-        # The raw ISO string from the API, accessed with the correct field name.
-        # Conversion is handled by the loader via FIELD_CONVERTERS.
-        event_datetime_str = data.get("datetime_")
+        # Handle both datetime and datetime_ for compatibility
+        event_datetime_str = data.get("datetime") or data.get("datetime_")
 
         return {
             "event_id": event.get("id"),
-            "timestamp_utc": event_datetime_str, # Pass raw string
+            "timestamp_utc": event_datetime_str,  # raw string
             "profile_id": profile_data.get("id"),
             "email": event_props.get("Recipient Email Address"),
             "campaign_id": event_props.get("$campaign"),
             "message_id": event_props.get("$message"),
-            "_load_timestamp": datetime.utcnow().replace(tzinfo=timezone.utc),
-            "datetime": event_datetime_str, # Pass raw string
+            "_load_timestamp": datetime.utcnow().replace(tzinfo=timezone.utc).isoformat(),
+            "datetime": event_datetime_str,  # raw string
         }
 
     try:
+        # Fetch first page
         response = client.get_events(**params)
         page_count += 1
 
         if hasattr(response, "data") and response.data:
             for e in response.data:
-                all_events.append(flatten_event(e.dict()))
+                record = e if isinstance(e, dict) else e.dict()
+                all_events.append(flatten_event(record))
             logger.info(f"Page {page_count}: Fetched {len(response.data)} events")
 
+        # Proper pagination loop
         while (
             hasattr(response, "links")
             and getattr(response.links, "next", None)
             and page_count < MAX_PAGES_PER_RUN
         ):
-            # The Klaviyo SDK handles pagination internally, but this is a safeguard.
-            break
+            next_url = response.links.next
+            if not next_url:
+                break
+
+            response = client.get_events(page_cursor=next_url)
+            page_count += 1
+
+            if hasattr(response, "data") and response.data:
+                for e in response.data:
+                    record = e if isinstance(e, dict) else e.dict()
+                    all_events.append(flatten_event(record))
+                logger.info(f"Page {page_count}: Fetched {len(response.data)} events")
+            else:
+                logger.info(f"Page {page_count}: No data returned, stopping pagination.")
+                break
 
     except Exception as e:
         logger.error(f"Failed to fetch Klaviyo email clicked events: {e}")
@@ -133,7 +152,6 @@ def extract_email_clicked_query_fn(client, last_sync: datetime) -> Dict:
     logger.info(f"  - Time window: {start_iso} to {end_iso}")
     logger.info(f"  - Time elapsed: {elapsed:.2f}s")
 
-    # Return the full payload for the S3 loader
     return {
         "records": all_events,
         "row_count": len(all_events),
