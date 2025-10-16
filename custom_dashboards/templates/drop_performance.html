@@ -1,5 +1,52 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Drop Performance</h1>
-<p>This page will eventually show your custom product performance metrics.</p>
+<div class="container">
+  <h1>Drop Performance Dashboard</h1>
+  <label for="tagFilter">Filter by Product Tag:</label>
+  <select id="tagFilter" class="form-select">
+    <option value="">-- Select a tag --</option>
+    {% for tag in tags %}
+    <option value="{{ tag }}">{{ tag }}</option>
+    {% endfor %}
+  </select>
+
+  <table id="resultsTable" class="table table-striped mt-3" style="display:none;">
+    <thead>
+      <tr>
+        <th>Product ID</th>
+        <th>Name</th>
+        <th>Units Sold</th>
+        <th>Revenue</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+document.getElementById("tagFilter").addEventListener("change", async (e) => {
+  const tag = e.target.value;
+  const table = document.getElementById("resultsTable");
+  const tbody = table.querySelector("tbody");
+  tbody.innerHTML = "";
+
+  if (!tag) { table.style.display = "none"; return; }
+
+  const res = await fetch(`/api/drop-performance?tag=${encodeURIComponent(tag)}`);
+  const data = await res.json();
+
+  data.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${row.product_id}</td>
+      <td>${row.product_name}</td>
+      <td>${row.units_sold}</td>
+      <td>${row.revenue.toLocaleString()}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  table.style.display = "table";
+});
+</script>
 {% endblock %}

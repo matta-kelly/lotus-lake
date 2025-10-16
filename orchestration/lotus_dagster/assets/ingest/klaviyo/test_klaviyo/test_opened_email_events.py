@@ -67,7 +67,7 @@ def main():
     
     # --- Set Parameters and Run ---
     # Simulate a run asking for data from the last 24 hours.
-    last_sync_time = datetime.now(timezone.utc) - timedelta(hours=24)
+    last_sync_time = datetime(2025, 10, 1, 14, 0, 0, tzinfo=timezone.utc)
     
     logging.info(f"🚀 Starting test extraction for data since: {last_sync_time.strftime('%Y-%m-%d %H:%M:%S')} UTC")
     print("=" * 80)

@@ -63,6 +63,49 @@ class KlaviyoClient:
             logger.error(f"Failed to fetch campaigns from new API: {e}")
             raise
 
+    def get_campaign_messages(self, campaign_id: str, **params):
+        """
+        Fetch campaign messages for a specific campaign:
+        GET /api/campaigns/{campaign_id}/campaign-messages/
+        Supports pagination URLs.
+
+        Example:
+            client.get_campaign_messages("01HXYZ1234")
+        """
+        base_url = f"https://a.klaviyo.com/api/campaigns/{campaign_id}/campaign-messages/"
+        api_key = self.client.api_key
+        headers = {
+            "Authorization": f"Klaviyo-API-Key {api_key}",
+            "Accept": "application/json",
+            "revision": "2025-07-15",
+        }
+
+        try:
+            # Pagination handling
+            page_cursor = params.pop("page_cursor", None)
+            if page_cursor and page_cursor.startswith("http"):
+                url = page_cursor
+                response = requests.get(url, headers=headers, timeout=30)
+            else:
+                response = requests.get(base_url, headers=headers, params=params, timeout=30)
+
+            response.raise_for_status()
+            payload = response.json()
+
+            class _Shim:
+                def __init__(self, data):
+                    self.data = data.get("data", [])
+                    self.links = type("Links", (), data.get("links", {}))()
+
+            return _Shim(payload)
+
+        except Exception as e:
+            logger.error(f"Failed to fetch messages for campaign {campaign_id}: {e}")
+            raise
+
+
+    
+
 
 @resource(config_schema={"api_key": str})
 def klaviyo_client_resource(context: InitResourceContext) -> KlaviyoClient:

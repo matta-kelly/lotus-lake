@@ -6,52 +6,51 @@
 
 WITH received AS (
     SELECT
-        campaign_id,
+        message_id,
         DATE(event_datetime) AS date,
         COUNT(*) AS received_count
     FROM {{ ref('received_email') }}
     {% if is_incremental() %}
     WHERE DATE(event_datetime) > (SELECT MAX(date) FROM {{ this }})
     {% endif %}
-    GROUP BY campaign_id, DATE(event_datetime)
+    GROUP BY message_id, DATE(event_datetime)
 ),
 
 opens AS (
     SELECT
-        campaign_id,
+        message_id,
         DATE(event_datetime) AS date,
         COUNT(*) AS open_count
     FROM {{ ref('email_open') }}
     {% if is_incremental() %}
     WHERE DATE(event_datetime) > (SELECT MAX(date) FROM {{ this }})
     {% endif %}
-    GROUP BY campaign_id, DATE(event_datetime)
+    GROUP BY message_id, DATE(event_datetime)
 ),
 
 clicks AS (
     SELECT
-        campaign_id,
+        message_id,
         DATE(event_datetime) AS date,
         COUNT(*) AS click_count
     FROM {{ ref('email_clicked') }}
     {% if is_incremental() %}
     WHERE DATE(event_datetime) > (SELECT MAX(date) FROM {{ this }})
     {% endif %}
-    GROUP BY campaign_id, DATE(event_datetime)
+    GROUP BY message_id, DATE(event_datetime)
 ),
 
 all_dates AS (
-    -- Get all campaign-date combinations that exist
-    SELECT campaign_id, date FROM received
+    SELECT message_id, date FROM received
     UNION
-    SELECT campaign_id, date FROM opens
+    SELECT message_id, date FROM opens
     UNION
-    SELECT campaign_id, date FROM clicks
+    SELECT message_id, date FROM clicks
 ),
 
 aggregated AS (
     SELECT
-        ad.campaign_id,
+        ad.message_id,
         ad.date,
         COALESCE(r.received_count, 0) AS received_count,
         COALESCE(o.open_count, 0) AS open_count,
@@ -67,29 +66,37 @@ aggregated AS (
             ELSE 0 
         END AS click_rate
     FROM all_dates ad
-    LEFT JOIN received r ON ad.campaign_id = r.campaign_id AND ad.date = r.date
-    LEFT JOIN opens o ON ad.campaign_id = o.campaign_id AND ad.date = o.date
-    LEFT JOIN clicks cl ON ad.campaign_id = cl.campaign_id AND ad.date = cl.date
+    LEFT JOIN received r ON ad.message_id = r.message_id AND ad.date = r.date
+    LEFT JOIN opens o ON ad.message_id = o.message_id AND ad.date = o.date
+    LEFT JOIN clicks cl ON ad.message_id = cl.message_id AND ad.date = cl.date
 ),
 
-with_campaign_info AS (
+with_message_info AS (
     SELECT
         a.*,
-        c.campaign_name,
-        c.send_time
+        m.campaign_id,
+        m.subject,
+        m.preview_text,
+        m.from_email,
+        m.from_label,
+        m.send_time
     FROM aggregated a
-    LEFT JOIN {{ ref('klaviyo_campaigns') }} c
-        ON a.campaign_id = c.campaign_id
+    LEFT JOIN {{ ref('campaign_message') }} m
+        ON a.message_id = m.message_id
 )
 
 SELECT
+    message_id,
     campaign_id,
     date,
-    campaign_name,
+    subject,
+    preview_text,
+    from_email,
+    from_label,
     send_time,
     received_count,
     open_count,
     click_count,
     open_rate,
     click_rate
-FROM with_campaign_info
+FROM with_message_info

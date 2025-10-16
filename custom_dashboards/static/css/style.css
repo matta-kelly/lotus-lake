@@ -8,3 +8,11 @@ body { font-family: Arial, sans-serif; margin: 0; display: flex; }
 .sidebar a:hover { color: #fff; }
 .content { padding: 2rem; flex: 1; }
 h1 { color: #333; }
+
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+}
+h1 {
+  margin-bottom: 20px;
+}
