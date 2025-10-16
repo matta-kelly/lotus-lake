@@ -16,3 +16,42 @@ h1 { color: #333; }
 h1 {
   margin-bottom: 20px;
 }
+
+/* Reusable Data Table Styles */
+.data-table {
+  width: 100%;
+  border-collapse: collapse; /* Removes space between borders */
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Subtle shadow for depth */
+  border-radius: 8px;
+  overflow: hidden; /* Ensures border-radius is respected */
+}
+
+.data-table thead tr {
+  background-color: #1e1e2f; /* Dark header matching the sidebar */
+  color: #ffffff;
+  text-align: left;
+}
+
+.data-table th, .data-table td {
+  padding: 12px 15px; /* Adds comfortable spacing */
+}
+
+.data-table tbody tr {
+  border-bottom: 1px solid #dddddd; /* Clean horizontal lines */
+}
+
+.data-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3; /* Zebra striping for readability */
+}
+
+.data-table tbody tr:last-of-type {
+  border-bottom: 2px solid #1e1e2f;
+}
+
+/* Align numbers to the right for clarity */
+.data-table td:nth-child(2),
+.data-table td:nth-child(3) {
+  text-align: right;
+}

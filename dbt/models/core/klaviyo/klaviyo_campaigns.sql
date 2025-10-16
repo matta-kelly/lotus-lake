@@ -19,7 +19,9 @@ WITH deduped AS (
 SELECT
   id AS campaign_id,
   name AS campaign_name,
+  status AS campaign_status,
   send_time,
+  created_at,
   updated_at,
   _load_timestamp,
   ingestion_date

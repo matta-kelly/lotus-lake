@@ -21,7 +21,7 @@ SELECT
   profile_id,
   email,
   campaign_id,
-  message_id,
+  flow_id,
   timestamp_utc AS event_timestamp,
   datetime AS event_datetime,
   _load_timestamp,

@@ -14,7 +14,7 @@ from ....resources.load import schema_converters
 NAMESPACE = "klaviyo"
 TABLE = "email_clicked"
 UPDATED_FIELD = "datetime"
-MAX_PAGES_PER_RUN = 50
+MAX_PAGES_PER_RUN = 20
 DEFAULT_TIME_WINDOW_HOURS = 120
 
 METRIC_ID_EMAIL_CLICKED = "TteUhh"
@@ -30,8 +30,8 @@ EMAIL_CLICKED_SCHEMA = pa.schema([
     pa.field('timestamp_utc', pa.timestamp('us', tz='UTC')),
     pa.field('profile_id', pa.string()),
     pa.field('email', pa.string()),
-    pa.field('campaign_id', pa.string()),
-    pa.field('message_id', pa.string()),
+    pa.field('campaign_id', pa.string()),  # This will actually contain the campaign ID
+    pa.field('flow_id', pa.string()),       # For flow emails if present
     pa.field('_load_timestamp', pa.timestamp('us', tz='UTC')),
     pa.field('datetime', pa.timestamp('us', tz='UTC')),
     pa.field('ingestion_date', pa.string()),
@@ -46,7 +46,6 @@ FIELD_CONVERTERS = {
     '_load_timestamp': schema_converters.convert_timestamp,
 }
 
-
 # --------------------------------------------------------------------
 # Asset builder
 # --------------------------------------------------------------------
@@ -54,14 +53,13 @@ def build_email_clicked_assets():
     """Builds the asset pipeline for Klaviyo Email Clicked Events."""
     return make_flow_assets(NAMESPACE, TABLE, UPDATED_FIELD, extract_email_clicked_query_fn)
 
-
 # --------------------------------------------------------------------
 # Extraction function
 # --------------------------------------------------------------------
 def extract_email_clicked_query_fn(client, last_sync: datetime) -> Dict:
     """
-    Extracts 'Email Clicked' events from Klaviyo within a specific time window,
-    following pagination links until exhaustion or MAX_PAGES_PER_RUN.
+    Extracts 'Email Clicked' events from Klaviyo within a specific time window.
+    Note: Klaviyo's $message field contains the campaign_id for campaigns.
     """
     all_events = []
     page_count = 0
@@ -73,7 +71,6 @@ def extract_email_clicked_query_fn(client, last_sync: datetime) -> Dict:
 
     logger.info(f"Extracting Klaviyo EMAIL CLICKED events from {start_iso} to {end_iso}")
 
-    # Using the correct Klaviyo filter syntax with metric_id
     combined_filter = (
         f"and("
         f"equals(metric_id,'{METRIC_ID_EMAIL_CLICKED}'),"
@@ -86,26 +83,30 @@ def extract_email_clicked_query_fn(client, last_sync: datetime) -> Dict:
 
     def flatten_event(event: Dict) -> Dict:
         """
-        Flattens the nested API response, preserving the raw timestamp string.
-        Conversion is handled later via FIELD_CONVERTERS.
+        Flattens the nested API response.
+        IMPORTANT: Klaviyo's $message field contains campaign_id for campaigns.
         """
         data = event.get("attributes", {}) or {}
         relationships = event.get("relationships", {}) or {}
         event_props = data.get("event_properties", {}) or {}
         profile_data = relationships.get("profile", {}).get("data", {}) or {}
 
-        # Handle both datetime and datetime_ for compatibility
         event_datetime_str = data.get("datetime") or data.get("datetime_")
+        
+        # Klaviyo's $message contains the campaign_id for campaigns
+        # $flow contains flow ID for flow emails
+        campaign_or_flow_id = event_props.get("$message")
+        flow_id = event_props.get("$flow")
 
         return {
             "event_id": event.get("id"),
-            "timestamp_utc": event_datetime_str,  # raw string
+            "timestamp_utc": event_datetime_str,
             "profile_id": profile_data.get("id"),
             "email": event_props.get("Recipient Email Address"),
-            "campaign_id": event_props.get("$campaign"),
-            "message_id": event_props.get("$message"),
+            "campaign_id": campaign_or_flow_id,  # This is actually the campaign ID
+            "flow_id": flow_id,  # Store flow ID separately if present
             "_load_timestamp": datetime.utcnow().replace(tzinfo=timezone.utc).isoformat(),
-            "datetime": event_datetime_str,  # raw string
+            "datetime": event_datetime_str,
         }
 
     try:
@@ -119,7 +120,7 @@ def extract_email_clicked_query_fn(client, last_sync: datetime) -> Dict:
                 all_events.append(flatten_event(record))
             logger.info(f"Page {page_count}: Fetched {len(response.data)} events")
 
-        # Proper pagination loop
+        # Pagination loop
         while (
             hasattr(response, "links")
             and getattr(response.links, "next", None)

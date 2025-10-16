@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h1>Mart Table Sync Status</h1>
+
+  {% if error %}
+  <div
+    style="padding: 1rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: .25rem; color: #721c24; background-color: #f8d7da; border-color: #f5c6cb;">
+    <strong>Error:</strong> {{ error }}
+  </div>
+  {% endif %}
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Table Name</th>
+        <th>Last Sync Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in sync_data %}
+      <tr>
+        <td>{{ row[0] }}</td>
+        <td>{{ row[1].strftime('%Y-%m-%d') if row[1] else 'N/A' }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="2" style="text-align: center;">No data to display.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

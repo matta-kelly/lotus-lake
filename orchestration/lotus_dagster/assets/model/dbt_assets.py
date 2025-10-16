@@ -202,9 +202,9 @@ def klaviyo_campaign_core_dbt_models(context: AssetExecutionContext, iceberg_res
     claimed_parent_count = iceberg_result["row_count"]
     context.log.info(f"Validated input: {claimed_parent_count} Klaviyo campaign records from Iceberg")
 
-    # Run both the campaigns model AND the campaign_message model
+    # Run just the klaviyo_campaigns model (no more campaign_message)
     dbt_result = run_dbt_command(
-        ["run", "--select", "campaign_message"],
+        ["run", "--select", "klaviyo_campaigns"],
         context,
         target_name="klaviyo_campaign"
     )
@@ -214,25 +214,29 @@ def klaviyo_campaign_core_dbt_models(context: AssetExecutionContext, iceberg_res
         with open(run_results_path) as f:
             run_results = json.load(f)
 
-        rows_processed = {}
+        rows_processed = None
         for result in run_results.get("results", []):
             model_name = result.get("unique_id", "")
-            adapter_response = result.get("adapter_response", {})
-            if "klaviyo_campaigns" in model_name and "message" not in model_name:
-                rows_processed["campaigns"] = adapter_response.get("rows_affected", 0)
-            elif "campaign_message" in model_name:
-                rows_processed["message"] = adapter_response.get("rows_affected", 0)
+            if "klaviyo_campaigns" in model_name:
+                adapter_response = result.get("adapter_response", {})
+                rows_processed = adapter_response.get("rows_affected", 0)
+                context.log.info(
+                    f"dbt processed {rows_processed} rows for klaviyo_campaigns model"
+                )
+                break
 
-        if rows_processed.get("campaigns", 0) == 0:
-            raise ValueError(
-                f"dbt processed 0 rows for klaviyo_campaigns but {claimed_parent_count} were loaded to raw. "
-                f"Data loss detected in dbt transformation."
+        if rows_processed is not None:
+            if rows_processed == 0:
+                raise ValueError(
+                    f"dbt processed 0 rows for klaviyo_campaigns but {claimed_parent_count} were loaded to raw. "
+                    f"Data loss detected in dbt transformation."
+                )
+            context.log.info(
+                f"Validated dbt processing: {rows_processed} rows affected "
+                f"(includes DELETE+INSERT for {claimed_parent_count} campaign records)"
             )
-        
-        context.log.info(
-            f"Validated dbt processing: campaigns={rows_processed.get('campaigns', 0)} rows, "
-            f"message={rows_processed.get('message', 0)} rows"
-        )
+        else:
+            context.log.warning("Could not extract row count from dbt run_results.json - validation skipped")
     except Exception as e:
         context.log.warning(f"Could not parse dbt run_results.json: {e} - validation skipped")
 

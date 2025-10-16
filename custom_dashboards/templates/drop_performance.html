@@ -2,6 +2,13 @@
 {% block content %}
 <div class="container">
   <h1>Drop Performance Dashboard</h1>
+
+  {% if error %}
+    <div style="padding: 1rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: .25rem; color: #721c24; background-color: #f8d7da; border-color: #f5c6cb;">
+      <strong>Error:</strong> {{ error }}
+    </div>
+  {% endif %}
+
   <label for="tagFilter">Filter by Product Tag:</label>
   <select id="tagFilter" class="form-select">
     <option value="">-- Select a tag --</option>
@@ -10,10 +17,9 @@
     {% endfor %}
   </select>
 
-  <table id="resultsTable" class="table table-striped mt-3" style="display:none;">
+  <table id="resultsTable" class="data-table" style="display:none;">
     <thead>
       <tr>
-        <th>Product ID</th>
         <th>Name</th>
         <th>Units Sold</th>
         <th>Revenue</th>
@@ -38,10 +44,9 @@ document.getElementById("tagFilter").addEventListener("change", async (e) => {
   data.forEach(row => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${row.product_id}</td>
       <td>${row.product_name}</td>
       <td>${row.units_sold}</td>
-      <td>${row.revenue.toLocaleString()}</td>
+      <td>$${row.revenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
     `;
     tbody.appendChild(tr);
   });

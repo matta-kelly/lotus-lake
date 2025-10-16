@@ -1,26 +1,16 @@
 CREATE NAMESPACE IF NOT EXISTS klaviyo;
 
 CREATE TABLE IF NOT EXISTS klaviyo.campaign_raw (
-    -- Campaign-level identifiers
+    -- Campaign identifiers
     id STRING,                           -- Klaviyo campaign ID
-    name STRING,                         -- Campaign name (subject or internal label)
+    name STRING,                         -- Campaign name
+    status STRING,                       -- Campaign status (sent, draft, etc.)
 
-    -- Campaign metadata
+    -- Campaign timestamps
     send_time TIMESTAMP,                 -- Scheduled or actual send time
+    created_at TIMESTAMP,                -- When campaign was created
     updated_at TIMESTAMP,                -- Last modified timestamp (used for incremental sync)
     _load_timestamp TIMESTAMP,           -- Ingestion timestamp from flow run
-
-    -- Nested messages array (STRUCT inside ARRAY)
-    messages ARRAY<STRUCT<
-        id: STRING,
-        subject: STRING,
-        preview_text: STRING,
-        from_email: STRING,
-        from_label: STRING,
-        send_time: TIMESTAMP,
-        created_at: TIMESTAMP,
-        updated_at: TIMESTAMP
-    >>,
 
     -- Partitioning
     ingestion_date STRING                -- YYYY-MM-DD partition key
