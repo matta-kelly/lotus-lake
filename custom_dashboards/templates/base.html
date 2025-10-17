@@ -2,18 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ title or "Dashboard" }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title or "Lotus & Luna Dashboard" }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   <div class="sidebar">
-    <h2>Dashboard</h2>
-    <a href="/">Home</a>
-    <a href="/drop-performance">Drop Performance</a>
-    <a href="/last-sync">Last Sync Status</a>
+    <div class="sidebar-header">
+      <h2>Lotus & Luna</h2>
+      <div class="sidebar-subtitle">Analytics Dashboard</div>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="/" class="{% if request.path == '/' %}active{% endif %}">
+          <span class="nav-icon">🏠</span>
+          Home
+        </a>
+        <a href="/drop-performance" class="{% if request.path == '/drop-performance' %}active{% endif %}">
+          <span class="nav-icon">📊</span>
+          Drop Performance
+        </a>
+      </div>
+      
+      <div class="nav-section">
+        <div class="nav-section-title">System</div>
+        <a href="/last-sync" class="{% if request.path == '/last-sync' %}active{% endif %}">
+          <span class="nav-icon">🔄</span>
+          Last Sync Status
+        </a>
+      </div>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <div>v1.0.0 • © 2025</div>
+    </div>
   </div>
+  
   <div class="content">
     {% block content %}{% endblock %}
   </div>
+  
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
