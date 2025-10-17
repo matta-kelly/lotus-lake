@@ -58,3 +58,31 @@ def drop_performance_data():
         return jsonify(data)
     except TrinoUserError as e:
         return jsonify({"error": f"Failed to query Trino: {e}"}), 500
+
+
+@drop_perf_bp.route("/api/get-release-date")
+def get_release_date():
+    """
+    Finds the earliest release date for all products associated with a given tag.
+    """
+    tag = request.args.get("tag")
+    if not tag:
+        return jsonify({"error": "Missing tag"}), 400
+
+    query = f"""
+        SELECT MIN(p.release_date)
+        FROM iceberg.mart.shopify_product_performance p
+        JOIN iceberg.core.shopify_product_tags t ON p.product_id = t.product_id
+        WHERE t.tag_name = '{tag}'
+    """
+    try:
+        result = query_trino(query)
+        release_date = result[0][0] if result and result[0] and result[0][0] else None
+
+        if release_date:
+            return jsonify({"release_date": release_date.strftime('%Y-%m-%d')})
+        else:
+            return jsonify({"release_date": None})
+
+    except TrinoUserError as e:
+        return jsonify({"error": f"Failed to query Trino for release date: {e}"}), 500

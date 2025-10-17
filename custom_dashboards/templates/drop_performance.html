@@ -28,6 +28,16 @@
       <label for="endDate">End Date:</label>
       <input type="date" id="endDate" class="form-select">
     </div>
+    <div class="date-range-buttons">
+      <label>Quick Ranges (from release):</label>
+      <div>
+        <button data-days="7" class="btn-range">7 Days</button>
+        <button data-days="14" class="btn-range">14 Days</button>
+        <button data-days="30" class="btn-range">30 Days</button>
+        <button data-days="90" class="btn-range">90 Days</button>
+        <button data-days="all" class="btn-range">All Time</button>
+      </div>
+    </div>
   </div>
 
 
@@ -50,6 +60,9 @@
   const endDateFilter = document.getElementById("endDate");
   const table = document.getElementById("resultsTable");
   const tbody = table.querySelector("tbody");
+  const rangeButtons = document.querySelectorAll('.btn-range');
+
+  let releaseDate = null; // Variable to store the release date for the selected tag
 
   // Function to fetch and render data
   async function fetchData() {
@@ -59,13 +72,11 @@
 
     tbody.innerHTML = "";
 
-    // Only fetch if a tag is selected
     if (!tag) {
       table.style.display = "none";
       return;
     }
 
-    // Build the API URL with all parameters
     let apiUrl = `/api/drop-performance?tag=${encodeURIComponent(tag)}`;
     if (startDate && endDate) {
       apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
@@ -87,9 +98,64 @@
     table.style.display = "table";
   }
 
-  // Add event listeners to all filters
-  tagFilter.addEventListener("change", fetchData);
-  startDateFilter.addEventListener("change", fetchData);
-  endDateFilter.addEventListener("change", fetchData);
+  // Function to set date range from buttons
+  function setDateRange(days) {
+    if (!releaseDate) {
+        alert("Please select a drop to get its release date first.");
+        return;
+    };
+
+    const startDate = new Date(releaseDate + 'T00:00:00'); // Add time to avoid timezone issues
+    
+    if (days === 'all') {
+      startDateFilter.value = '';
+      endDateFilter.value = '';
+    } else {
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + (days - 1));
+      
+      startDateFilter.value = startDate.toISOString().split('T')[0];
+      endDateFilter.value = endDate.toISOString().split('T')[0];
+    }
+    
+    fetchData();
+  }
+
+  // --- Event Listeners ---
+  tagFilter.addEventListener("change", async () => {
+    const tag = tagFilter.value;
+    releaseDate = null;
+    rangeButtons.forEach(btn => btn.classList.remove('active'));
+    startDateFilter.value = '';
+    endDateFilter.value = '';
+
+    if (tag) {
+      const res = await fetch(`/api/get-release-date?tag=${encodeURIComponent(tag)}`);
+      const data = await res.json();
+      if (data.release_date) {
+        releaseDate = data.release_date;
+      }
+    }
+    fetchData();
+  });
+
+  startDateFilter.addEventListener("change", () => {
+    rangeButtons.forEach(btn => btn.classList.remove('active'));
+    fetchData();
+  });
+  endDateFilter.addEventListener("change", () => {
+    rangeButtons.forEach(btn => btn.classList.remove('active'));
+    fetchData();
+  });
+
+  rangeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      rangeButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      
+      const days = button.dataset.days;
+      setDateRange(days === 'all' ? 'all' : parseInt(days));
+    });
+  });
 </script>
 {% endblock %}

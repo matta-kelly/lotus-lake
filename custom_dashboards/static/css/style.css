@@ -17,11 +17,12 @@ h1 {
   margin-bottom: 20px;
 }
 
-/* New styles for filter controls */
+/* Updated styles for filter controls */
 .filters-container {
   display: flex;
-  gap: 1.5rem; /* Space between filter groups */
-  align-items: flex-end; /* Align items to the bottom */
+  flex-wrap: wrap; /* Allow filters to wrap on smaller screens */
+  gap: 1.5rem;
+  align-items: flex-end;
   margin-bottom: 1.5rem;
   padding: 1rem;
   background-color: #f8f9fa;
@@ -48,40 +49,66 @@ h1 {
   font-size: 1rem;
 }
 
+/* Styles for Quick Range buttons */
+.date-range-buttons div {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-range {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #ffffff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-range:hover {
+  background-color: #e9ecef;
+}
+
+.btn-range.active {
+  background-color: #1e1e2f;
+  color: white;
+  border-color: #1e1e2f;
+  outline: none;
+}
+
 /* Reusable Data Table Styles */
 .data-table {
   width: 100%;
-  border-collapse: collapse; /* Removes space between borders */
+  border-collapse: collapse;
   margin-top: 1.5rem;
   font-size: 0.95rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Subtle shadow for depth */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   border-radius: 8px;
-  overflow: hidden; /* Ensures border-radius is respected */
+  overflow: hidden;
 }
 
 .data-table thead tr {
-  background-color: #1e1e2f; /* Dark header matching the sidebar */
+  background-color: #1e1e2f;
   color: #ffffff;
   text-align: left;
 }
 
 .data-table th, .data-table td {
-  padding: 12px 15px; /* Adds comfortable spacing */
+  padding: 12px 15px;
 }
 
 .data-table tbody tr {
-  border-bottom: 1px solid #dddddd; /* Clean horizontal lines */
+  border-bottom: 1px solid #dddddd;
 }
 
 .data-table tbody tr:nth-of-type(even) {
-  background-color: #f3f3f3; /* Zebra striping for readability */
+  background-color: #f3f3f3;
 }
 
 .data-table tbody tr:last-of-type {
   border-bottom: 2px solid #1e1e2f;
 }
 
-/* Align numbers to the right for clarity */
 .data-table td:nth-child(2),
 .data-table td:nth-child(3) {
   text-align: right;
