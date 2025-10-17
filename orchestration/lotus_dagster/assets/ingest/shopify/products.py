@@ -13,7 +13,7 @@ from ....resources.load import schema_converters
 NAMESPACE = "shopify"
 TABLE = "products"
 UPDATED_FIELD = "updatedAt"  
-MAX_PAGES_PER_RUN = 10
+MAX_PAGES_PER_RUN = 120
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

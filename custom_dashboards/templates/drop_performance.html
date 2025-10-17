@@ -4,18 +4,32 @@
   <h1>Drop Performance Dashboard</h1>
 
   {% if error %}
-    <div style="padding: 1rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: .25rem; color: #721c24; background-color: #f8d7da; border-color: #f5c6cb;">
-      <strong>Error:</strong> {{ error }}
-    </div>
+  <div
+    style="padding: 1rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: .25rem; color: #721c24; background-color: #f8d7da; border-color: #f5c6cb;">
+    <strong>Error:</strong> {{ error }}
+  </div>
   {% endif %}
 
-  <label for="tagFilter">Filter by Product Tag:</label>
-  <select id="tagFilter" class="form-select">
-    <option value="">-- Select a tag --</option>
-    {% for tag in tags %}
-    <option value="{{ tag }}">{{ tag }}</option>
-    {% endfor %}
-  </select>
+  <div class="filters-container">
+    <div>
+      <label for="tagFilter">Filter by Product Tag:</label>
+      <select id="tagFilter" class="form-select">
+        <option value="">-- Select a tag --</option>
+        {% for tag in tags %}
+        <option value="{{ tag }}">{{ tag }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="startDate">Start Date:</label>
+      <input type="date" id="startDate" class="form-select">
+    </div>
+    <div>
+      <label for="endDate">End Date:</label>
+      <input type="date" id="endDate" class="form-select">
+    </div>
+  </div>
+
 
   <table id="resultsTable" class="data-table" style="display:none;">
     <thead>
@@ -30,28 +44,52 @@
 </div>
 
 <script>
-document.getElementById("tagFilter").addEventListener("change", async (e) => {
-  const tag = e.target.value;
+  // Get references to all filter elements
+  const tagFilter = document.getElementById("tagFilter");
+  const startDateFilter = document.getElementById("startDate");
+  const endDateFilter = document.getElementById("endDate");
   const table = document.getElementById("resultsTable");
   const tbody = table.querySelector("tbody");
-  tbody.innerHTML = "";
 
-  if (!tag) { table.style.display = "none"; return; }
+  // Function to fetch and render data
+  async function fetchData() {
+    const tag = tagFilter.value;
+    const startDate = startDateFilter.value;
+    const endDate = endDateFilter.value;
 
-  const res = await fetch(`/api/drop-performance?tag=${encodeURIComponent(tag)}`);
-  const data = await res.json();
+    tbody.innerHTML = "";
 
-  data.forEach(row => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${row.product_name}</td>
-      <td>${row.units_sold}</td>
-      <td>$${row.revenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-    `;
-    tbody.appendChild(tr);
-  });
+    // Only fetch if a tag is selected
+    if (!tag) {
+      table.style.display = "none";
+      return;
+    }
 
-  table.style.display = "table";
-});
+    // Build the API URL with all parameters
+    let apiUrl = `/api/drop-performance?tag=${encodeURIComponent(tag)}`;
+    if (startDate && endDate) {
+      apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
+    }
+
+    const res = await fetch(apiUrl);
+    const data = await res.json();
+
+    data.forEach(row => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${row.product_name}</td>
+        <td>${row.units_sold}</td>
+        <td>$${row.revenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    table.style.display = "table";
+  }
+
+  // Add event listeners to all filters
+  tagFilter.addEventListener("change", fetchData);
+  startDateFilter.addEventListener("change", fetchData);
+  endDateFilter.addEventListener("change", fetchData);
 </script>
 {% endblock %}

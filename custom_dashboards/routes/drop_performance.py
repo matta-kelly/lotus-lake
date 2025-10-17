@@ -27,10 +27,13 @@ def drop_performance():
 @drop_perf_bp.route("/api/drop-performance")
 def drop_performance_data():
     tag = request.args.get("tag")
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+
     if not tag:
         return jsonify({"error": "Missing tag"}), 400
 
-    # Query to load products for a selected tag
+    # Dynamically build the query based on provided filters
     query = f"""
         SELECT
             p.product_title,
@@ -39,9 +42,16 @@ def drop_performance_data():
         FROM iceberg.mart.shopify_product_performance p
         JOIN iceberg.core.shopify_product_tags t ON p.product_id = t.product_id
         WHERE t.tag_name = '{tag}'
+    """
+
+    if start_date and end_date:
+        query += f" AND p.date BETWEEN DATE '{start_date}' AND DATE '{end_date}'"
+
+    query += """
         GROUP BY p.product_title
         ORDER BY total_revenue DESC
     """
+
     try:
         rows = query_trino(query)
         data = [{"product_name": r[0], "units_sold": r[1], "revenue": r[2]} for r in rows]

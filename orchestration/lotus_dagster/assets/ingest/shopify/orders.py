@@ -15,7 +15,7 @@ NAMESPACE = "shopify"
 TABLE = "orders"
 UPDATED_FIELD = "updatedAt"
 PAGE_SIZE = 100
-MAX_PAGES_PER_RUN = 10
+MAX_PAGES_PER_RUN = 50
 has_next = False
 
 logger = logging.getLogger(__name__)

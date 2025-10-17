@@ -13,7 +13,7 @@ from ....resources.load import schema_converters
 NAMESPACE = "klaviyo"
 TABLE = "campaign"
 UPDATED_FIELD = "updated_at"
-MAX_PAGES_PER_RUN = 10
+MAX_PAGES_PER_RUN = 20
 DEFAULT_TIME_WINDOW_HOURS = 120
 
 logger = logging.getLogger(__name__)

@@ -5,19 +5,19 @@
 ) }}
 
 WITH order_data AS (
-    -- Join order lines to orders to get the DATE
+    -- This CTE is now simpler and more accurate.
+    -- We can get the true sale date directly from the order lines table.
     SELECT
-        ol.line_item_id,
-        ol.sku,
-        ol.quantity,
-        ol.discounted_total,
-        o.order_id,
-        DATE(o.created_at) AS date  -- THIS is our date dimension
-    FROM {{ ref('shopify_order_lines') }} ol
-    INNER JOIN {{ ref('shopify_orders') }} o 
-        ON ol.order_id = o.order_id
+        line_item_id,
+        sku,
+        quantity,
+        discounted_total,
+        order_id,
+        DATE(created_at) AS date  -- UPDATED to use the correct sale date from the source
+    FROM {{ ref('shopify_order_lines') }}
     {% if is_incremental() %}
-    WHERE DATE(o.created_at) > (SELECT MAX(date) FROM {{ this }})
+    -- UPDATED to filter on the correct sale date
+    WHERE DATE(created_at) > (SELECT MAX(date) FROM {{ this }})
     {% endif %}
 ),
 

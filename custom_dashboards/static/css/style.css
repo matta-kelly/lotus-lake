@@ -17,6 +17,37 @@ h1 {
   margin-bottom: 20px;
 }
 
+/* New styles for filter controls */
+.filters-container {
+  display: flex;
+  gap: 1.5rem; /* Space between filter groups */
+  align-items: flex-end; /* Align items to the bottom */
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.filters-container > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.filters-container label {
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.form-select {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
 /* Reusable Data Table Styles */
 .data-table {
   width: 100%;

@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # Buffer to prevent boundary gaps - guarantees overlap with previous run
-SYNC_BUFFER_MINUTES = 1
+SYNC_BUFFER_SECONDS = 10
 
 def make_get_last_sync_asset(namespace: str, table: str):
     @asset(
@@ -33,13 +33,13 @@ def make_get_last_sync_asset(namespace: str, table: str):
         if is_dev:
             # DEV MODE: Use default date, return early - NEVER touch DB
             default_sync = datetime.now(timezone.utc) - timedelta(days=7)
-            buffered_sync = default_sync - timedelta(minutes=SYNC_BUFFER_MINUTES)
+            buffered_sync = default_sync - timedelta(seconds=SYNC_BUFFER_SECONDS)
             
             context.log.info(
                 f"[DEV MODE] Using default last_sync for {namespace}/{table}: "
                 f"default={default_sync.isoformat()}, "
                 f"buffered={buffered_sync.isoformat()} "
-                f"(buffer={SYNC_BUFFER_MINUTES}min)"
+                f"(buffer={SYNC_BUFFER_SECONDS}min)"
             )
             return buffered_sync
         
@@ -63,13 +63,13 @@ def make_get_last_sync_asset(namespace: str, table: str):
             )
         
         # Apply buffer to prevent boundary gaps
-        buffered_sync = stored_last_sync - timedelta(minutes=SYNC_BUFFER_MINUTES)
+        buffered_sync = stored_last_sync - timedelta(seconds=SYNC_BUFFER_SECONDS)
         
         context.log.info(
             f"Last sync for {namespace}/{table}: "
             f"stored={stored_last_sync.isoformat()}, "
             f"buffered={buffered_sync.isoformat()} "
-            f"(buffer={SYNC_BUFFER_MINUTES}min)"
+            f"(buffer={SYNC_BUFFER_SECONDS}min)"
         )
         
         return buffered_sync

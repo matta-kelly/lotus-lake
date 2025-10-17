@@ -19,6 +19,7 @@ WITH deduped_orders AS (
 line_items AS (
   SELECT
     o.id AS order_id,
+    o.createdAt AS created_at, -- Now we add the correct sale date
     o.updatedAt AS updated_at,
     li.node.id AS line_item_id,
     li.node.title AS title,
