@@ -13,7 +13,7 @@ from ....resources.load import schema_converters
 NAMESPACE = "klaviyo"
 TABLE = "email_open"
 UPDATED_FIELD = "datetime"
-MAX_PAGES_PER_RUN = 100
+MAX_PAGES_PER_RUN = 150
 DEFAULT_TIME_WINDOW_HOURS = 120
 
 METRIC_ID_EMAIL_OPEN = "UCDKb9"

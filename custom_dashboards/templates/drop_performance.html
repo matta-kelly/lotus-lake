@@ -40,6 +40,37 @@
     </div>
   </div>
 
+  <!-- Summary Stats Cards -->
+  <div id="summaryCards" style="display:none;">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Units Sold</div>
+        <div class="stat-value" id="totalUnits">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value" id="totalRevenue">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Open Rate</div>
+        <div class="stat-value" id="avgOpenRate">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Click Rate</div>
+        <div class="stat-value" id="avgClickRate">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg CTOR</div>
+        <div class="stat-value" id="avgCTOR">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Debug Info (toggle with Ctrl+D) -->
+  <div id="debugInfo" style="display:none; padding: 10px; background-color: #f0f0f0; margin: 10px 0; border-radius: 5px; font-family: monospace; font-size: 12px;">
+    <strong>Debug Info:</strong>
+    <pre id="debugContent"></pre>
+  </div>
 
   <table id="resultsTable" class="data-table" style="display:none;">
     <thead>
@@ -51,71 +82,238 @@
     </thead>
     <tbody></tbody>
   </table>
+
+  <div id="campaignSection" style="display:none;">
+    <h2 class="table-header">Campaign Performance</h2>
+    <table id="campaignTable" class="data-table">
+      <thead>
+        <tr>
+          <th>Campaign Name</th>
+          <th>Send Date</th>
+          <th>Received</th>
+          <th>Opens</th>
+          <th>Clicks</th>
+          <th>Open Rate</th>
+          <th>Click Rate</th>
+          <th>CTOR</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 </div>
 
 <script>
-  // Get references to all filter elements
+  // Get references to all filter and table elements
   const tagFilter = document.getElementById("tagFilter");
   const startDateFilter = document.getElementById("startDate");
   const endDateFilter = document.getElementById("endDate");
-  const table = document.getElementById("resultsTable");
-  const tbody = table.querySelector("tbody");
   const rangeButtons = document.querySelectorAll('.btn-range');
 
-  let releaseDate = null; // Variable to store the release date for the selected tag
+  const summaryCards = document.getElementById("summaryCards");
+  const totalUnitsEl = document.getElementById("totalUnits");
+  const totalRevenueEl = document.getElementById("totalRevenue");
+  const avgOpenRateEl = document.getElementById("avgOpenRate");
+  const avgClickRateEl = document.getElementById("avgClickRate");
+  const avgCTOREl = document.getElementById("avgCTOR");
 
-  // Function to fetch and render data
+  const productTable = document.getElementById("resultsTable");
+  const productTbody = productTable.querySelector("tbody");
+
+  const campaignSection = document.getElementById("campaignSection");
+  const campaignTable = document.getElementById("campaignTable");
+  const campaignTbody = campaignTable.querySelector("tbody");
+
+  const debugInfo = document.getElementById("debugInfo");
+  const debugContent = document.getElementById("debugContent");
+
+  let releaseDate = null; // Store release date for the selected tag
+
+  // Toggle debug info with Ctrl+D
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'd') {
+      e.preventDefault();
+      debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+    }
+  });
+
+  // Validate date range
+  function validateDateRange() {
+    const start = startDateFilter.value;
+    const end = endDateFilter.value;
+    
+    if (start && end) {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      
+      if (startDate > endDate) {
+        console.warn("Start date is after end date, swapping...");
+        // Swap the dates
+        startDateFilter.value = end;
+        endDateFilter.value = start;
+        return false; // Indicate dates were invalid
+      }
+    }
+    return true; // Dates are valid
+  }
+
+  // Function to update summary cards
+  function updateSummaryCards(summary) {
+    if (summary) {
+      totalUnitsEl.textContent = summary.total_units.toLocaleString();
+      totalRevenueEl.textContent = '$' + summary.total_revenue.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+      avgOpenRateEl.textContent = summary.avg_open_rate.toFixed(2) + '%';
+      avgClickRateEl.textContent = summary.avg_click_rate.toFixed(2) + '%';
+      avgCTOREl.textContent = summary.avg_ctor.toFixed(2) + '%';
+      summaryCards.style.display = 'block';
+    } else {
+      summaryCards.style.display = 'none';
+    }
+  }
+
+  // Function to fetch and render data for BOTH tables
   async function fetchData() {
     const tag = tagFilter.value;
-    const startDate = startDateFilter.value;
-    const endDate = endDateFilter.value;
+    let startDate = startDateFilter.value;
+    let endDate = endDateFilter.value;
 
-    tbody.innerHTML = "";
+    // Clear and hide tables initially
+    productTbody.innerHTML = "";
+    campaignTbody.innerHTML = "";
+    productTable.style.display = "none";
+    campaignSection.style.display = "none";
+    summaryCards.style.display = "none";
 
     if (!tag) {
-      table.style.display = "none";
-      return;
+      console.log("No tag selected, skipping fetch");
+      return; // Exit if no tag is selected
     }
+
+    // Validate and potentially swap dates
+    validateDateRange();
+    
+    // Re-read values after potential swap
+    startDate = startDateFilter.value;
+    endDate = endDateFilter.value;
 
     let apiUrl = `/api/drop-performance?tag=${encodeURIComponent(tag)}`;
     if (startDate && endDate) {
       apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     }
 
-    const res = await fetch(apiUrl);
-    const data = await res.json();
+    console.log("Fetching data from:", apiUrl);
 
-    data.forEach(row => {
+    try {
+      const res = await fetch(apiUrl);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
+      const responseData = await res.json();
+      console.log("Response data:", responseData);
+
+      // Update debug info
+      if (responseData.debug) {
+        debugContent.textContent = JSON.stringify(responseData.debug, null, 2);
+      }
+
+      // Update summary cards
+      if (responseData.summary) {
+        updateSummaryCards(responseData.summary);
+      }
+
+      // Render Product Table
+      if (responseData.products && responseData.products.length > 0) {
+        console.log(`Rendering ${responseData.products.length} products`);
+        responseData.products.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.product_name}</td>
+            <td>${row.units_sold.toLocaleString()}</td>
+            <td>$${row.revenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+          `;
+          productTbody.appendChild(tr);
+        });
+        productTable.style.display = "table";
+      } else {
+        console.log("No product data to display");
+      }
+
+      // Show the campaign section whenever a date filter is active
+      if (startDate && endDate) {
+        console.log("Date range active, showing campaign section");
+        campaignSection.style.display = "block";
+
+        // Now, check if there's data to render, or show a message
+        if (responseData.campaigns && responseData.campaigns.length > 0) {
+          console.log(`Rendering ${responseData.campaigns.length} campaigns`);
+          responseData.campaigns.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${row.campaign_name || 'N/A'}</td>
+              <td>${row.send_time || 'N/A'}</td>
+              <td>${(row.unique_received || 0).toLocaleString()}</td>
+              <td>${(row.unique_opens || 0).toLocaleString()}</td>
+              <td>${(row.unique_clicks || 0).toLocaleString()}</td>
+              <td>${(row.open_rate || 0).toFixed(2)}%</td>
+              <td>${(row.click_rate || 0).toFixed(2)}%</td>
+              <td>${(row.click_to_open_rate || 0).toFixed(2)}%</td>
+            `;
+            campaignTbody.appendChild(tr);
+          });
+        } else {
+          console.log("No campaign data, showing message");
+          // Render the "No data" message row
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td colspan="8" style="text-align: center; padding: 20px; color: #666;">
+              No campaigns were sent during this date range.<br>
+              <small style="font-size: 0.9em;">Try expanding the date range to see if campaigns were sent before or after.</small>
+            </td>
+          `;
+          campaignTbody.appendChild(tr);
+        }
+      } else {
+        console.log("No date range specified, hiding campaign section");
+      }
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      
+      // Show error message in product table
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${row.product_name}</td>
-        <td>${row.units_sold}</td>
-        <td>$${row.revenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+        <td colspan="3" style="text-align: center; padding: 20px; color: #721c24; background-color: #f8d7da;">
+          <strong>Error:</strong> ${error.message}
+        </td>
       `;
-      tbody.appendChild(tr);
-    });
-
-    table.style.display = "table";
+      productTbody.appendChild(tr);
+      productTable.style.display = "table";
+    }
   }
 
   // Function to set date range from buttons
   function setDateRange(days) {
     if (!releaseDate) {
-        alert("Please select a drop to get its release date first.");
-        return;
-    };
-
-    const startDate = new Date(releaseDate + 'T00:00:00'); // Add time to avoid timezone issues
+      alert("Please select a drop to get its release date first.");
+      return;
+    }
+    
+    const startDate = new Date(releaseDate + 'T00:00:00');
     
     if (days === 'all') {
+      console.log("Setting date range to: All Time");
       startDateFilter.value = '';
       endDateFilter.value = '';
     } else {
       const endDate = new Date(startDate);
       endDate.setDate(startDate.getDate() + (days - 1));
-      
       startDateFilter.value = startDate.toISOString().split('T')[0];
       endDateFilter.value = endDate.toISOString().split('T')[0];
+      console.log(`Setting date range to: ${startDateFilter.value} - ${endDateFilter.value}`);
     }
     
     fetchData();
@@ -129,22 +327,37 @@
     startDateFilter.value = '';
     endDateFilter.value = '';
 
+    console.log("Tag changed to:", tag);
+
     if (tag) {
-      const res = await fetch(`/api/get-release-date?tag=${encodeURIComponent(tag)}`);
-      const data = await res.json();
-      if (data.release_date) {
-        releaseDate = data.release_date;
+      try {
+        const res = await fetch(`/api/get-release-date?tag=${encodeURIComponent(tag)}`);
+        const data = await res.json();
+        if (data.release_date) {
+          releaseDate = data.release_date;
+          console.log("Release date found:", releaseDate);
+        } else {
+          console.log("No release date found for this tag");
+        }
+      } catch (error) {
+        console.error("Error fetching release date:", error);
       }
     }
+    
     fetchData();
   });
 
   startDateFilter.addEventListener("change", () => {
+    console.log("Start date changed to:", startDateFilter.value);
     rangeButtons.forEach(btn => btn.classList.remove('active'));
+    validateDateRange();
     fetchData();
   });
+
   endDateFilter.addEventListener("change", () => {
+    console.log("End date changed to:", endDateFilter.value);
     rangeButtons.forEach(btn => btn.classList.remove('active'));
+    validateDateRange();
     fetchData();
   });
 
@@ -152,10 +365,24 @@
     button.addEventListener('click', () => {
       rangeButtons.forEach(btn => btn.classList.remove('active'));
       button.classList.add('active');
-      
       const days = button.dataset.days;
+      console.log("Quick range button clicked:", days);
       setDateRange(days === 'all' ? 'all' : parseInt(days));
     });
   });
+
+  // Optional: Load campaign date range info on page load for debugging
+  async function loadCampaignDateRangeInfo() {
+    try {
+      const res = await fetch('/api/campaign-date-range');
+      const data = await res.json();
+      console.log("Campaign data availability:", data);
+    } catch (error) {
+      console.error("Error loading campaign date range:", error);
+    }
+  }
+
+  // Uncomment the line below if you want to see campaign data availability on page load
+  // loadCampaignDateRangeInfo();
 </script>
 {% endblock %}

@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # Buffer to prevent boundary gaps - guarantees overlap with previous run
-SYNC_BUFFER_SECONDS = 10
+SYNC_BUFFER_SECONDS = 1
 
 def make_get_last_sync_asset(namespace: str, table: str):
     @asset(
@@ -19,12 +19,12 @@ def make_get_last_sync_asset(namespace: str, table: str):
         """
         Fetch the last sync timestamp for extraction, with buffer applied.
         
-        Applies a 1-minute buffer to prevent boundary gaps. This ensures we always
+        Applies a 1-second buffer to prevent boundary gaps. This ensures we always
         re-pull the most recent record from the previous run, guaranteeing no data loss.
         MERGE operations handle the duplicate idempotently.
         
         Returns:
-            datetime: Buffered sync point for extraction (actual last_sync - 1 minute)
+            datetime: Buffered sync point for extraction (actual last_sync - 1 second)
         """
         # Check if we're in development mode
         from shared.config import settings
@@ -39,7 +39,7 @@ def make_get_last_sync_asset(namespace: str, table: str):
                 f"[DEV MODE] Using default last_sync for {namespace}/{table}: "
                 f"default={default_sync.isoformat()}, "
                 f"buffered={buffered_sync.isoformat()} "
-                f"(buffer={SYNC_BUFFER_SECONDS}min)"
+                f"(buffer={SYNC_BUFFER_SECONDS}sec)"
             )
             return buffered_sync
         
@@ -69,7 +69,7 @@ def make_get_last_sync_asset(namespace: str, table: str):
             f"Last sync for {namespace}/{table}: "
             f"stored={stored_last_sync.isoformat()}, "
             f"buffered={buffered_sync.isoformat()} "
-            f"(buffer={SYNC_BUFFER_SECONDS}min)"
+            f"(buffer={SYNC_BUFFER_SECONDS}sec)"
         )
         
         return buffered_sync

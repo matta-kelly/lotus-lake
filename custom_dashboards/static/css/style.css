@@ -10,7 +10,7 @@ body { font-family: Arial, sans-serif; margin: 0; display: flex; }
 h1 { color: #333; }
 
 .container {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 40px auto;
 }
 h1 {
@@ -76,11 +76,76 @@ h1 {
   outline: none;
 }
 
+/* Summary Stats Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card:nth-child(1) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stat-card:nth-child(2) {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.stat-card:nth-child(3) {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.stat-card:nth-child(4) {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.stat-card:nth-child(5) {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+/* Styles for table sections */
+.table-header {
+    margin-top: 2.5rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 0.5rem;
+}
+
 /* Reusable Data Table Styles */
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   font-size: 0.95rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   border-radius: 8px;
@@ -109,7 +174,17 @@ h1 {
   border-bottom: 2px solid #1e1e2f;
 }
 
-.data-table td:nth-child(2),
-.data-table td:nth-child(3) {
+.data-table td:nth-child(n+2) { /* Align all columns except the first to the right */
   text-align: right;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-value {
+    font-size: 1.75rem;
+  }
 }

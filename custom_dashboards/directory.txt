@@ -1,0 +1,23 @@
+.
+├── app.py
+├── Dockerfile.custom-dashboards
+├── requirements.txt
+├── routes
+│   ├── drop_performance.py
+│   ├── home.py
+│   ├── __init__.py
+│   └── last_sync.py
+├── services
+│   └── query_utils.py
+├── static
+│   ├── css
+│   │   └── style.css
+│   └── js
+│       └── main.js
+└── templates
+    ├── base.html
+    ├── drop_performance.html
+    ├── home.html
+    └── last_sync.html
+
+6 directories, 14 files
