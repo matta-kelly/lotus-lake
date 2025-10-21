@@ -1,5 +1,289 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Welcome to the Home Page</h1>
-<p>This is placeholder content.</p>
+<div class="container">
+  <h1>Shopify Sales Overview</h1>
+  <p class="page-subtitle">Daily sales performance breakdown</p>
+
+  <!-- Date Filters -->
+  <div class="filters-container">
+    <div>
+      <label for="startDate">Start Date:</label>
+      <input type="date" id="startDate" class="form-select">
+    </div>
+    <div>
+      <label for="endDate">End Date:</label>
+      <input type="date" id="endDate" class="form-select">
+    </div>
+    <div class="date-range-buttons">
+      <label>Quick Ranges:</label>
+      <div>
+        <button data-days="7" class="btn-range">7 Days</button>
+        <button data-days="14" class="btn-range">14 Days</button>
+        <button data-days="30" class="btn-range active">30 Days</button>
+        <button data-days="60" class="btn-range">60 Days</button>
+        <button data-days="90" class="btn-range">90 Days</button>
+        <button data-days="all" class="btn-range">All Time</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Stats Cards -->
+  <div id="summaryCards" style="display:none;">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Sales</div>
+        <div class="stat-value" id="totalSales">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-value" id="totalOrders">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Order Value</div>
+        <div class="stat-value" id="avgOrderValue">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Discounts</div>
+        <div class="stat-value" id="totalDiscounts">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="loadingState" style="text-align: center; padding: 3rem;">
+    <p style="color: #718096; font-size: 1.1rem;">Loading sales data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div id="errorState" style="display:none; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb;">
+    <strong>Error:</strong> <span id="errorMessage"></span>
+  </div>
+
+  <!-- Sales Breakdown Table -->
+  <div id="salesSection" style="display:none;">
+    <h2 class="table-header">Daily Sales Breakdown</h2>
+    <table id="salesTable" class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Orders</th>
+          <th>Gross Sales</th>
+          <th>Discounts</th>
+          <th>Net Sales</th>
+          <th>Shipping</th>
+          <th>Taxes</th>
+          <th>Total Sales</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const startDateFilter = document.getElementById("startDate");
+  const endDateFilter = document.getElementById("endDate");
+  const rangeButtons = document.querySelectorAll('.btn-range');
+
+  const summaryCards = document.getElementById("summaryCards");
+  const totalSalesEl = document.getElementById("totalSales");
+  const totalOrdersEl = document.getElementById("totalOrders");
+  const avgOrderValueEl = document.getElementById("avgOrderValue");
+  const totalDiscountsEl = document.getElementById("totalDiscounts");
+
+  const loadingState = document.getElementById("loadingState");
+  const errorState = document.getElementById("errorState");
+  const errorMessage = document.getElementById("errorMessage");
+
+  const salesSection = document.getElementById("salesSection");
+  const salesTable = document.getElementById("salesTable");
+  const salesTbody = salesTable.querySelector("tbody");
+
+  // Set default date range (last 30 days)
+  function setDefaultDateRange() {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - 30);
+    
+    endDateFilter.value = endDate.toISOString().split('T')[0];
+    startDateFilter.value = startDate.toISOString().split('T')[0];
+  }
+
+  // Validate date range
+  function validateDateRange() {
+    const start = startDateFilter.value;
+    const end = endDateFilter.value;
+    
+    if (start && end) {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      
+      if (startDate > endDate) {
+        console.warn("Start date is after end date, swapping...");
+        startDateFilter.value = end;
+        endDateFilter.value = start;
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Function to set date range from buttons
+  function setDateRange(days) {
+    const endDate = new Date();
+    const startDate = new Date();
+    
+    if (days === 'all') {
+      // For "All Time", we'll set a very early start date
+      startDate.setFullYear(2020, 0, 1); // Jan 1, 2020
+    } else {
+      startDate.setDate(endDate.getDate() - days);
+    }
+    
+    endDateFilter.value = endDate.toISOString().split('T')[0];
+    startDateFilter.value = startDate.toISOString().split('T')[0];
+    
+    fetchSalesData();
+  }
+
+  // Function to update summary cards
+  function updateSummaryCards(summary) {
+    totalSalesEl.textContent = '$' + summary.total_sales.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    totalOrdersEl.textContent = summary.total_orders.toLocaleString();
+    avgOrderValueEl.textContent = '$' + summary.avg_order_value.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    totalDiscountsEl.textContent = '$' + summary.total_discounts.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    summaryCards.style.display = 'block';
+  }
+
+  // Function to render sales table
+  function renderSalesTable(salesData) {
+    salesTbody.innerHTML = "";
+    
+    if (salesData.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td colspan="8" style="text-align: center; padding: 20px; color: #666;">
+          No sales data available for the selected date range.
+        </td>
+      `;
+      salesTbody.appendChild(tr);
+    } else {
+      salesData.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.day}</td>
+          <td>${row.order_count.toLocaleString()}</td>
+          <td>$${row.gross_sales.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+          <td>$${row.discounts.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+          <td>$${row.net_sales.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+          <td>$${row.shipping_charges.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+          <td>$${row.taxes.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+          <td>$${row.total_sales.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+        `;
+        salesTbody.appendChild(tr);
+      });
+    }
+    
+    salesSection.style.display = 'block';
+  }
+
+  // Function to fetch and display sales data
+  async function fetchSalesData() {
+    try {
+      // Validate and potentially swap dates
+      validateDateRange();
+      
+      const startDate = startDateFilter.value;
+      const endDate = endDateFilter.value;
+
+      if (!startDate || !endDate) {
+        console.log("Date range not set");
+        return;
+      }
+
+      loadingState.style.display = 'block';
+      errorState.style.display = 'none';
+      summaryCards.style.display = 'none';
+      salesSection.style.display = 'none';
+
+      const apiUrl = `/api/sales-overview?start_date=${startDate}&end_date=${endDate}`;
+      console.log("Fetching from:", apiUrl);
+
+      const res = await fetch(apiUrl);
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
+      const data = await res.json();
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      console.log("Sales data loaded:", data);
+      
+      // Hide loading state
+      loadingState.style.display = 'none';
+      
+      // Update summary cards
+      if (data.summary) {
+        updateSummaryCards(data.summary);
+      }
+      
+      // Render sales table
+      if (data.sales_data) {
+        renderSalesTable(data.sales_data);
+      }
+      
+    } catch (error) {
+      console.error("Error fetching sales data:", error);
+      
+      loadingState.style.display = 'none';
+      errorState.style.display = 'block';
+      errorMessage.textContent = error.message;
+    }
+  }
+
+  // Event listeners for date filters
+  startDateFilter.addEventListener("change", () => {
+    console.log("Start date changed to:", startDateFilter.value);
+    rangeButtons.forEach(btn => btn.classList.remove('active'));
+    validateDateRange();
+    fetchSalesData();
+  });
+
+  endDateFilter.addEventListener("change", () => {
+    console.log("End date changed to:", endDateFilter.value);
+    rangeButtons.forEach(btn => btn.classList.remove('active'));
+    validateDateRange();
+    fetchSalesData();
+  });
+
+  // Event listeners for quick range buttons
+  rangeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      rangeButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      const days = button.dataset.days;
+      console.log("Quick range button clicked:", days);
+      setDateRange(days === 'all' ? 'all' : parseInt(days));
+    });
+  });
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    setDefaultDateRange();
+    fetchSalesData();
+  });
+</script>
 {% endblock %}
