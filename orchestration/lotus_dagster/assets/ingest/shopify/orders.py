@@ -232,7 +232,7 @@ def extract_orders_query_fn(client, last_sync: datetime) -> Dict:
         orders(
           first: {PAGE_SIZE}
           after: $cursor
-          query: "NOT (financial_status:voided OR financial_status:pending OR financial_status:authorized) updated_at:>={since_date}"
+          query: "updated_at:>={since_date}"
           sortKey: UPDATED_AT
         ) {{
           edges {{

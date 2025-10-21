@@ -22,7 +22,7 @@ try:
     if str(project_root) not in sys.path:
         sys.path.append(str(project_root))
     from orchestration.lotus_dagster.resources.connectors.shop_resource import ShopifyClient
-    from orchestration.lotus_dagster.assets.ingest.shopify.products import extract_products_query_fn
+    from orchestration.lotus_dagster.assets.ingest.shopify.returns import extract_refunds_query_fn
 except ImportError as e:
     print(f"❌ ERROR: Failed to import project modules.\nDetails: {e}")
     sys.exit(1)
@@ -37,26 +37,34 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 # ----------------------------------------------------------------------
 def main():
     logging.info("Initializing ShopifyClient...")
-    client = ShopifyClient()  # ✅ No api_key argument — uses internal credentials
+    client = ShopifyClient()
 
-    last_sync_time = datetime.now(timezone.utc) - timedelta(hours=24)
-    logging.info(f"🚀 Fetching products updated since: {last_sync_time.isoformat()}")
+    # Fetch refunds from last 7 days (refunds are less frequent than products)
+    last_sync_time = datetime.now(timezone.utc) - timedelta(days=7)
+    logging.info(f"🚀 Fetching refunds updated since: {last_sync_time.isoformat()}")
 
-    result = extract_products_query_fn(client, last_sync_time)
+    result = extract_refunds_query_fn(client, last_sync_time)
 
-    logging.info(f"✅ Extraction complete: {result['row_count']} products fetched")
+    logging.info(f"✅ Extraction complete: {result['row_count']} refunds fetched")
 
-    output_path = current_file.parent / "shopify_products_output.json"
+    output_path = current_file.parent / "shopify_refunds_output.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2, default=str)
 
     # Optional: quick summary
-    products = result.get("records", {}).get("products", [])
-    variants = result.get("records", {}).get("variants", [])
-    logging.info(f"Summary → Products: {len(products)}, Variants: {len(variants)}")
+    refunds = result.get("records", [])
+    logging.info(f"Summary → Total refunds: {len(refunds)}")
 
-    if products:
-        logging.info(f"Example product: {json.dumps(products[0], indent=2)}")
+    if refunds:
+        # Show first refund as example
+        logging.info(f"Example refund: {json.dumps(refunds[0], indent=2, default=str)}")
+        
+        # Count refund line items across all refunds
+        total_line_items = sum(
+            len(r.get("refundLineItems", {}).get("edges", []))
+            for r in refunds
+        )
+        logging.info(f"Total refund line items across all refunds: {total_line_items}")
 
     logging.info(f"🗂 Output saved to {output_path}")
 
