@@ -39,6 +39,18 @@ shipping_refund_aggregates AS (
   GROUP BY r.id
 ),
 
+-- NEW: Get the transaction date (when refund was actually processed)
+refund_transaction_dates AS (
+  SELECT
+    r.id AS refund_id,
+    MAX(t.node.createdAt) AS refund_processed_at
+  FROM deduped_refunds r
+  CROSS JOIN UNNEST(r.transactions.edges) AS t
+  WHERE t.node.kind = 'REFUND'
+    AND t.node.status = 'SUCCESS'
+  GROUP BY r.id
+),
+
 refunds AS (
   SELECT
     r.id AS refund_id,
@@ -46,16 +58,18 @@ refunds AS (
     r.order_name,
     r.createdAt AS created_at,
     r.updatedAt AS updated_at,
+    COALESCE(rtd.refund_processed_at, r.createdAt) AS refund_processed_at,  -- NEW FIELD
     CAST(r.totalRefundedSet.shopMoney.amount AS DOUBLE) AS total_refunded,
     COALESCE(rli.gross_returns, 0.0) AS gross_returns,
     COALESCE(rli.taxes_returned, 0.0) AS taxes_returned,
     COALESCE(sr.shipping_returned, 0.0) AS shipping_returned,
     0.0 AS discounts_returned,
     COALESCE(rli.gross_returns, 0.0) - 0.0 AS net_returns,
-    COALESCE(rli.gross_returns, 0.0) - 0.0 + COALESCE(rli.taxes_returned, 0.0) + COALESCE(sr.shipping_returned, 0.0) AS total_returns
+    CAST(r.totalRefundedSet.shopMoney.amount AS DOUBLE) AS total_returns
   FROM deduped_refunds r
   LEFT JOIN refund_line_item_aggregates rli ON r.id = rli.refund_id
   LEFT JOIN shipping_refund_aggregates sr ON r.id = sr.refund_id
+  LEFT JOIN refund_transaction_dates rtd ON r.id = rtd.refund_id  -- NEW JOIN
 )
 
 SELECT * FROM refunds

@@ -6,7 +6,8 @@
 │   ├── routes
 │   │   ├── drop_performance.py
 │   │   ├── home.py
-│   │   └── __init__.py
+│   │   ├── __init__.py
+│   │   └── last_sync.py
 │   ├── services
 │   │   └── query_utils.py
 │   ├── static
@@ -15,9 +16,10 @@
 │   │   └── js
 │   │       └── main.js
 │   └── templates
-│       ├── base..html
-│       ├── drop_perfomance.html
-│       └── home.html
+│       ├── base.html
+│       ├── drop_performance.html
+│       ├── home.html
+│       └── last_sync.html
 ├── dbt
 │   ├── dbt_packages
 │   │   └── dbt_utils
@@ -294,6 +296,8 @@
 │   │   │       ├── shopify_orders.sql
 │   │   │       ├── shopify_products.sql
 │   │   │       ├── shopify_product_tags.sql
+│   │   │       ├── shopify_refund_line_items.sql
+│   │   │       ├── shopify_refunds.sql
 │   │   │       ├── shopify_tax_lines.sql
 │   │   │       └── shopify_variants.sql
 │   │   ├── mart
@@ -314,25 +318,11 @@
 │   │   │       │       ├── lotus-on-run-start-0.sql
 │   │   │       │       └── lotus-on-run-start-1.sql
 │   │   │       └── models
-│   │   │           ├── core
-│   │   │           │   ├── klaviyo
-│   │   │           │   │   ├── email_clicked.sql
-│   │   │           │   │   ├── email_open.sql
-│   │   │           │   │   ├── klaviyo_campaigns.sql
-│   │   │           │   │   └── received_email.sql
-│   │   │           │   └── shopify
-│   │   │           │       ├── shopify_discounts.sql
-│   │   │           │       ├── shopify_order_lines.sql
-│   │   │           │       ├── shopify_orders.sql
-│   │   │           │       ├── shopify_products.sql
-│   │   │           │       ├── shopify_product_tags.sql
-│   │   │           │       ├── shopify_tax_lines.sql
-│   │   │           │       └── shopify_variants.sql
-│   │   │           └── mart
-│   │   │               ├── campaign_performance.sql
-│   │   │               ├── shopify_product_performance.sql
-│   │   │               ├── shopify_sales_breakdown.sql
-│   │   │               └── shopify_tag_performance.sql
+│   │   │           └── core
+│   │   │               ├── klaviyo
+│   │   │               │   └── klaviyo_campaigns.sql
+│   │   │               └── shopify
+│   │   │                   └── shopify_order_lines.sql
 │   │   ├── graph.gpickle
 │   │   ├── graph_summary.json
 │   │   ├── manifest.json
@@ -349,6 +339,7 @@
 │   │   │       └── models
 │   │   │           └── core
 │   │   │               └── klaviyo
+│   │   │                   ├── campaign_message.sql
 │   │   │                   └── klaviyo_campaigns.sql
 │   │   ├── graph.gpickle
 │   │   ├── graph_summary.json
@@ -494,6 +485,24 @@
 │   │   ├── partial_parse.msgpack
 │   │   ├── run_results.json
 │   │   └── semantic_manifest.json
+│   ├── target_shopify_refunds
+│   │   ├── compiled
+│   │   │   └── lotus
+│   │   │       ├── dbt_project.yml
+│   │   │       │   └── hooks
+│   │   │       │       ├── lotus-on-run-start-0.sql
+│   │   │       │       └── lotus-on-run-start-1.sql
+│   │   │       └── models
+│   │   │           └── core
+│   │   │               └── shopify
+│   │   │                   ├── shopify_refund_line_items.sql
+│   │   │                   └── shopify_refunds.sql
+│   │   ├── graph.gpickle
+│   │   ├── graph_summary.json
+│   │   ├── manifest.json
+│   │   ├── partial_parse.msgpack
+│   │   ├── run_results.json
+│   │   └── semantic_manifest.json
 │   ├── target_shopify_tag_performance_mart
 │   │   ├── compiled
 │   │   │   └── lotus
@@ -546,10 +555,14 @@
 │   │   │   │   │       ├── test_email_clicked.py
 │   │   │   │   │       ├── test_opened_email_events.py
 │   │   │   │   │       ├── test_output
+│   │   │   │   │       │   ├── campaign_messages.csv
+│   │   │   │   │       │   ├── campaign_messages_raw.json
 │   │   │   │   │       │   ├── campaigns.csv
 │   │   │   │   │       │   ├── campaigns_raw.json
 │   │   │   │   │       │   ├── email_clicked.csv
 │   │   │   │   │       │   ├── email_clicked_raw.json
+│   │   │   │   │       │   ├── open_events.csv
+│   │   │   │   │       │   ├── open_events_raw.json
 │   │   │   │   │       │   ├── purchase_events.csv
 │   │   │   │   │       │   ├── purchase_events_raw.json
 │   │   │   │   │       │   ├── received_email.csv
@@ -559,9 +572,12 @@
 │   │   │   │   └── shopify
 │   │   │   │       ├── orders.py
 │   │   │   │       ├── products.py
+│   │   │   │       ├── returns.py
 │   │   │   │       └── test_shopify
 │   │   │   │           ├── shopify_products_output.json
-│   │   │   │           └── test_products.py
+│   │   │   │           ├── shopify_refunds_output.json
+│   │   │   │           ├── test_products.py
+│   │   │   │           └── test_returns.py
 │   │   │   └── model
 │   │   │       ├── dbt_assets.py
 │   │   │       └── __init__.py
@@ -600,9 +616,8 @@
 │   ├── raw_klaviyo_campaign.sql
 │   ├── raw_received_email.sql
 │   ├── raw_shopify_orders.sql
-│   └── raw_shopify_products.sql
-├── tests
-│   └── test_connections.py
+│   ├── raw_shopify_products.sql
+│   └── raw_shopify_refunds.sql
 └── workspace.yaml
 
-157 directories, 448 files
+163 directories, 457 files

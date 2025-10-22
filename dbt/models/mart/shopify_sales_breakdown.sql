@@ -18,13 +18,13 @@ gross_sales_calc AS (
   GROUP BY o.order_id, date_trunc('day', o.created_at AT TIME ZONE 'America/Los_Angeles')
 ),
 
--- FIXED: Returns by refund date, not order date
+-- FIXED: Returns by transaction date (when refund was actually processed)
 returns_by_day AS (
   SELECT
-    date_trunc('day', r.created_at AT TIME ZONE 'America/Los_Angeles') AS day,
+    date_trunc('day', r.refund_processed_at AT TIME ZONE 'America/Los_Angeles') AS day,
     COALESCE(SUM(r.total_returns), 0.0) AS returns
   FROM {{ ref('shopify_refunds') }} r
-  GROUP BY date_trunc('day', r.created_at AT TIME ZONE 'America/Los_Angeles')
+  GROUP BY date_trunc('day', r.refund_processed_at AT TIME ZONE 'America/Los_Angeles')
 ),
 
 order_metrics AS (
@@ -40,7 +40,6 @@ order_metrics AS (
   JOIN orders_in_scope o ON gs.order_id = o.order_id
 ),
 
--- Aggregate orders by day first
 daily_orders AS (
   SELECT
     day,
@@ -54,13 +53,12 @@ daily_orders AS (
   GROUP BY day
 )
 
--- FIXED: Join returns by day, not by order
 SELECT
   do.day,
   do.order_count,
   do.gross_sales,
   do.discounts,
-  -1 * COALESCE(r.returns, 0.0) AS returns,  -- Negative for display
+  -1 * COALESCE(r.returns, 0.0) AS returns,
   (do.gross_sales - do.discounts - COALESCE(r.returns, 0.0)) AS net_sales,
   do.shipping_charges,
   do.return_fees,
