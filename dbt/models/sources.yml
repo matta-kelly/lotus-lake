@@ -13,6 +13,7 @@ sources:
         description: "Raw Shopify order data including nested customer and line-item details"
       - name: products_raw
         description: "Raw Shopify product, variant, and tag data ingested from the unified GraphQL extraction flow"
+      - name: refunds_raw
 
   - name: klaviyo
     description: "Klaviyo data sources (email opens, campaigns, etc.)"

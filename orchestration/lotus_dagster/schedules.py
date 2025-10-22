@@ -16,6 +16,8 @@ from .jobs import (
     klaviyo_campaign_performance_mart_dbt_job,
     shopify_product_performance_mart_dbt_job,
     shopify_tag_performance_summary_mart_dbt_job,
+    shopify_refunds_ingestion_job,
+    shopify_refunds_core_dbt_job,
 )
 
 # ============================================================================
@@ -57,6 +59,11 @@ shopify_products_ingestion_schedule = ScheduleDefinition(
     cron_schedule="3 * * * *",  # Products: :03 every hour
 )
 
+# === MEDIUM FREQUENCY - Refunds (Every 15 min) ===
+shopify_refunds_ingestion_schedule = ScheduleDefinition(
+    job=shopify_refunds_ingestion_job,
+    cron_schedule="6,21,36,51 * * * *",  # Refunds: every 15 min at :06
+)
 # ============================================================================
 # CORE DBT SCHEDULES - 7 min after corresponding ingestion
 # ============================================================================
@@ -95,6 +102,12 @@ shopify_products_core_dbt_schedule = ScheduleDefinition(
     cron_schedule="10 * * * *",  # 7 min after products
 )
 
+# === MEDIUM FREQUENCY - Refunds DBT (7 min after ingestion) ===
+shopify_refunds_core_dbt_schedule = ScheduleDefinition(
+    job=shopify_refunds_core_dbt_job,
+    cron_schedule="13,28,43,58 * * * *",  # 7 min after refunds
+)
+
 # ============================================================================
 # MART DBT SCHEDULES - Hourly after all dependencies complete
 # ============================================================================
@@ -118,3 +131,4 @@ shopify_tag_performance_summary_mart_dbt_schedule = ScheduleDefinition(
     job=shopify_tag_performance_summary_mart_dbt_job,
     cron_schedule="45 * * * *",  # :45 - depends on product_performance mart
 )
+

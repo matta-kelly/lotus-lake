@@ -48,6 +48,7 @@ def sales_overview():
                 day,
                 gross_sales,
                 discounts,
+                returns,
                 net_sales,
                 shipping_charges,
                 taxes,
@@ -66,11 +67,12 @@ def sales_overview():
                 "day": r[0].strftime('%Y-%m-%d') if r[0] else None,
                 "gross_sales": float(r[1]) if r[1] is not None else 0.0,
                 "discounts": float(r[2]) if r[2] is not None else 0.0,
-                "net_sales": float(r[3]) if r[3] is not None else 0.0,
-                "shipping_charges": float(r[4]) if r[4] is not None else 0.0,
-                "taxes": float(r[5]) if r[5] is not None else 0.0,
-                "total_sales": float(r[6]) if r[6] is not None else 0.0,
-                "order_count": int(r[7]) if r[7] is not None else 0
+                "returns": float(r[3]) if r[3] is not None else 0.0,
+                "net_sales": float(r[4]) if r[4] is not None else 0.0,
+                "shipping_charges": float(r[5]) if r[5] is not None else 0.0,
+                "taxes": float(r[6]) if r[6] is not None else 0.0,
+                "total_sales": float(r[7]) if r[7] is not None else 0.0,
+                "order_count": int(r[8]) if r[8] is not None else 0
             } for r in rows
         ]
         
@@ -80,6 +82,7 @@ def sales_overview():
         total_sales = sum(d["total_sales"] for d in sales_data)
         total_orders = sum(d["order_count"] for d in sales_data)
         total_discounts = sum(d["discounts"] for d in sales_data)
+        total_returns = sum(d["returns"] for d in sales_data)
         avg_order_value = total_sales / total_orders if total_orders > 0 else 0.0
         
         return jsonify({
@@ -88,6 +91,7 @@ def sales_overview():
                 "total_sales": total_sales,
                 "total_orders": total_orders,
                 "total_discounts": total_discounts,
+                "total_returns": total_returns,
                 "avg_order_value": avg_order_value
             }
         })

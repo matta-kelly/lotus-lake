@@ -8,10 +8,13 @@ from shared.config import settings
 # Ingestion flows
 from .assets.ingest.shopify.orders import build_orders_assets
 from .assets.ingest.shopify.products import build_products_assets
+from .assets.ingest.shopify.returns import build_refunds_assets
 from .assets.ingest.klaviyo.email_open import build_email_open_assets
 from .assets.ingest.klaviyo.received_email import build_received_email_assets
 from .assets.ingest.klaviyo.campaigns import build_campaign_assets
 from .assets.ingest.klaviyo.email_clicked import build_email_clicked_assets
+
+
 
 # dbt transformations
 from .assets.model.dbt_assets import (
@@ -25,6 +28,7 @@ from .assets.model.dbt_assets import (
     klaviyo_campaign_performance_mart_dbt_models,
     shopify_tag_performance_summary_mart_dbt_models,
     shopify_product_performance_mart_dbt_models, 
+    shopify_refunds_core_dbt_models,
 )
 
 # Resources
@@ -54,6 +58,9 @@ from .jobs import (
     klaviyo_campaign_performance_mart_dbt_job,
     shopify_tag_performance_summary_mart_dbt_job,
     shopify_product_performance_mart_dbt_job,
+    shopify_refunds_ingestion_job,
+    shopify_refunds_core_dbt_job,
+
 )
 from .schedules import (
     shopify_orders_ingestion_schedule,
@@ -72,6 +79,8 @@ from .schedules import (
     klaviyo_campaign_performance_mart_dbt_schedule,
     shopify_product_performance_mart_dbt_schedule,
     shopify_tag_performance_summary_mart_dbt_schedule,
+    shopify_refunds_ingestion_schedule,
+    shopify_refunds_core_dbt_schedule,  
 )
 
 # ============================================================================
@@ -86,6 +95,7 @@ all_ingestion_assets = [
     *build_received_email_assets(),
     *build_campaign_assets(),
     *build_email_clicked_assets(),
+    *build_refunds_assets(),
 ]
 all_dbt_assets = [
     shopify_orders_core_dbt_models,
@@ -97,7 +107,8 @@ all_dbt_assets = [
     klaviyo_email_clicked_core_dbt_models,
     klaviyo_campaign_performance_mart_dbt_models,
     shopify_tag_performance_summary_mart_dbt_models,
-    shopify_product_performance_mart_dbt_models, 
+    shopify_product_performance_mart_dbt_models,
+    shopify_refunds_core_dbt_models, 
 ]
 
 if settings.ENV == "production":
@@ -123,6 +134,8 @@ if settings.ENV == "production":
             klaviyo_campaign_performance_mart_dbt_schedule,
             shopify_product_performance_mart_dbt_schedule,
             shopify_tag_performance_summary_mart_dbt_schedule,
+            shopify_refunds_ingestion_schedule,
+            shopify_refunds_core_dbt_schedule,  
             
         ],
         resources={
@@ -162,6 +175,8 @@ else:
             klaviyo_campaign_performance_mart_dbt_job,
             shopify_tag_performance_summary_mart_dbt_job,
             shopify_product_performance_mart_dbt_job,
+            shopify_refunds_ingestion_job,
+            shopify_refunds_core_dbt_job,
         ],
         resources={
             "db": postgres_resource,

@@ -572,3 +572,63 @@ def shopify_tag_performance_summary_mart_dbt_models(context: AssetExecutionConte
             "dbt_output": dbt_result["stdout"][:500],
         },
     )
+
+
+@asset(
+    name="shopify_refunds_core_dbt_models",
+    description="dbt core models for the Shopify Refunds flow.",
+    group_name="shopify_refunds_core_dbt",
+    ins={"iceberg_result": AssetIn("iceberg_loader_shopify_refunds")},
+    tags={"dbt_layer": "core"},
+)
+def shopify_refunds_core_dbt_models(context: AssetExecutionContext, iceberg_result: dict):
+    """Run dbt core models for Shopify Refunds, validate, and pass through result."""
+    if "row_count" not in iceberg_result:
+        raise ValueError("iceberg_result missing row_count for validation")
+
+    claimed_parent_count = iceberg_result["row_count"]
+    context.log.info(f"✓ Validated input: {claimed_parent_count} parent refunds from Iceberg")
+
+    dbt_result = run_dbt_command(
+        [
+            "run",
+            "--select",
+            "core.shopify.shopify_refunds core.shopify.shopify_refund_line_items",
+        ],
+        context,
+        target_name="shopify_refunds"
+    )
+
+    run_results_path = DBT_PROJECT_DIR / dbt_result["target_dir"] / "run_results.json"
+    try:
+        with open(run_results_path) as f:
+            run_results = json.load(f)
+
+        parent_rows_processed = None
+        for result in run_results.get("results", []):
+            model_name = result.get("unique_id", "")
+            if "shopify_refunds" in model_name and "refund_line_items" not in model_name:
+                adapter_response = result.get("adapter_response", {})
+                parent_rows_processed = adapter_response.get("rows_affected", 0)
+                context.log.info(
+                    f"dbt processed {parent_rows_processed} rows for shopify_refunds model"
+                )
+                break
+
+        if parent_rows_processed is not None:
+            if parent_rows_processed == 0:
+                raise ValueError(
+                    f"dbt processed 0 rows for shopify_refunds but {claimed_parent_count} were loaded to raw. "
+                    f"Data loss detected in dbt transformation."
+                )
+            context.log.info(
+                f"✓ Validated dbt processing: {parent_rows_processed} rows affected "
+                f"(includes DELETE+INSERT for {claimed_parent_count} parent refunds)"
+            )
+        else:
+            context.log.warning("Could not extract row count from dbt run_results.json - validation skipped")
+    except Exception as e:
+        context.log.warning(f"Could not parse dbt run_results.json: {e} - validation skipped")
+
+    context.log.info("dbt completed successfully, passing through iceberg result for sync update")
+    return iceberg_result

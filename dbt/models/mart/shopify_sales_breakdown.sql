@@ -18,31 +18,54 @@ gross_sales_calc AS (
   GROUP BY o.order_id, date_trunc('day', o.created_at AT TIME ZONE 'America/Los_Angeles')
 ),
 
+-- FIXED: Returns by refund date, not order date
+returns_by_day AS (
+  SELECT
+    date_trunc('day', r.created_at AT TIME ZONE 'America/Los_Angeles') AS day,
+    COALESCE(SUM(r.total_returns), 0.0) AS returns
+  FROM {{ ref('shopify_refunds') }} r
+  GROUP BY date_trunc('day', r.created_at AT TIME ZONE 'America/Los_Angeles')
+),
+
 order_metrics AS (
   SELECT
     gs.order_id,
     gs.day,
     gs.gross_sales,
     o.discounts_total AS discounts,
-    (gs.gross_sales - o.discounts_total) AS net_sales,
     o.shipping_cost AS shipping_charges,
     0.00 AS return_fees,
-    o.total_tax AS taxes,
-    (gs.gross_sales - o.discounts_total + o.shipping_cost + o.total_tax) AS total_sales
+    o.total_tax AS taxes
   FROM gross_sales_calc gs
   JOIN orders_in_scope o ON gs.order_id = o.order_id
+),
+
+-- Aggregate orders by day first
+daily_orders AS (
+  SELECT
+    day,
+    COUNT(DISTINCT order_id) AS order_count,
+    SUM(gross_sales) AS gross_sales,
+    SUM(discounts) AS discounts,
+    SUM(shipping_charges) AS shipping_charges,
+    SUM(return_fees) AS return_fees,
+    SUM(taxes) AS taxes
+  FROM order_metrics
+  GROUP BY day
 )
 
+-- FIXED: Join returns by day, not by order
 SELECT
-  day,
-  COUNT(DISTINCT order_id) AS order_count,
-  SUM(gross_sales) AS gross_sales,
-  SUM(discounts) AS discounts,
-  SUM(net_sales) AS net_sales,
-  SUM(shipping_charges) AS shipping_charges,
-  SUM(return_fees) AS return_fees,
-  SUM(taxes) AS taxes,
-  SUM(total_sales) AS total_sales
-FROM order_metrics
-GROUP BY day
-ORDER BY day DESC
+  do.day,
+  do.order_count,
+  do.gross_sales,
+  do.discounts,
+  -1 * COALESCE(r.returns, 0.0) AS returns,  -- Negative for display
+  (do.gross_sales - do.discounts - COALESCE(r.returns, 0.0)) AS net_sales,
+  do.shipping_charges,
+  do.return_fees,
+  do.taxes,
+  (do.gross_sales - do.discounts - COALESCE(r.returns, 0.0) + do.shipping_charges + do.taxes) AS total_sales
+FROM daily_orders do
+LEFT JOIN returns_by_day r ON do.day = r.day
+ORDER BY do.day DESC

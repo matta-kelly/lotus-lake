@@ -15,7 +15,7 @@ NAMESPACE = "shopify"
 TABLE = "refunds"
 UPDATED_FIELD = "updatedAt"
 PAGE_SIZE = 100
-MAX_PAGES_PER_RUN = 1
+MAX_PAGES_PER_RUN = 50
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -261,6 +261,15 @@ def extract_refunds_query_fn(client, last_sync: datetime) -> Dict:
             f"Hit pagination limit ({MAX_PAGES_PER_RUN} pages, {len(all_refunds)} refunds). "
             f"More data exists - will continue in next run."
         )
+    
+    logger.info(f"Pre-processing {len(all_refunds)} refunds to convert nested transaction timestamps...")
+    for refund in all_refunds:
+        if refund.get("transactions") and refund["transactions"].get("edges"):
+            for edge in refund["transactions"]["edges"]:
+                node = edge.get("node")
+                if node and node.get("createdAt"):
+                    node["createdAt"] = schema_converters.convert_timestamp(node["createdAt"])
+    logger.info("Nested timestamp pre-processing complete.")
     
     elapsed = time.time() - start_time
     logger.info(f"EXTRACTION SUMMARY:")

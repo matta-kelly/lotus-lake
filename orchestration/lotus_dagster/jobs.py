@@ -22,6 +22,7 @@ shopify_orders_mart_dbt_job = define_asset_job(
     selection=AssetSelection.groups("shopify_sales_summary_mart_dbt"),
 )
 
+# Shopify Products Ingestion
 shopify_products_ingestion_job = define_asset_job(
     name="shopify_products_ingestion_job",
     selection=AssetSelection.groups("shopify_products"),
@@ -31,6 +32,18 @@ shopify_products_ingestion_job = define_asset_job(
 shopify_products_core_dbt_job = define_asset_job(
     name="shopify_products_core_dbt_job",
     selection=AssetSelection.groups("shopify_products_core_dbt"),
+)
+
+# Shopify Refunds Ingestion
+shopify_refunds_ingestion_job = define_asset_job(
+    name="shopify_refunds_ingestion_job",
+    selection=AssetSelection.groups("shopify_refunds"),
+)
+
+# Shopify Refunds Core dbt
+shopify_refunds_core_dbt_job = define_asset_job(
+    name="shopify_refunds_core_dbt_job",
+    selection=AssetSelection.groups("shopify_refunds_core_dbt"),
 )
 
 # ============================================================================
