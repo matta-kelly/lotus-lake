@@ -1,3 +1,5 @@
+-- campaign_performance.sql
+
 {{ config(
     materialized='table',
     schema='mart',
@@ -7,34 +9,34 @@
 WITH received AS (
     SELECT
         campaign_id,
-        DATE(event_datetime) AS date,
+        DATE(event_datetime AT TIME ZONE 'America/Los_Angeles') AS date,
         COUNT(DISTINCT profile_id) AS unique_received,
         COUNT(*) AS total_received
     FROM {{ ref('received_email') }}
     WHERE campaign_id IS NOT NULL  -- Exclude flow emails
-    GROUP BY campaign_id, DATE(event_datetime)
+    GROUP BY campaign_id, DATE(event_datetime AT TIME ZONE 'America/Los_Angeles')
 ),
 
 opens AS (
     SELECT
         campaign_id,
-        DATE(event_datetime) AS date,
+        DATE(event_datetime AT TIME ZONE 'America/Los_Angeles') AS date,
         COUNT(DISTINCT profile_id) AS unique_opens,
         COUNT(*) AS total_opens
     FROM {{ ref('email_open') }}
     WHERE campaign_id IS NOT NULL  -- Exclude flow emails
-    GROUP BY campaign_id, DATE(event_datetime)
+    GROUP BY campaign_id, DATE(event_datetime AT TIME ZONE 'America/Los_Angeles')
 ),
 
 clicks AS (
     SELECT
         campaign_id,
-        DATE(event_datetime) AS date,
+        DATE(event_datetime AT TIME ZONE 'America/Los_Angeles') AS date,
         COUNT(DISTINCT profile_id) AS unique_clicks,
         COUNT(*) AS total_clicks
     FROM {{ ref('email_clicked') }}
     WHERE campaign_id IS NOT NULL  -- Exclude flow emails
-    GROUP BY campaign_id, DATE(event_datetime)
+    GROUP BY campaign_id, DATE(event_datetime AT TIME ZONE 'America/Los_Angeles')
 ),
 
 all_dates AS (

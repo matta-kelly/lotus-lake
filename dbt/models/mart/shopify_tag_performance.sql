@@ -1,3 +1,5 @@
+-- shopify_tag_performance.sql
+
 {{ config(
     materialized='table',
     schema='mart',

@@ -1,3 +1,5 @@
+-- shopify_product_performance.sql
+
 {{ config(
     materialized='table',
     schema='mart',
@@ -13,11 +15,10 @@ WITH order_data AS (
         quantity,
         discounted_total,
         order_id,
-        DATE(created_at) AS date  -- UPDATED to use the correct sale date from the source
+        DATE(created_at AT TIME ZONE 'America/Los_Angeles') AS date
     FROM {{ ref('shopify_order_lines') }}
     {% if is_incremental() %}
-    -- UPDATED to filter on the correct sale date
-    WHERE DATE(created_at) > (SELECT MAX(date) FROM {{ this }})
+    WHERE DATE(created_at AT TIME ZONE 'America/Los_Angeles') > (SELECT MAX(date) FROM {{ this }})
     {% endif %}
 ),
 
