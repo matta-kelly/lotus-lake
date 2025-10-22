@@ -174,7 +174,21 @@
     summaryCards.style.display = 'block';
   }
 
-  // Function to render sales table
+  // Add this function before renderSalesTable
+  function calculateTotals(salesData) {
+    return {
+      order_count: salesData.reduce((sum, row) => sum + row.order_count, 0),
+      gross_sales: salesData.reduce((sum, row) => sum + row.gross_sales, 0),
+      discounts: salesData.reduce((sum, row) => sum + row.discounts, 0),
+      returns: salesData.reduce((sum, row) => sum + row.returns, 0),
+      net_sales: salesData.reduce((sum, row) => sum + row.net_sales, 0),
+      shipping_charges: salesData.reduce((sum, row) => sum + row.shipping_charges, 0),
+      taxes: salesData.reduce((sum, row) => sum + row.taxes, 0),
+      total_sales: salesData.reduce((sum, row) => sum + row.total_sales, 0)
+    };
+  }
+
+  // Function to render sales table (REPLACE ENTIRE FUNCTION)
   function renderSalesTable(salesData) {
     salesTbody.innerHTML = "";
     
@@ -202,6 +216,25 @@
         `;
         salesTbody.appendChild(tr);
       });
+      
+      // Add totals row
+      const totals = calculateTotals(salesData);
+      const totalRow = document.createElement("tr");
+      totalRow.style.fontWeight = "bold";
+      totalRow.style.borderTop = "2px solid #333";
+      totalRow.style.backgroundColor = "#f8f9fa";
+      totalRow.innerHTML = `
+        <td>TOTAL</td>
+        <td>${totals.order_count.toLocaleString()}</td>
+        <td>$${totals.gross_sales.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+        <td>$${totals.discounts.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+        <td style="color: #d32f2f;">-$${totals.returns.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+        <td>$${totals.net_sales.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+        <td>$${totals.shipping_charges.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+        <td>$${totals.taxes.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+        <td>$${totals.total_sales.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+      `;
+      salesTbody.appendChild(totalRow);
     }
     
     salesSection.style.display = 'block';
