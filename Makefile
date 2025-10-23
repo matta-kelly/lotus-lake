@@ -138,7 +138,9 @@ restart-caddy-prod:
 
 # === COMMON TARGETS ===
 logs:
-	docker compose logs -f 2>/dev/null || echo "No services running"
+	@docker compose -f infra/docker-compose.prod.yml logs -f 2>/dev/null || \
+	docker compose -f infra/docker-compose.dev.yml logs -f 2>/dev/null || \
+	echo "No services running"
 
 down-clean:
 	@echo "WARNING: This stops ALL services and removes ALL volumes"
