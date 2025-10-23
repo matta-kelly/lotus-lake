@@ -7,8 +7,8 @@ import pathlib
 # Get project root (2 levels up from shared/config.py)
 PROJECT_ROOT = pathlib.Path(__file__).parent.parent
 
-env = os.getenv("ENV", "production").lower()
-env_file = PROJECT_ROOT / "infra" / ".env" if env == "production" else PROJECT_ROOT / "infra" / ".env.test"
+env = os.getenv("ENV", "prod").lower()
+env_file = PROJECT_ROOT / "infra" / ".env" 
 
 # Only load from file if it exists (local development)
 # In Docker, env vars are already set by docker-compose

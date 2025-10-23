@@ -38,30 +38,8 @@ from .resources.load.load_s3 import s3_client_resource, s3_loader_resource
 from .resources.load.iceberg_loader import iceberg_loader_resource
 from .resources.connectors.shop_resource import shopify_client_resource
 from .resources.connectors.klaviyo_resource import klaviyo_client_resource
-from .resources.load.test_load import local_loader_resource
 
 # Jobs and schedules
-from .jobs import (
-    shopify_orders_ingestion_job,
-    shopify_orders_core_dbt_job,
-    shopify_orders_mart_dbt_job,
-    klaviyo_email_open_ingestion_job,
-    klaviyo_email_open_dbt_job,
-    klaviyo_received_email_ingestion_job,
-    klaviyo_received_email_dbt_job,
-    klaviyo_campaign_ingestion_job,
-    klaviyo_campaign_dbt_job,
-    shopify_products_ingestion_job,
-    shopify_products_core_dbt_job,
-    klaviyo_email_clicked_ingestion_job,
-    klaviyo_email_clicked_dbt_job,
-    klaviyo_campaign_performance_mart_dbt_job,
-    shopify_tag_performance_summary_mart_dbt_job,
-    shopify_product_performance_mart_dbt_job,
-    shopify_refunds_ingestion_job,
-    shopify_refunds_core_dbt_job,
-
-)
 from .schedules import (
     shopify_orders_ingestion_schedule,
     shopify_orders_core_dbt_schedule,
@@ -111,82 +89,40 @@ all_dbt_assets = [
     shopify_refunds_core_dbt_models, 
 ]
 
-if settings.ENV == "production":
-    defs = Definitions(
-        assets=[
-            *all_ingestion_assets,
-            *all_dbt_assets,
-        ],
-        schedules=[
-            shopify_orders_ingestion_schedule,
-            shopify_orders_core_dbt_schedule,
-            shopify_orders_mart_dbt_schedule,
-            shopify_products_ingestion_schedule,
-            shopify_products_core_dbt_schedule,
-            klaviyo_email_open_ingestion_schedule,
-            klaviyo_email_open_dbt_schedule,
-            klaviyo_received_email_ingestion_schedule,
-            klaviyo_received_email_dbt_schedule,
-            klaviyo_campaign_ingestion_schedule,
-            klaviyo_campaign_dbt_schedule,
-            klaviyo_email_clicked_ingestion_schedule,
-            klaviyo_email_clicked_dbt_schedule,
-            klaviyo_campaign_performance_mart_dbt_schedule,
-            shopify_product_performance_mart_dbt_schedule,
-            shopify_tag_performance_summary_mart_dbt_schedule,
-            shopify_refunds_ingestion_schedule,
-            shopify_refunds_core_dbt_schedule,  
-            
-        ],
-        resources={
-            "db": postgres_resource,
-            "sync_state": sync_state_resource,
-            "s3_client": s3_client_resource,
-            "s3_loader": s3_loader_resource,
-            "loader": iceberg_loader_resource,
-            "shopify": shopify_client_resource,
-            "klaviyo": klaviyo_client_resource.configured(
-                {"api_key": settings.KLAVIYO_API_KEY}
-            ),
-        },
-    )
-
-else:
-    # Development mode
-    defs = Definitions(
-        assets=[
-            *all_ingestion_assets,
-            *all_dbt_assets,
-        ],
-        jobs=[
-            shopify_orders_ingestion_job,
-            shopify_orders_core_dbt_job,
-            shopify_orders_mart_dbt_job,
-            klaviyo_email_open_ingestion_job,
-            klaviyo_email_open_dbt_job,
-            klaviyo_received_email_ingestion_job,
-            klaviyo_received_email_dbt_job,
-            klaviyo_campaign_ingestion_job,
-            klaviyo_campaign_dbt_job,
-            shopify_products_ingestion_job,
-            shopify_products_core_dbt_job,
-            klaviyo_email_clicked_ingestion_job,
-            klaviyo_email_clicked_dbt_job,
-            klaviyo_campaign_performance_mart_dbt_job,
-            shopify_tag_performance_summary_mart_dbt_job,
-            shopify_product_performance_mart_dbt_job,
-            shopify_refunds_ingestion_job,
-            shopify_refunds_core_dbt_job,
-        ],
-        resources={
-            "db": postgres_resource,
-            "sync_state": sync_state_resource,
-            "s3_client": s3_client_resource,
-            "s3_loader": s3_loader_resource,
-            "loader": local_loader_resource,
-            "shopify": shopify_client_resource,
-            "klaviyo": klaviyo_client_resource.configured(
-                {"api_key": settings.KLAVIYO_API_KEY}
-            ),
-        },
-    )
+defs = Definitions(
+    assets=[
+        *all_ingestion_assets,
+        *all_dbt_assets,
+    ],
+    schedules=[
+        shopify_orders_ingestion_schedule,
+        shopify_orders_core_dbt_schedule,
+        shopify_orders_mart_dbt_schedule,
+        shopify_products_ingestion_schedule,
+        shopify_products_core_dbt_schedule,
+        klaviyo_email_open_ingestion_schedule,
+        klaviyo_email_open_dbt_schedule,
+        klaviyo_received_email_ingestion_schedule,
+        klaviyo_received_email_dbt_schedule,
+        klaviyo_campaign_ingestion_schedule,
+        klaviyo_campaign_dbt_schedule,
+        klaviyo_email_clicked_ingestion_schedule,
+        klaviyo_email_clicked_dbt_schedule,
+        klaviyo_campaign_performance_mart_dbt_schedule,
+        shopify_product_performance_mart_dbt_schedule,
+        shopify_tag_performance_summary_mart_dbt_schedule,
+        shopify_refunds_ingestion_schedule,
+        shopify_refunds_core_dbt_schedule,  
+    ],
+    resources={
+        "db": postgres_resource,
+        "sync_state": sync_state_resource,
+        "s3_client": s3_client_resource,
+        "s3_loader": s3_loader_resource,
+        "loader": iceberg_loader_resource,
+        "shopify": shopify_client_resource,
+        "klaviyo": klaviyo_client_resource.configured(
+            {"api_key": settings.KLAVIYO_API_KEY}
+        ),
+    },
+)

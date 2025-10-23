@@ -1,0 +1,374 @@
+version: "3.9"
+
+services:
+  # 1. PostgreSQL — stores ingestion sync state
+  ingestion-state-db:
+    image: postgres:15
+    container_name: lotus-ingestion-state-db
+    environment:
+      POSTGRES_DB: ${DB_NAME_PROD}
+      POSTGRES_USER: ${DB_USER_PROD}
+      POSTGRES_PASSWORD: ${DB_PASSWORD_PROD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ingestion_state_data:/var/lib/postgresql/data
+      - ./ingestion_state.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - lotus-data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER_PROD} -d ${DB_NAME_PROD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. MinIO — S3-compatible data lake
+  datalake-storage:
+    image: minio/minio:latest
+    container_name: lotus-datalake-storage
+    command: server --console-address ":9001" /data
+    environment:
+      MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID}
+      MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - datalake_storage_data:/data
+    networks:
+      - lotus-data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 3. MinIO Setup — creates S3 bucket
+  datalake-init:
+    image: minio/mc:latest
+    container_name: lotus-datalake-init
+    depends_on:
+      datalake-storage:
+        condition: service_healthy
+    networks:
+      - lotus-data
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set minio http://datalake-storage:9000 ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY};
+      mc mb minio/${S3_BUCKET} --ignore-existing;
+      exit 0;
+      "
+
+  # 4. Jobs Init — uploads Spark jobs to MinIO
+  jobs-init:
+    image: minio/mc:latest
+    container_name: lotus-jobs-init
+    depends_on:
+      datalake-storage:
+        condition: service_healthy
+      datalake-init:
+        condition: service_completed_successfully
+    networks:
+      - lotus-data
+    volumes:
+      - ../spark/jobs:/jobs
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set minio http://datalake-storage:9000 ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY};
+      mc mb minio/${S3_BUCKET}/jobs --ignore-existing;
+      mc cp /jobs/*.py minio/${S3_BUCKET}/jobs/ --recursive;
+      exit 0;
+      "
+
+  # 5. Spark Base — builds JARs + core runtime
+  spark-base:
+    build:
+      context: ..
+      dockerfile: spark/Dockerfile.spark-base
+    image: lotus-spark-base:latest
+
+  # 6. Spark Master
+  spark-master:
+    build:
+      context: ..
+      dockerfile: spark/Dockerfile.spark-master
+    container_name: lotus-spark-master
+    environment:
+      SPARK_MODE: master
+      SPARK_MASTER_HOST: spark-master
+      SPARK_MASTER_PORT: 7077
+      SPARK_MASTER_WEBUI_PORT: 8080
+      ICEBERG_CATALOG_URI: http://nessie:19120/api/v1
+      ICEBERG_CATALOG_WAREHOUSE: s3a://lotus-lakehouse
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      S3_ENDPOINT: http://datalake-storage:9000
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+      - "6066:6066"
+    volumes:
+      - ./spark-defaults.conf:/opt/spark/conf/spark-defaults.conf:ro
+    networks:
+      - lotus-data
+    depends_on:
+      - spark-base
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 7. Spark Worker
+  spark-worker:
+    build:
+      context: ..
+      dockerfile: spark/Dockerfile.spark-worker
+    container_name: lotus-spark-worker
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_CORES: 2
+      SPARK_WORKER_MEMORY: 2G
+      SPARK_WORKER_PORT: 7078
+      SPARK_WORKER_WEBUI_PORT: 8081
+      ICEBERG_CATALOG_URI: http://nessie:19120/api/v1
+      ICEBERG_CATALOG_WAREHOUSE: s3a://lotus-lakehouse
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      S3_ENDPOINT: http://datalake-storage:9000
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./spark-defaults.conf:/opt/spark/conf/spark-defaults.conf:ro
+    networks:
+      - lotus-data
+    depends_on:
+      spark-master:
+        condition: service_healthy
+      spark-base:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 8. Nessie — Iceberg catalog
+  nessie:
+    image: projectnessie/nessie:latest
+    container_name: lotus-nessie
+    environment:
+      QUARKUS_HTTP_PORT: 19120
+      NESSIE_SERVER_AUTHENTICATION: false
+      QUARKUS_OPENTELEMETRY_ENABLED: false
+      QUARKUS_OPENTELEMETRY_EXPORTER_OTLP_ENABLED: false
+    ports:
+      - "19120:19120"
+    networks:
+      - lotus-data
+    depends_on:
+      datalake-storage:
+        condition: service_healthy
+      ingestion-state-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:19120/api/v1/config"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 9. Spark Init — initializes Iceberg/Nessie tables
+  spark-init:
+    build:
+      context: ..
+      dockerfile: spark/Dockerfile.spark-base
+    image: lotus-spark-base:latest
+    container_name: lotus-spark-init
+    entrypoint: ["/opt/spark/jobs/run-init.sh"]
+    environment:
+      HADOOP_USER_NAME: spark
+      NESSIE_URI: http://nessie:19120/api/v1
+      WAREHOUSE: s3a://lotus-lakehouse
+      S3_ENDPOINT: http://datalake-storage:9000
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      ICEBERG_CATALOG_URI: http://nessie:19120/api/v1
+      ICEBERG_CATALOG_WAREHOUSE: s3a://lotus-lakehouse
+    depends_on:
+      spark-master:
+        condition: service_healthy
+      spark-worker:
+        condition: service_healthy
+      nessie:
+        condition: service_healthy
+      datalake-storage:
+        condition: service_healthy
+      jobs-init:
+        condition: service_completed_successfully
+    volumes:
+      - ../sql:/sql:ro
+    networks:
+      - lotus-data
+
+  # 10. Trino — query engine
+  trino:
+    image: trinodb/trino:latest
+    container_name: lotus-trino
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    ports:
+      - "8090:8080"
+    volumes:
+      - ./trino-catalog.properties:/etc/trino/catalog/iceberg.properties:ro
+    networks:
+      - lotus-data
+    depends_on:
+      ingestion-state-db:
+        condition: service_healthy
+      datalake-storage:
+        condition: service_healthy
+      datalake-init:
+        condition: service_completed_successfully
+      spark-master:
+        condition: service_healthy
+      spark-worker:
+        condition: service_healthy
+      spark-init:
+        condition: service_completed_successfully
+      nessie:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/info"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+ # 11. Dagster — orchestrator
+  dagster:
+    build:
+      context: ..
+      dockerfile: orchestration/Dockerfile.orchestration
+    container_name: lotus-dagster
+    working_dir: /opt/dagster/app
+    environment:
+      DAGSTER_HOME: /opt/dagster/dagster_home
+      ENV: production
+      DB_HOST_PROD: ${DB_HOST_PROD}
+      DB_PORT_PROD: ${DB_PORT_PROD}
+      DB_USER_PROD: ${DB_USER_PROD}
+      DB_PASSWORD_PROD: ${DB_PASSWORD_PROD}
+      DB_NAME_PROD: ${DB_NAME_PROD}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      S3_BUCKET: ${S3_BUCKET}
+      AWS_REGION: ${AWS_REGION}
+      SHOP_URL_PROD: ${SHOP_URL_PROD}
+      SHOP_TOKEN_PROD: ${SHOP_TOKEN_PROD}
+      SHOP_KEY_PROD: ${SHOP_KEY_PROD}
+      SHOP_SECRET_KEY_PROD: ${SHOP_SECRET_KEY_PROD}
+      KLAVIYO_API_KEY: ${KLAVIYO_API_KEY}
+      DEFAULT_DATE_PROD: ${DEFAULT_DATE_PROD}
+      LOG_LEVEL: ${LOG_LEVEL}
+      ICEBERG_CATALOG_URI: http://nessie:19120/api/v1
+      ICEBERG_CATALOG_WAREHOUSE: s3a://lotus-lakehouse
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../orchestration:/opt/dagster/app/orchestration
+      - ../shared:/opt/dagster/app/shared
+      - ../dbt:/opt/dagster/app/dbt
+      - ./dagster.yaml:/opt/dagster/dagster_home/dagster.yaml:ro
+      - dagster_home:/opt/dagster/dagster_home
+    depends_on:
+      ingestion-state-db:
+        condition: service_healthy
+      datalake-storage:
+        condition: service_healthy
+      datalake-init:
+        condition: service_completed_successfully
+      jobs-init:
+        condition: service_completed_successfully
+      spark-master:
+        condition: service_healthy
+      spark-worker:
+        condition: service_healthy
+      spark-init:
+        condition: service_completed_successfully
+      nessie:
+        condition: service_healthy
+      trino:
+        condition: service_healthy
+    networks:
+      - lotus-data
+    command: >
+      sh -c "
+      find /opt/dagster/dagster_home -mindepth 1 -maxdepth 1 ! -name 'dagster.yaml' -exec rm -rf {} +;
+      cd /opt/dagster/app/dbt && dbt deps;
+      cd /opt/dagster/app;
+      dagster-webserver -h 0.0.0.0 -p 3000 -w /opt/dagster/app/workspace.yaml &
+      sleep 5;
+      DAGSTER_HOME=/opt/dagster/dagster_home dagster-daemon run
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 12. Caddy — reverse proxy
+  caddy:
+    image: caddy:latest
+    container_name: lotus-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile-dev:/etc/caddy/Caddyfile
+      - caddy_data:/data
+    networks:
+      - lotus-data
+    depends_on:
+      - dagster
+      - spark-master
+      - trino
+      - datalake-storage
+      - nessie
+
+  custom-dashboards:
+    build:
+      context: ../custom_dashboards
+      dockerfile: Dockerfile.custom-dashboards
+    container_name: lotus-custom-dashboards
+    environment:
+      - ENV=production
+    ports:
+      - "5000:5000"
+    networks:
+      - lotus-data
+    restart: unless-stopped
+    depends_on:
+      - trino
+    
+
+  
+volumes:
+  ingestion_state_data:
+    name: lotus-ingestion-state-data
+  datalake_storage_data:
+    name: lotus-datalake-storage-data
+  dagster_home:
+    name: lotus-dagster-home
+  lightdash_data:
+    name: lotus-lightdash-data
+  caddy_data:
+    name: lotus-caddy-data
+  caddy_config:
+    name: lotus-caddy-config
+
+networks:
+  lotus-data:
+    name: lotus-data
+    driver: bridge

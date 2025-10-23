@@ -1,0 +1,19 @@
+# Global configuration
+{
+    email mattkacllyy@gmail.com
+    acme_ca https://acme-v02.api.letsencrypt.org/directory
+}
+
+dagster.datamountainsolutions.com {
+    basicauth {
+        lotus {env.CADDY_PASS_HASH}
+    }
+    reverse_proxy lotus-dagster:3000
+}
+
+dashboard.datamountainsolutions.com {
+    basicauth {
+        lotus {env.CADDY_PASS_HASH}
+    }
+    reverse_proxy lotus-custom-dashboards:5000
+}
