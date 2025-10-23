@@ -19,11 +19,11 @@ run_storage:
     postgres_db:
       hostname: ingestion-state-db
       username:
-        env: DB_USER_PROD
+        env: DB_USER
       password:
-        env: DB_PASSWORD_PROD
+        env: DB_PASSWORD
       db_name:
-        env: DB_NAME_PROD
+        env: DB_NAME
       port: 5432
 
 event_log_storage:
@@ -33,11 +33,11 @@ event_log_storage:
     postgres_db:
       hostname: ingestion-state-db
       username:
-        env: DB_USER_PROD
+        env: DB_USER
       password:
-        env: DB_PASSWORD_PROD
+        env: DB_PASSWORD
       db_name:
-        env: DB_NAME_PROD
+        env: DB_NAME
       port: 5432
 
 schedule_storage:
@@ -47,9 +47,9 @@ schedule_storage:
     postgres_db:
       hostname: ingestion-state-db
       username:
-        env: DB_USER_PROD
+        env: DB_USER
       password:
-        env: DB_PASSWORD_PROD
+        env: DB_PASSWORD
       db_name:
-        env: DB_NAME_PROD
+        env: DB_NAME
       port: 5432
