@@ -6,9 +6,9 @@ services:
     image: postgres:15
     container_name: lotus-ingestion-state-db
     environment:
-      POSTGRES_DB: ${DB_NAME_PROD}
-      POSTGRES_USER: ${DB_USER_PROD}
-      POSTGRES_PASSWORD: ${DB_PASSWORD_PROD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -17,7 +17,7 @@ services:
     networks:
       - lotus-data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER_PROD} -d ${DB_NAME_PROD}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -254,23 +254,23 @@ services:
     working_dir: /opt/dagster/app
     environment:
       DAGSTER_HOME: /opt/dagster/dagster_home
-      ENV: production
-      DB_HOST_PROD: ${DB_HOST_PROD}
-      DB_PORT_PROD: ${DB_PORT_PROD}
-      DB_USER_PROD: ${DB_USER_PROD}
-      DB_PASSWORD_PROD: ${DB_PASSWORD_PROD}
-      DB_NAME_PROD: ${DB_NAME_PROD}
+      ENV: dev
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       S3_ENDPOINT: ${S3_ENDPOINT}
       S3_BUCKET: ${S3_BUCKET}
       AWS_REGION: ${AWS_REGION}
-      SHOP_URL_PROD: ${SHOP_URL_PROD}
-      SHOP_TOKEN_PROD: ${SHOP_TOKEN_PROD}
-      SHOP_KEY_PROD: ${SHOP_KEY_PROD}
-      SHOP_SECRET_KEY_PROD: ${SHOP_SECRET_KEY_PROD}
+      SHOP_URL: ${SHOP_URL}
+      SHOP_TOKEN: ${SHOP_TOKEN}
+      SHOP_KEY: ${SHOP_KEY}
+      SHOP_SECRET_KEY: ${SHOP_SECRET_KEY}
       KLAVIYO_API_KEY: ${KLAVIYO_API_KEY}
-      DEFAULT_DATE_PROD: ${DEFAULT_DATE_PROD}
+      DEFAULT_DATE: ${DEFAULT_DATE}
       LOG_LEVEL: ${LOG_LEVEL}
       ICEBERG_CATALOG_URI: http://nessie:19120/api/v1
       ICEBERG_CATALOG_WAREHOUSE: s3a://lotus-lakehouse
@@ -343,7 +343,7 @@ services:
       dockerfile: Dockerfile.custom-dashboards
     container_name: lotus-custom-dashboards
     environment:
-      - ENV=production
+      - ENV=prod
     ports:
       - "5000:5000"
     networks:
@@ -361,8 +361,6 @@ volumes:
     name: lotus-datalake-storage-data
   dagster_home:
     name: lotus-dagster-home
-  lightdash_data:
-    name: lotus-lightdash-data
   caddy_data:
     name: lotus-caddy-data
   caddy_config:

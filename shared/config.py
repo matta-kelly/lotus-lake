@@ -19,88 +19,37 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-class DevSettings(BaseSettings):
-    """Development environment - uses _TEST suffixed variables"""
-    ENV: str = "dev"
-    
-    DB_HOST_TEST: str
-    DB_PORT_TEST: int
-    DB_USER_TEST: str
-    DB_PASSWORD_TEST: str
-    DB_NAME_TEST: str
-    
-    ODOO_URL_TEST: str
-    ODOO_DB_TEST: str
-    ODOO_USER_TEST: str
-    ODOO_PASSWORD_TEST: str
-    
-    SHOP_URL_TEST: str
-    SHOP_TOKEN_TEST: str
-    SHOP_KEY_TEST: str
-    SHOP_SECRET_KEY_TEST: str
-    
-    KLAVIYO_API_KEY: str
-    DEFAULT_DATE_TEST: str
-    LOG_LEVEL: str = "DEBUG"
-    
-    model_config = SettingsConfigDict(env_file=None, case_sensitive=True, extra="ignore")
-    
-    # Aliases for clean access
-    @property
-    def DB_HOST(self): return self.DB_HOST_TEST
-    @property
-    def DB_PORT(self): return self.DB_PORT_TEST
-    @property
-    def DB_USER(self): return self.DB_USER_TEST
-    @property
-    def DB_PASSWORD(self): return self.DB_PASSWORD_TEST
-    @property
-    def DB_NAME(self): return self.DB_NAME_TEST
-    @property
-    def ODOO_URL(self): return self.ODOO_URL_TEST
-    @property
-    def ODOO_DB(self): return self.ODOO_DB_TEST
-    @property
-    def ODOO_USER(self): return self.ODOO_USER_TEST
-    @property
-    def ODOO_PASSWORD(self): return self.ODOO_PASSWORD_TEST
-    @property
-    def SHOP_URL(self): return self.SHOP_URL_TEST
-    @property
-    def SHOP_TOKEN(self): return self.SHOP_TOKEN_TEST
-    @property
-    def SHOP_KEY(self): return self.SHOP_KEY_TEST
-    @property
-    def SHOP_SECRET_KEY(self): return self.SHOP_SECRET_KEY_TEST
-    @property
-    def DEFAULT_DATE(self): return self.DEFAULT_DATE_TEST
-
-
-class ProdSettings(BaseSettings):
-    """Production environment - uses _PROD suffixed variables"""
+class Settings(BaseSettings):
+    """Single settings class - reads from unsuffixed env vars"""
     ENV: str = "prod"
     
-    DB_HOST_PROD: str
-    DB_PORT_PROD: int
-    DB_USER_PROD: str
-    DB_PASSWORD_PROD: str
-    DB_NAME_PROD: str
+    # Database
+    DB_HOST: str
+    DB_PORT: int
+    DB_USER: str
+    DB_PASSWORD: str
+    DB_NAME: str
     
-    ODOO_URL_PROD: str = ""
-    ODOO_DB_PROD: str = ""
-    ODOO_USER_PROD: str = ""
-    ODOO_PASSWORD_PROD: str = ""
+    # Odoo (optional)
+    ODOO_URL: str = ""
+    ODOO_DB: str = ""
+    ODOO_USER: str = ""
+    ODOO_PASSWORD: str = ""
     
-    SHOP_URL_PROD: str
-    SHOP_TOKEN_PROD: str
-    SHOP_KEY_PROD: str
-    SHOP_SECRET_KEY_PROD: str
+    # Shopify
+    SHOP_URL: str
+    SHOP_TOKEN: str
+    SHOP_KEY: str
+    SHOP_SECRET_KEY: str
     
+    # Klaviyo
     KLAVIYO_API_KEY: str
-    DEFAULT_DATE_PROD: str
+    
+    # Defaults
+    DEFAULT_DATE: str
     LOG_LEVEL: str = "INFO"
     
-    # S3 for production
+    # S3/MinIO
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
     S3_ENDPOINT: str = ""
@@ -108,39 +57,8 @@ class ProdSettings(BaseSettings):
     AWS_REGION: str = "us-east-1"
     
     model_config = SettingsConfigDict(env_file=None, case_sensitive=True, extra="ignore")
-    
-    # Aliases for clean access
-    @property
-    def DB_HOST(self): return self.DB_HOST_PROD
-    @property
-    def DB_PORT(self): return self.DB_PORT_PROD
-    @property
-    def DB_USER(self): return self.DB_USER_PROD
-    @property
-    def DB_PASSWORD(self): return self.DB_PASSWORD_PROD
-    @property
-    def DB_NAME(self): return self.DB_NAME_PROD
-    @property
-    def ODOO_URL(self): return self.ODOO_URL_PROD
-    @property
-    def ODOO_DB(self): return self.ODOO_DB_PROD
-    @property
-    def ODOO_USER(self): return self.ODOO_USER_PROD
-    @property
-    def ODOO_PASSWORD(self): return self.ODOO_PASSWORD_PROD
-    @property
-    def SHOP_URL(self): return self.SHOP_URL_PROD
-    @property
-    def SHOP_TOKEN(self): return self.SHOP_TOKEN_PROD
-    @property
-    def SHOP_KEY(self): return self.SHOP_KEY_PROD
-    @property
-    def SHOP_SECRET_KEY(self): return self.SHOP_SECRET_KEY_PROD
-    @property
-    def DEFAULT_DATE(self): return self.DEFAULT_DATE_PROD
 
 
-# Load the appropriate settings class based on ENV variable
-settings = DevSettings() if env == "dev" else ProdSettings()
+settings = Settings()
 
 logger.debug(f"Loaded from {'file' if env_file.exists() else 'env vars'} | ENV={settings.ENV} | DB={settings.DB_NAME}")
