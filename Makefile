@@ -1,4 +1,4 @@
-.PHONY: help build-dev build-prod build-logs-dev build-logs-prod up-dev up-prod up-logs-dev up-logs-prod down-dev down-prod down-clean logs rebuild-dev rebuild-prod rebuild-dagster-dev rebuild-dagster-prod rebuild-dashboards-dev rebuild-dashboards-prod rebuild-spark-dev rebuild-spark-prod restart-dagster-dev restart-dagster-prod restart-dashboards-dev restart-dashboards-prod restart-caddy-dev restart-caddy-prod
+.PHONY: help build-dev build-prod up-dev up-prod up-logs-dev up-logs-prod down-dev down-prod down-clean-dev down-clean-prod logs-dev logs-prod rebuild-dev rebuild-prod rebuild-dagster-dev rebuild-dagster-prod rebuild-dashboards-dev rebuild-dashboards-prod rebuild-spark-dev rebuild-spark-prod restart-dagster-dev restart-dagster-prod restart-dashboards-dev restart-dashboards-prod restart-caddy-dev restart-caddy-prod
 
 COMPOSE_DEV = docker compose -f infra/docker-compose.dev.yml
 COMPOSE_PROD = docker compose -f infra/docker-compose.prod.yml
@@ -10,7 +10,9 @@ help:
 	@echo "  make build-dev              Build all images"
 	@echo "  make up-dev                 Start services"
 	@echo "  make up-logs-dev            Start + follow logs"
+	@echo "  make logs-dev               Follow logs (already running)"
 	@echo "  make down-dev               Stop services (keeps volumes)"
+	@echo "  make down-clean-dev         Stop + remove volumes"
 	@echo "  make rebuild-dev            Full rebuild"
 	@echo "  make rebuild-dagster-dev    Rebuild just Dagster"
 	@echo "  make rebuild-dashboards-dev Rebuild just dashboards"
@@ -22,17 +24,15 @@ help:
 	@echo "  make build-prod             Build all images"
 	@echo "  make up-prod                Start services"
 	@echo "  make up-logs-prod           Start + follow logs"
+	@echo "  make logs-prod              Follow logs (already running)"
 	@echo "  make down-prod              Stop services (keeps volumes)"
+	@echo "  make down-clean-prod        Stop + remove volumes"
 	@echo "  make rebuild-prod           Full rebuild"
 	@echo "  make rebuild-dagster-prod   Rebuild just Dagster"
 	@echo "  make rebuild-dashboards-prod Rebuild just dashboards"
 	@echo "  make rebuild-spark-prod     Rebuild Spark stack"
 	@echo "  make restart-dagster-prod   Restart Dagster (no rebuild)"
 	@echo "  make restart-dashboards-prod Restart dashboards (no rebuild)"
-	@echo ""
-	@echo "=== COMMON ==="
-	@echo "  make logs                   Follow logs"
-	@echo "  make down-clean             Stop ALL + remove volumes (destructive!)"
 
 # === DEV TARGETS ===
 build-dev:
@@ -40,26 +40,26 @@ build-dev:
 	$(COMPOSE_DEV) build spark-base
 	$(COMPOSE_DEV) build
 
-build-logs-dev:
-	$(COMPOSE_DEV) build spark-base
-	$(COMPOSE_DEV) build
-	$(COMPOSE_DEV) up
-	$(COMPOSE_DEV) logs -f
-
 up-dev:
 	@echo "Starting dev environment..."
 	$(COMPOSE_DEV) up -d
 
 up-logs-dev:
 	$(COMPOSE_DEV) up
+
+logs-dev:
 	$(COMPOSE_DEV) logs -f
 
 down-dev:
 	@echo "Stopping dev environment (volumes preserved)..."
 	$(COMPOSE_DEV) down
 
+down-clean-dev:
+	@echo "WARNING: Stopping dev and removing volumes..."
+	@printf "Are you sure? [y/N] " && read ans && [ $${ans:-N} = y ]
+	$(COMPOSE_DEV) down -v
+
 rebuild-dev: down-dev build-dev up-dev
-	@echo "Dev rebuild complete"
 
 rebuild-dagster-dev:
 	@echo "Rebuilding Dagster (dev)..."
@@ -91,26 +91,26 @@ build-prod:
 	$(COMPOSE_PROD) build spark-base
 	$(COMPOSE_PROD) build
 
-build-logs-prod:
-	$(COMPOSE_PROD) build spark-base
-	$(COMPOSE_PROD) build
-	$(COMPOSE_PROD) up
-	$(COMPOSE_PROD) logs -f
-
 up-prod:
 	@echo "Starting prod environment..."
 	$(COMPOSE_PROD) up -d
 
 up-logs-prod:
 	$(COMPOSE_PROD) up
+
+logs-prod:
 	$(COMPOSE_PROD) logs -f
 
 down-prod:
 	@echo "Stopping prod environment (volumes preserved)..."
 	$(COMPOSE_PROD) down
 
+down-clean-prod:
+	@echo "WARNING: Stopping prod and removing volumes..."
+	@printf "Are you sure? [y/N] " && read ans && [ $${ans:-N} = y ]
+	$(COMPOSE_PROD) down -v
+
 rebuild-prod: down-prod build-prod up-prod
-	@echo "Prod rebuild complete"
 
 rebuild-dagster-prod:
 	@echo "Rebuilding Dagster (prod)..."
@@ -135,18 +135,3 @@ restart-dashboards-prod:
 
 restart-caddy-prod:
 	$(COMPOSE_PROD) restart caddy
-
-# === COMMON TARGETS ===
-logs:
-	@docker compose -f infra/docker-compose.prod.yml logs -f 2>/dev/null || \
-	docker compose -f infra/docker-compose.dev.yml logs -f 2>/dev/null || \
-	echo "No services running"
-
-down-clean:
-	@echo "WARNING: This stops ALL services and removes ALL volumes"
-	@read -p "Are you sure? [y/N] " -n 1 -r; \
-	echo; \
-	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
-		$(COMPOSE_DEV) down -v 2>/dev/null || true; \
-		$(COMPOSE_PROD) down -v 2>/dev/null || true; \
-	fi
