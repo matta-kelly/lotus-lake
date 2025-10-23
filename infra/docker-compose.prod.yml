@@ -326,6 +326,7 @@ services:
       - "80:80"
       - "443:443"
     environment:
+    - CADDY_USER=${CADDY_USER}
     - CADDY_PASS_HASH=${CADDY_PASS_HASH} 
     volumes:
       - ./Caddyfile-prod:/etc/caddy/Caddyfile
