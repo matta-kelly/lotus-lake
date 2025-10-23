@@ -19,8 +19,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-class TestSettings(BaseSettings):
-    ENV: str = "test"
+class DevSettings(BaseSettings):
+    """Development environment - uses _TEST suffixed variables"""
+    ENV: str = "dev"
     
     DB_HOST_TEST: str
     DB_PORT_TEST: int
@@ -76,7 +77,8 @@ class TestSettings(BaseSettings):
 
 
 class ProdSettings(BaseSettings):
-    ENV: str = "production"
+    """Production environment - uses _PROD suffixed variables"""
+    ENV: str = "prod"
     
     DB_HOST_PROD: str
     DB_PORT_PROD: int
@@ -138,7 +140,7 @@ class ProdSettings(BaseSettings):
     def DEFAULT_DATE(self): return self.DEFAULT_DATE_PROD
 
 
-# Load the appropriate settings class
-settings = TestSettings() if env == "test" else ProdSettings()
+# Load the appropriate settings class based on ENV variable
+settings = DevSettings() if env == "dev" else ProdSettings()
 
 logger.debug(f"Loaded from {'file' if env_file.exists() else 'env vars'} | ENV={settings.ENV} | DB={settings.DB_NAME}")

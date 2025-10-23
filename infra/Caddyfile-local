@@ -15,12 +15,6 @@ dagster.localhost {
     reverse_proxy lotus-dagster:3000
 }
 
-# -----------------------------
-# Superset
-# -----------------------------
-#superset.localhost {
-#    reverse_proxy lotus-superset:8088
-#}
 
 # -----------------------------
 # Trino (optional, admin only)
