@@ -1,0 +1,20 @@
+repositories:
+  - name: minio
+    url: https://charts.min.io
+  - name: airbyte-v2
+    url: https://airbytehq.github.io/charts
+
+releases:
+  - name: minio
+    namespace: minio
+    createNamespace: true
+    chart: minio/minio
+    values:
+      - minio/values.yaml
+      - rootUser: {{ requiredEnv "MINIO_USER" }}
+        rootPassword: {{ requiredEnv "MINIO_PASSWORD" }}
+
+  - name: airbyte
+    namespace: airbyte
+    createNamespace: true
+    chart: airbyte-v2/airbyte
