@@ -3,6 +3,10 @@ repositories:
     url: https://charts.min.io
   - name: airbyte-v2
     url: https://airbytehq.github.io/charts
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+  - name: nessie-helm
+    url: https://charts.projectnessie.org
 
 releases:
   - name: minio
@@ -11,10 +15,37 @@ releases:
     chart: minio/minio
     values:
       - minio/values.yaml
-      - rootUser: {{ requiredEnv "MINIO_USER" }}
-        rootPassword: {{ requiredEnv "MINIO_PASSWORD" }}
+      - rootUser: {{ requiredEnv "TF_VAR_minio_user" }}
+        rootPassword: {{ requiredEnv "TF_VAR_minio_password" }}
 
   - name: airbyte
     namespace: airbyte
     createNamespace: true
     chart: airbyte-v2/airbyte
+
+  - name: nessie-postgres
+    namespace: nessie
+    createNamespace: true
+    chart: bitnami/postgresql
+    values:
+      - nessie/postgres-values.yaml.gotmpl
+
+  - name: nessie
+    namespace: nessie
+    chart: nessie-helm/nessie
+    needs:
+      - nessie/nessie-postgres
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: sh
+        args:
+          - -c
+          - |
+            kubectl create secret generic nessie-db-creds \
+              --namespace=nessie \
+              --from-literal=postgres_username=nessie \
+              --from-literal=postgres_password={{ requiredEnv "TF_VAR_nessie_db_password" }} \
+              --dry-run=client -o yaml | kubectl apply -f -
+    values:
+      - nessie/values.yaml

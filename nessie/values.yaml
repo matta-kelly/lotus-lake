@@ -1,0 +1,8 @@
+versionStoreType: JDBC2
+
+jdbc:
+  jdbcUrl: jdbc:postgresql://nessie-postgres-postgresql.nessie.svc.cluster.local:5432/nessie
+  secret:
+    name: nessie-db-creds
+    username: postgres_username
+    password: postgres_password
