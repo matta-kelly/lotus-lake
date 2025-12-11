@@ -1,9 +1,10 @@
-resource "airbyte_connection" "shopify_to_minio" {
+resource "airbyte_connection" "shopify_to_lake" {
   source_id                       = airbyte_source.shopify.source_id
-  destination_id                  = airbyte_destination.minio_shopify.destination_id
-  name                            = "Shopify → MinIO - Shopify"
+  destination_id                  = airbyte_destination.s3_data_lake.destination_id
+  name                            = "Shopify → S3 Data Lake"
   status                          = "active"
-  namespace_definition            = "destination"
+  namespace_definition            = "customformat"
+  namespace_format                = "shopify"
   non_breaking_changes_preference = "propagate_columns"
   notify_schema_changes           = true
   notify_schema_changes_by_email  = false
@@ -13,7 +14,32 @@ resource "airbyte_connection" "shopify_to_minio" {
   schedule_data = {
     basic_schedule = {
       time_unit = "hours"
-      units     = 24
+      units     = 1
     }
   }
+
+  sync_catalog = jsondecode(file("${path.module}/../streams/shopify.json"))
+}
+
+resource "airbyte_connection" "klaviyo_to_lake" {
+  source_id                       = airbyte_source.klaviyo.source_id
+  destination_id                  = airbyte_destination.s3_data_lake.destination_id
+  name                            = "Klaviyo → S3 Data Lake"
+  status                          = "active"
+  namespace_definition            = "customformat"
+  namespace_format                = "klaviyo"
+  non_breaking_changes_preference = "propagate_columns"
+  notify_schema_changes           = true
+  notify_schema_changes_by_email  = false
+  prefix                          = ""
+  schedule_type                   = "basic"
+
+  schedule_data = {
+    basic_schedule = {
+      time_unit = "hours"
+      units     = 1
+    }
+  }
+
+  sync_catalog = jsondecode(file("${path.module}/../streams/klaviyo.json"))
 }

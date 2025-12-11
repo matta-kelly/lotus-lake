@@ -1,0 +1,678 @@
+{
+  "streams": [
+    {
+      "stream": {
+        "name": "customers",
+        "supportedSyncModes": [
+          "full_refresh",
+          "incremental"
+        ],
+        "isResumable": true,
+        "json_schema": {
+          "type": "[\"null\", \"object\"]",
+          "properties": "{\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the customer.\"}, \"tags\": {\"type\": [\"null\", \"string\"], \"description\": \"Tags associated with the customer for categorization.\"}, \"email\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's email address.\"}, \"phone\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's phone number.\"}, \"state\": {\"type\": [\"null\", \"string\"], \"description\": \"Current state or status of the customer.\"}, \"addresses\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the address.\"}, \"zip\": {\"type\": [\"null\", \"string\"], \"description\": \"Postal or ZIP code of the customer's address.\"}, \"city\": {\"type\": [\"null\", \"string\"], \"description\": \"City where the customer is located.\"}, \"name\": {\"type\": [\"null\", \"string\"], \"description\": \"Full name associated with the address.\"}, \"phone\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's phone number.\"}, \"company\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's company name.\"}, \"country\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's country.\"}, \"default\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if this address is the default address for the customer.\"}, \"address1\": {\"type\": [\"null\", \"string\"], \"description\": \"First line of customer's address.\"}, \"address2\": {\"type\": [\"null\", \"string\"], \"description\": \"Second line of customer's address.\"}, \"province\": {\"type\": [\"null\", \"string\"], \"description\": \"Province or state where the customer is located.\"}, \"last_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's last name.\"}, \"first_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's first name.\"}, \"customer_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the customer.\"}, \"country_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Country code of the customer's country.\"}, \"country_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the customer's country.\"}, \"province_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Province or state code.\"}}}, \"description\": \"List of addresses associated with the customer\"}, \"last_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's last name.\"}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"Timestamp when the customer was created.\"}, \"first_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's first name.\"}, \"updated_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"Timestamp when the customer data was last updated.\"}, \"total_spent\": {\"type\": [\"null\", \"number\"], \"description\": \"Total amount spent by the customer.\"}, \"orders_count\": {\"type\": [\"null\", \"integer\"], \"description\": \"Total number of orders placed by the customer.\"}, \"last_order_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the customer's last order.\"}, \"tax_exemptions\": {\"type\": [\"null\", \"string\"], \"description\": \"Information about tax exemptions for the customer.\"}}",
+          "additionalProperties": "true"
+        },
+        "default_cursor_field": [
+          "updated_at"
+        ],
+        "source_defined_cursor": true,
+        "source_defined_primary_key": [
+          [
+            "id"
+          ]
+        ]
+      },
+      "config": {
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "hashedFields": [],
+        "mappers": [],
+        "sync_mode": "incremental",
+        "destination_sync_mode": "append_dedup",
+        "cursor_field": [
+          "updated_at"
+        ],
+        "primary_key": [
+          [
+            "id"
+          ]
+        ],
+        "alias_name": "customers",
+        "field_selection_enabled": true,
+        "selected_fields": [
+          {
+            "field_path": [
+              "id"
+            ]
+          },
+          {
+            "field_path": [
+              "tags"
+            ]
+          },
+          {
+            "field_path": [
+              "email"
+            ]
+          },
+          {
+            "field_path": [
+              "phone"
+            ]
+          },
+          {
+            "field_path": [
+              "state"
+            ]
+          },
+          {
+            "field_path": [
+              "addresses"
+            ]
+          },
+          {
+            "field_path": [
+              "last_name"
+            ]
+          },
+          {
+            "field_path": [
+              "created_at"
+            ]
+          },
+          {
+            "field_path": [
+              "first_name"
+            ]
+          },
+          {
+            "field_path": [
+              "updated_at"
+            ]
+          },
+          {
+            "field_path": [
+              "total_spent"
+            ]
+          },
+          {
+            "field_path": [
+              "orders_count"
+            ]
+          },
+          {
+            "field_path": [
+              "last_order_id"
+            ]
+          },
+          {
+            "field_path": [
+              "tax_exemptions"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "stream": {
+        "name": "discount_codes",
+        "supportedSyncModes": [
+          "full_refresh",
+          "incremental"
+        ],
+        "isResumable": true,
+        "json_schema": {
+          "type": "\"object\"",
+          "properties": "{\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"The unique identifier for the discount code\"}, \"code\": {\"type\": [\"null\", \"string\"], \"description\": \"The discount code that customers can use during checkout to apply the discount\"}, \"title\": {\"type\": [\"null\", \"string\"], \"description\": \"The title of the discount.\"}, \"status\": {\"type\": [\"null\", \"string\"], \"description\": \"The status of the Discount\"}, \"ends_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the discount code is deactivated.\"}, \"summary\": {\"type\": [\"null\", \"string\"], \"description\": \"A brief summary or description of the discount code\"}, \"shop_url\": {\"type\": [\"null\", \"string\"], \"description\": \"The URL of the shop where the discount code is applicable\"}, \"typename\": {\"type\": [\"null\", \"string\"], \"description\": \"The typename of the discount\"}, \"starts_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the discount code is activated.\"}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the discount code was created\"}, \"updated_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the discount code was last updated\"}, \"codes_count\": {\"type\": [\"null\", \"object\"], \"properties\": {\"count\": {\"type\": [\"null\", \"integer\"], \"description\": \"The count of elements.\"}}, \"description\": \"The number of redeem codes for the discount.\", \"additionalProperties\": true}, \"total_sales\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"The total sales from orders where the discount was used.\", \"additionalProperties\": true}, \"usage_count\": {\"type\": [\"null\", \"integer\"], \"description\": \"The number of times the discount code has been used by customers\"}, \"usage_limit\": {\"type\": [\"null\", \"integer\"], \"description\": \"The maximum number of times that the discount can be used.\"}, \"discount_type\": {\"type\": [\"null\", \"string\"], \"description\": \"The type of discount applied by the discount code, such as a percentage or fixed amount off\"}, \"price_rule_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"The identifier of the price rule associated with the discount code\"}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"The unique identifier for the discount code in the Shopify Admin GraphQL API\"}}",
+          "additionalProperties": "true"
+        },
+        "default_cursor_field": [
+          "updated_at"
+        ],
+        "source_defined_cursor": true,
+        "source_defined_primary_key": [
+          [
+            "id"
+          ]
+        ]
+      },
+      "config": {
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "hashedFields": [],
+        "mappers": [],
+        "sync_mode": "incremental",
+        "destination_sync_mode": "append_dedup",
+        "cursor_field": [
+          "updated_at"
+        ],
+        "primary_key": [
+          [
+            "id"
+          ]
+        ],
+        "alias_name": "discount_codes",
+        "field_selection_enabled": true,
+        "selected_fields": [
+          {
+            "field_path": [
+              "id"
+            ]
+          },
+          {
+            "field_path": [
+              "code"
+            ]
+          },
+          {
+            "field_path": [
+              "title"
+            ]
+          },
+          {
+            "field_path": [
+              "status"
+            ]
+          },
+          {
+            "field_path": [
+              "ends_at"
+            ]
+          },
+          {
+            "field_path": [
+              "summary"
+            ]
+          },
+          {
+            "field_path": [
+              "shop_url"
+            ]
+          },
+          {
+            "field_path": [
+              "typename"
+            ]
+          },
+          {
+            "field_path": [
+              "starts_at"
+            ]
+          },
+          {
+            "field_path": [
+              "created_at"
+            ]
+          },
+          {
+            "field_path": [
+              "updated_at"
+            ]
+          },
+          {
+            "field_path": [
+              "codes_count"
+            ]
+          },
+          {
+            "field_path": [
+              "total_sales"
+            ]
+          },
+          {
+            "field_path": [
+              "usage_count"
+            ]
+          },
+          {
+            "field_path": [
+              "usage_limit"
+            ]
+          },
+          {
+            "field_path": [
+              "discount_type"
+            ]
+          },
+          {
+            "field_path": [
+              "price_rule_id"
+            ]
+          },
+          {
+            "field_path": [
+              "admin_graphql_api_id"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "stream": {
+        "name": "order_refunds",
+        "supportedSyncModes": [
+          "full_refresh",
+          "incremental"
+        ],
+        "isResumable": true,
+        "json_schema": {
+          "type": "\"object\"",
+          "properties": "{\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the order refund resource\"}, \"note\": {\"type\": [\"null\", \"string\"], \"description\": \"Any additional notes or comments regarding the refund\"}, \"return\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the return\"}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"ID of the return resource in Shopify API\"}}, \"description\": \"Details of the return associated with the refund\"}, \"restock\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the refund involves restocking items\"}, \"user_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the user who initiated the refund\"}, \"order_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the original order for which the refund was issued\"}, \"shop_url\": {\"type\": [\"null\", \"string\"], \"description\": \"URL of the shop where the refund was processed\"}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"Date and time when the order refund was created\"}, \"processed_at\": {\"type\": [\"null\", \"string\"], \"description\": \"Date and time when the refund was processed\"}, \"transactions\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the transaction\"}, \"kind\": {\"type\": [\"null\", \"string\"], \"description\": \"Type of transaction\"}, \"test\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the transaction is a test\"}, \"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount of the transaction\"}, \"status\": {\"type\": [\"null\", \"string\"], \"description\": \"Status of the transaction\"}, \"gateway\": {\"type\": [\"null\", \"string\"], \"description\": \"Payment gateway used for the transaction\"}, \"message\": {\"type\": [\"null\", \"string\"], \"description\": \"Message related to the transaction\"}, \"receipt\": {\"type\": [\"null\", \"object\"], \"properties\": {\"paid_amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount paid in the receipt\"}}, \"description\": \"Details of the receipt for the transaction\"}, \"user_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the user associated with the transaction\"}, \"currency\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency used for the transaction\"}, \"order_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the order related to the transaction\"}, \"device_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the device used for the transaction\"}, \"parent_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the parent transaction, if applicable\"}, \"created_at\": {\"type\": [\"null\", \"string\"], \"description\": \"Date and time when the transaction was created\"}, \"error_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Error code associated with the transaction\"}, \"payment_id\": {\"type\": [\"null\", \"string\"], \"description\": \"ID of the payment associated with the transaction\"}, \"location_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the location where the transaction occurred\"}, \"source_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the payment source\"}, \"processed_at\": {\"type\": [\"null\", \"string\"], \"description\": \"Date and time when the transaction was processed\"}, \"authorization\": {\"type\": [\"null\", \"string\"], \"description\": \"Authorization details for the transaction\"}, \"payment_details\": {\"type\": [\"null\", \"object\"], \"properties\": {\"avs_result_code\": {\"type\": [\"null\", \"string\"], \"description\": \"AVS result code for the payment\"}, \"credit_card_bin\": {\"type\": [\"null\", \"string\"], \"description\": \"BIN number of the credit card\"}, \"cvv_result_code\": {\"type\": [\"null\", \"string\"], \"description\": \"CVV result code for the payment\"}, \"credit_card_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name on the credit card\"}, \"buyer_action_info\": {\"type\": [\"null\", \"string\"], \"description\": \"Information about buyer's actions during payment\"}, \"credit_card_number\": {\"type\": [\"null\", \"string\"], \"description\": \"Masked credit card number\"}, \"credit_card_wallet\": {\"type\": [\"null\", \"string\"], \"description\": \"Information about the credit card wallet used\"}, \"credit_card_company\": {\"type\": [\"null\", \"string\"], \"description\": \"Company associated with the credit card\"}, \"credit_card_expiration_year\": {\"type\": [\"null\", \"integer\"], \"description\": \"Expiration year of the credit card\"}, \"credit_card_expiration_month\": {\"type\": [\"null\", \"integer\"], \"description\": \"Expiration month of the credit card\"}}, \"description\": \"Details about the payment for the transaction\", \"additionalProperties\": true}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"ID of the transaction resource in Shopify API\"}}}, \"description\": \"Payment transactions related to the refund\"}, \"order_adjustments\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the adjustment\"}, \"kind\": {\"type\": [\"null\", \"string\"], \"description\": \"Type of adjustment\"}, \"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount of the adjustment\"}, \"reason\": {\"type\": [\"null\", \"string\"], \"description\": \"Reason for the adjustment\"}, \"order_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the original order related to the adjustment\"}, \"refund_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the refund associated with the adjustment\"}, \"tax_amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount of tax associated with the adjustment\"}}}, \"description\": \"Adjustments made to the original order as part of the refund\"}, \"refund_line_items\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the refund line item\"}, \"quantity\": {\"type\": [\"null\", \"integer\"], \"description\": \"Quantity being refunded\"}, \"subtotal\": {\"type\": [\"null\", \"number\"], \"description\": \"Subtotal amount for the line item\"}, \"line_item\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the line item\"}, \"sku\": {\"type\": [\"null\", \"string\"], \"description\": \"Stock Keeping Unit for the product\"}, \"name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the product\"}, \"grams\": {\"type\": [\"null\", \"integer\"], \"description\": \"Weight of the line item\"}, \"price\": {\"type\": [\"null\", \"number\"], \"description\": \"Price of the product after taxes\"}, \"title\": {\"type\": [\"null\", \"string\"], \"description\": \"Title of the line item\"}, \"duties\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"duty_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the duty\"}, \"amount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Amount in the shop's currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Amount in the currency presented to the customer\"}}, \"description\": \"Details of the duty amount\"}}, \"additionalProperties\": true}, \"description\": \"Information about any duties associated with the line item\"}, \"vendor\": {\"type\": [\"null\", \"string\"], \"description\": \"Vendor of the product\"}, \"taxable\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the product is taxable\"}, \"quantity\": {\"type\": [\"null\", \"integer\"], \"description\": \"Quantity of the line item\"}, \"gift_card\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the line item is a gift card\"}, \"price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Price after taxes in the shop's currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Price after taxes in the currency presented to the customer\"}}, \"description\": \"Details of the price after taxes\"}, \"tax_lines\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"rate\": {\"type\": [\"null\", \"number\"], \"description\": \"Tax rate applied\"}, \"price\": {\"type\": [\"null\", \"number\"], \"description\": \"Price of the tax\"}, \"title\": {\"type\": [\"null\", \"string\"], \"description\": \"Title of the tax\"}, \"price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Tax price in the shop's currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Tax price in the currency presented to the customer\"}}, \"description\": \"Details of the tax price\"}, \"channel_liable\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the channel is liable for the tax\"}}}, \"description\": \"Tax details associated with the line item\"}, \"product_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the associated product\"}, \"properties\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"string\"]}, \"description\": \"Additional properties of the line item\"}, \"variant_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the variant associated with the product\"}, \"pre_tax_price\": {\"type\": [\"null\", \"number\"], \"description\": \"Price of the product before taxes\"}, \"variant_title\": {\"type\": [\"null\", \"string\"], \"description\": \"Title of the variant\"}, \"product_exists\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the product exists\"}, \"total_discount\": {\"type\": [\"null\", \"number\"], \"description\": \"Total discount applied to the line item\"}, \"pre_tax_price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Pre-tax price in the shop's currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Pre-tax price in the currency presented to the customer\"}}, \"description\": \"Details of the pre-tax price\"}, \"requires_shipping\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the product requires shipping\"}, \"fulfillment_status\": {\"type\": [\"null\", \"string\"], \"description\": \"Status of fulfillment for the line item\"}, \"total_discount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Total discount in the shop's currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Total discount in the currency presented to the customer\"}}, \"description\": \"Details of the total discount\"}, \"fulfillment_service\": {\"type\": [\"null\", \"string\"], \"description\": \"Service responsible for fulfilling the item\"}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"ID of the original line item in Shopify API\"}, \"discount_allocations\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"Amount of the discount\"}, \"amount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Amount in the shop's currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Amount in the currency presented to the customer\"}}, \"description\": \"Details of the discount amount\"}, \"discount_application_index\": {\"type\": [\"null\", \"integer\"], \"description\": \"Index of the discount application\"}}}, \"description\": \"Discounts applied to the line item\"}, \"fulfillable_quantity\": {\"type\": [\"null\", \"integer\"], \"description\": \"Quantity that can be fulfilled\"}, \"variant_inventory_management\": {\"type\": [\"null\", \"string\"], \"description\": \"Manages the inventory for the variant\"}}, \"description\": \"Information about the original line item being refunded\"}, \"total_tax\": {\"type\": [\"null\", \"number\"], \"description\": \"Total tax amount for the line item\"}, \"location_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the location related to the refund\"}, \"line_item_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the original line item being refunded\"}, \"restock_type\": {\"type\": [\"null\", \"string\"], \"description\": \"Type of restocking for the line item\"}, \"subtotal_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Subtotal amount in the shop's currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Subtotal amount in the currency presented to the customer\"}}, \"description\": \"Details of the subtotal amount\"}, \"total_tax_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Total tax amount in the shop's currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Total tax amount in the currency presented to the customer\"}}, \"description\": \"Details of the total tax amount\"}}}, \"description\": \"Line items included in the refund\"}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"ID of the Shopify API resource\"}}",
+          "additionalProperties": "true"
+        },
+        "default_cursor_field": [
+          "created_at"
+        ],
+        "source_defined_cursor": true,
+        "source_defined_primary_key": [
+          [
+            "id"
+          ]
+        ]
+      },
+      "config": {
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "hashedFields": [],
+        "mappers": [],
+        "sync_mode": "incremental",
+        "destination_sync_mode": "append_dedup",
+        "cursor_field": [
+          "created_at"
+        ],
+        "primary_key": [
+          [
+            "id"
+          ]
+        ],
+        "alias_name": "order_refunds",
+        "field_selection_enabled": true,
+        "selected_fields": [
+          {
+            "field_path": [
+              "id"
+            ]
+          },
+          {
+            "field_path": [
+              "note"
+            ]
+          },
+          {
+            "field_path": [
+              "return"
+            ]
+          },
+          {
+            "field_path": [
+              "restock"
+            ]
+          },
+          {
+            "field_path": [
+              "user_id"
+            ]
+          },
+          {
+            "field_path": [
+              "order_id"
+            ]
+          },
+          {
+            "field_path": [
+              "shop_url"
+            ]
+          },
+          {
+            "field_path": [
+              "created_at"
+            ]
+          },
+          {
+            "field_path": [
+              "processed_at"
+            ]
+          },
+          {
+            "field_path": [
+              "transactions"
+            ]
+          },
+          {
+            "field_path": [
+              "order_adjustments"
+            ]
+          },
+          {
+            "field_path": [
+              "refund_line_items"
+            ]
+          },
+          {
+            "field_path": [
+              "admin_graphql_api_id"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "stream": {
+        "name": "orders",
+        "supportedSyncModes": [
+          "full_refresh",
+          "incremental"
+        ],
+        "isResumable": true,
+        "json_schema": {
+          "type": "\"object\"",
+          "properties": "{\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"The unique identifier of the order\"}, \"name\": {\"type\": [\"null\", \"string\"], \"description\": \"The name of the order\"}, \"note\": {\"type\": [\"null\", \"string\"], \"description\": \"Additional notes related to the order\"}, \"tags\": {\"type\": [\"null\", \"string\"], \"description\": \"Tags associated with the order\"}, \"test\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the order is a test order\"}, \"email\": {\"type\": [\"null\", \"string\"], \"description\": \"The email address of the customer\"}, \"phone\": {\"type\": [\"null\", \"string\"], \"description\": \"The phone number of the customer\"}, \"token\": {\"type\": [\"null\", \"string\"], \"description\": \"Token associated with the order\"}, \"app_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"The ID of the app that created the order\"}, \"number\": {\"type\": [\"null\", \"integer\"], \"description\": \"The order number\"}, \"company\": {\"type\": [\"null\", \"string\"], \"description\": \"The name of the company associated with the order\"}, \"refunds\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique ID of the refund\"}, \"note\": {\"type\": [\"null\", \"string\"], \"description\": \"Additional note associated with the refund\"}, \"duties\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"duty_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the duty\"}, \"amount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"Amount in shop currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for shop amount\"}}, \"description\": \"Shop amount of duty\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"Amount in presentment currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for presentment amount\"}}, \"description\": \"Presentment amount of duty\"}}, \"description\": \"Set of amounts for duties\"}}, \"additionalProperties\": true}, \"description\": \"Information about duties for the refund\"}, \"restock\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if restocking is required\"}, \"user_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the user associated with the refund\"}, \"order_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the order for which the refund is created\"}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"Timestamp for when the refund was created\"}, \"processed_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"Timestamp for when the refund was processed\"}, \"transactions\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique ID of the transaction\"}, \"kind\": {\"type\": [\"null\", \"string\"], \"description\": \"Type of transaction\"}, \"test\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the transaction is a test\"}, \"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount of the transaction\"}, \"status\": {\"type\": [\"null\", \"string\"], \"description\": \"Status of the transaction\"}, \"gateway\": {\"type\": [\"null\", \"string\"], \"description\": \"Payment gateway used for the transaction\"}, \"message\": {\"type\": [\"null\", \"string\"], \"description\": \"Message related to the transaction\"}, \"receipt\": {\"type\": [\"null\", \"object\"], \"properties\": {\"paid_amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount paid\"}}, \"description\": \"Receipt information for the transaction\"}, \"user_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the user associated with the transaction\"}, \"currency\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency of the transaction\"}, \"order_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the order associated with the transaction\"}, \"device_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the device used for the transaction\"}, \"parent_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the parent transaction\"}, \"created_at\": {\"type\": [\"null\", \"string\"], \"description\": \"Timestamp for when the transaction was created\"}, \"error_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Error code of the transaction\"}, \"payment_id\": {\"type\": [\"null\", \"string\"], \"description\": \"ID of the payment\"}, \"location_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the location\"}, \"source_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the transaction source\"}, \"processed_at\": {\"type\": [\"null\", \"string\"], \"description\": \"Timestamp for when the transaction was processed\"}, \"authorization\": {\"type\": [\"null\", \"string\"], \"description\": \"Authorization code of the transaction\"}, \"payment_details\": {\"type\": [\"null\", \"object\"], \"properties\": {\"avs_result_code\": {\"type\": [\"null\", \"string\"], \"description\": \"AVS (Address Verification System) result code\"}, \"credit_card_bin\": {\"type\": [\"null\", \"string\"], \"description\": \"BIN (Bank Identification Number) of the credit card\"}, \"cvv_result_code\": {\"type\": [\"null\", \"string\"], \"description\": \"CVV (Card Verification Value) result code\"}, \"credit_card_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name on the credit card\"}, \"buyer_action_info\": {\"type\": [\"null\", \"string\"], \"description\": \"Additional info on buyer action\"}, \"credit_card_number\": {\"type\": [\"null\", \"string\"], \"description\": \"Number of the credit card\"}, \"credit_card_wallet\": {\"type\": [\"null\", \"string\"], \"description\": \"Wallet used for the credit card\"}, \"credit_card_company\": {\"type\": [\"null\", \"string\"], \"description\": \"Company of the credit card\"}, \"credit_card_expiration_year\": {\"type\": [\"null\", \"integer\"], \"description\": \"Expiration year of the credit card\"}, \"credit_card_expiration_month\": {\"type\": [\"null\", \"integer\"], \"description\": \"Expiration month of the credit card\"}}, \"description\": \"Details about the payment\", \"additionalProperties\": true}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"Unique ID of the transaction in the GraphQL Admin API\"}}}, \"description\": \"Information about transactions related to the refund\"}, \"total_duties_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"Amount in shop currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for shop amount\"}}, \"description\": \"Shop total duties\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"Amount in presentment currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for presentment amount\"}}, \"description\": \"Presentment total duties\"}}, \"description\": \"Set of total duties for the order\"}, \"order_adjustments\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique ID of the adjustment\"}, \"kind\": {\"type\": [\"null\", \"string\"], \"description\": \"Type of adjustment\"}, \"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount of the adjustment\"}, \"reason\": {\"type\": [\"null\", \"string\"], \"description\": \"Reason for the adjustment\"}, \"order_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the order associated with the adjustment\"}, \"refund_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the refund associated with the adjustment\"}, \"amount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in shop currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for shop amount\"}}, \"description\": \"Shop amount of adjustment\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in presentment currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for presentment amount\"}}, \"description\": \"Presentment amount of adjustment\"}}, \"description\": \"Set of amounts for the adjustment\"}, \"tax_amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Tax amount of the adjustment\"}, \"tax_amount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in shop currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for shop amount\"}}, \"description\": \"Shop tax amount of the adjustment\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in presentment currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for presentment amount\"}}, \"description\": \"Presentment tax amount of the adjustment\"}}, \"description\": \"Set of tax amounts for the adjustment\"}}}, \"description\": \"Adjustments made to the order related to the refund\"}, \"refund_line_items\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique ID of the refund line item\"}, \"quantity\": {\"type\": [\"null\", \"integer\"], \"description\": \"Quantity of the line item included in the refund\"}, \"subtotal\": {\"type\": [\"null\", \"number\"], \"description\": \"Subtotal of the line item included in the refund\"}, \"line_item\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique ID of the line item\"}, \"sku\": {\"type\": [\"null\", \"string\"], \"description\": \"Stock keeping unit of the line item\"}, \"name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the line item\"}, \"grams\": {\"type\": [\"null\", \"number\"], \"description\": \"Weight of the line item in grams\"}, \"price\": {\"type\": [\"null\", \"string\"], \"description\": \"Price of the line item\"}, \"title\": {\"type\": [\"null\", \"string\"], \"description\": \"Title of the line item\"}, \"duties\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"duty_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the duty\"}, \"amount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"Amount in shop currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for shop amount\"}}, \"description\": \"Shop amount of duty for the line item\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"Amount in presentment currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for presentment amount\"}}, \"description\": \"Presentment amount of duty for the line item\"}}, \"description\": \"Set of amounts for the duties of the line item\"}}, \"additionalProperties\": true}, \"description\": \"Information about duties of the line item\"}, \"vendor\": {\"type\": [\"null\", \"string\"], \"description\": \"Vendor of the line item\"}, \"taxable\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the line item is taxable\"}, \"quantity\": {\"type\": [\"null\", \"integer\"], \"description\": \"Quantity of the line item\"}, \"gift_card\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if line item is a gift card\"}, \"price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in shop currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for shop amount\"}}, \"description\": \"Shop price of the line item\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in presentment currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for presentment amount\"}}, \"description\": \"Presentment price of the line item\"}}, \"description\": \"Set of prices for the line item\"}, \"tax_lines\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"rate\": {\"type\": [\"null\", \"number\"], \"description\": \"Tax rate applied to the line item\"}, \"price\": {\"type\": [\"null\", \"string\"], \"description\": \"Tax price applied to the line item\"}, \"title\": {\"type\": [\"null\", \"string\"], \"description\": \"Title of the tax applied\"}, \"price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in shop currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for shop amount\"}}, \"description\": \"Shop tax price of the line item\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in presentment currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for presentment amount\"}}, \"description\": \"Presentment tax price of the line item\"}}, \"description\": \"Set of tax prices for the line item\"}, \"channel_liable\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the channel is liable for the tax\"}}}, \"description\": \"Information about tax applied to the line item\"}, \"product_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the associated product\"}, \"properties\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"string\"]}, \"description\": \"Additional properties of the line item\"}, \"variant_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the variant associated with the line item\"}, \"variant_title\": {\"type\": [\"null\", \"string\"], \"description\": \"Title of the variant associated with the line item\"}, \"product_exists\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the product for the line item exists\"}, \"total_discount\": {\"type\": [\"null\", \"string\"], \"description\": \"Total discount applied to the line item\"}, \"requires_shipping\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if shipping is required for the line item\"}, \"fulfillment_status\": {\"type\": [\"null\", \"string\"], \"description\": \"Status of fulfillment\"}, \"total_discount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in shop currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for shop amount\"}}, \"description\": \"Shop total discount of the line item\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in presentment currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for presentment amount\"}}, \"description\": \"Presentment total discount of the line item\"}}, \"description\": \"Set of total discounts for the line item\"}, \"fulfillment_service\": {\"type\": [\"null\", \"string\"], \"description\": \"Service responsible for fulfillment\"}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"Unique ID of the line item in the GraphQL Admin API\"}, \"discount_allocations\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount of the discount\"}, \"amount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in shop currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for shop amount\"}}, \"description\": \"Shop amount of the discount allocation\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in presentment currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for presentment amount\"}}, \"description\": \"Presentment amount of the discount allocation\"}}, \"description\": \"Set of amounts for the discount allocation\"}, \"discount_application_index\": {\"type\": [\"null\", \"number\"], \"description\": \"Index of the discount application\"}}}, \"description\": \"Allocations of discounts for the line item\"}, \"fulfillable_quantity\": {\"type\": [\"null\", \"integer\"], \"description\": \"Quantity fulfillable for the line item\"}, \"variant_inventory_management\": {\"type\": [\"null\", \"string\"], \"description\": \"Type of inventory management for the variant\"}}, \"description\": \"Information about the line item in the refund\"}, \"total_tax\": {\"type\": [\"null\", \"number\"], \"description\": \"Total tax for the line item included in the refund\"}, \"location_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the location\"}, \"line_item_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"ID of the line item included in the refund\"}, \"restock_type\": {\"type\": [\"null\", \"string\"], \"description\": \"Type of restocking\"}, \"subtotal_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in shop currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for shop amount\"}}, \"description\": \"Shop subtotal of the line item\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in presentment currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for presentment amount\"}}, \"description\": \"Presentment subtotal of the line item\"}}, \"description\": \"Set of subtotals for the line item included in the refund\"}, \"total_tax_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in shop currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for shop amount\"}}, \"description\": \"Shop total tax of the line item\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount in presentment currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code for presentment amount\"}}, \"description\": \"Presentment total tax of the line item\"}}, \"description\": \"Set of total taxes for the line item included in the refund\"}}}, \"description\": \"Information about the line items included in the refund\"}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"Unique ID of the refund in the GraphQL Admin API\"}}}, \"description\": \"Information about the refunds associated with the order\"}, \"user_id\": {\"type\": [\"null\", \"number\"], \"description\": \"The unique identifier of the user associated with the order\"}, \"currency\": {\"type\": [\"null\", \"string\"], \"description\": \"The currency used for the order\"}, \"customer\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"]}, \"note\": {\"type\": [\"null\", \"string\"]}, \"tags\": {\"type\": [\"null\", \"string\"]}, \"email\": {\"type\": [\"null\", \"string\"]}, \"phone\": {\"type\": [\"null\", \"string\"]}, \"state\": {\"type\": [\"null\", \"string\"]}, \"currency\": {\"type\": [\"null\", \"string\"]}, \"last_name\": {\"type\": [\"null\", \"string\"]}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"first_name\": {\"type\": [\"null\", \"string\"]}, \"tax_exempt\": {\"type\": [\"null\", \"boolean\"]}, \"updated_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"total_spent\": {\"type\": [\"null\", \"number\"]}, \"orders_count\": {\"type\": [\"null\", \"integer\"]}, \"last_order_id\": {\"type\": [\"null\", \"integer\"]}, \"tax_exemptions\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"string\"]}}, \"verified_email\": {\"type\": [\"null\", \"boolean\"]}, \"default_address\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"]}, \"zip\": {\"type\": [\"null\", \"string\"]}, \"city\": {\"type\": [\"null\", \"string\"]}, \"name\": {\"type\": [\"null\", \"string\"]}, \"phone\": {\"type\": [\"null\", \"string\"]}, \"company\": {\"type\": [\"null\", \"string\"]}, \"country\": {\"type\": [\"null\", \"string\"]}, \"default\": {\"type\": [\"null\", \"boolean\"]}, \"address1\": {\"type\": [\"null\", \"string\"]}, \"address2\": {\"type\": [\"null\", \"string\"]}, \"province\": {\"type\": [\"null\", \"string\"]}, \"last_name\": {\"type\": [\"null\", \"string\"]}, \"first_name\": {\"type\": [\"null\", \"string\"]}, \"customer_id\": {\"type\": [\"null\", \"integer\"]}, \"country_code\": {\"type\": [\"null\", \"string\"]}, \"country_name\": {\"type\": [\"null\", \"string\"]}, \"province_code\": {\"type\": [\"null\", \"string\"]}}}, \"last_order_name\": {\"type\": [\"null\", \"string\"]}, \"accepts_marketing\": {\"type\": [\"null\", \"boolean\"]}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"]}, \"multipass_identifier\": {\"type\": [\"null\", \"string\"]}, \"sms_marketing_consent\": {\"type\": [\"null\", \"object\"], \"properties\": {\"state\": {\"type\": [\"null\", \"string\"]}, \"opt_in_level\": {\"type\": [\"null\", \"string\"]}, \"consent_updated_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"consent_collected_from\": {\"type\": [\"null\", \"string\"]}}, \"additionalProperties\": true}, \"marketing_opt_in_level\": {\"type\": [\"null\", \"string\"]}, \"email_marketing_consent\": {\"type\": [\"null\", \"object\"], \"properties\": {\"state\": {\"type\": [\"null\", \"string\"]}, \"opt_in_level\": {\"type\": [\"null\", \"string\"]}, \"consent_updated_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"consent_collected_from\": {\"type\": [\"null\", \"string\"]}}, \"additionalProperties\": true}, \"accepts_marketing_updated_at\": {\"type\": [\"null\", \"string\"]}}}, \"shop_url\": {\"type\": [\"null\", \"string\"], \"description\": \"URL of the shop associated with the order\"}, \"closed_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the order was closed\"}, \"confirmed\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the order has been confirmed\"}, \"device_id\": {\"type\": [\"null\", \"string\"], \"description\": \"The ID of the device used to place the order\"}, \"po_number\": {\"type\": [\"null\", \"string\"], \"description\": \"The purchase order number\"}, \"reference\": {\"type\": [\"null\", \"string\"], \"description\": \"Reference associated with the order\"}, \"tax_lines\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"rate\": {\"type\": [\"null\", \"number\"]}, \"price\": {\"type\": [\"null\", \"number\"]}, \"title\": {\"type\": [\"null\", \"string\"]}, \"price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"channel_liable\": {\"type\": [\"null\", \"boolean\"]}}}}, \"total_tax\": {\"type\": [\"null\", \"number\"], \"description\": \"The total tax amount for the order\"}, \"browser_ip\": {\"type\": [\"null\", \"string\"], \"description\": \"The IP address of the customer's browser\"}, \"cart_token\": {\"type\": [\"null\", \"string\"], \"description\": \"Token representing the cart associated with the order\"}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the order was created\"}, \"deleted_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the order was deleted\"}, \"line_items\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the item\"}, \"sku\": {\"type\": [\"null\", \"string\"], \"description\": \"Stock keeping unit of the item\"}, \"name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the item\"}, \"grams\": {\"type\": [\"null\", \"integer\"], \"description\": \"Weight in grams\"}, \"price\": {\"type\": [\"null\", \"number\"], \"description\": \"Price of the item\"}, \"title\": {\"type\": [\"null\", \"string\"], \"description\": \"Title of the item\"}, \"duties\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"], \"description\": \"Unique identifier for the duty\"}, \"tax_lines\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"rate\": {\"type\": [\"null\", \"number\"], \"description\": \"Tax rate\"}, \"price\": {\"type\": [\"null\", \"string\"], \"description\": \"Price of the tax\"}, \"title\": {\"type\": [\"null\", \"string\"], \"description\": \"Title of the tax\"}, \"price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Tax price in shop currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Tax price in presentment currency\"}}, \"description\": \"Details of the tax price\"}, \"channel_liable\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Whether the channel is liable for the tax\"}}}, \"description\": \"Details of tax lines associated with the duty\"}, \"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Duty amount\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code of the duty amount\"}}, \"description\": \"Duty amount in shop currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Duty amount\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency code of the duty amount\"}}, \"description\": \"Duty amount in presentment currency\"}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"Unique identifier for the duty\"}, \"country_code_of_origin\": {\"type\": [\"null\", \"string\"], \"description\": \"Country code of origin for the duty\"}, \"harmonized_system_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Harmonized system code for the duty\"}}}, \"description\": \"Details of any duties associated with the item\"}, \"vendor\": {\"type\": [\"null\", \"string\"], \"description\": \"Vendor of the item\"}, \"taxable\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Whether the item is taxable\"}, \"quantity\": {\"type\": [\"null\", \"integer\"], \"description\": \"Quantity of the item\"}, \"gift_card\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Whether the item is a gift card\"}, \"price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Item price in shop currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Item price in presentment currency\"}}, \"description\": \"Details of the item price\"}, \"tax_lines\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"rate\": {\"type\": [\"null\", \"number\"], \"description\": \"Tax rate\"}, \"price\": {\"type\": [\"null\", \"number\"], \"description\": \"Price of the tax\"}, \"title\": {\"type\": [\"null\", \"string\"], \"description\": \"Title of the tax\"}, \"price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Tax price in shop currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Tax price in presentment currency\"}}, \"description\": \"Details of the tax price\"}, \"channel_liable\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Whether the channel is liable for the tax\"}}}, \"description\": \"Details of tax lines associated with the item\"}, \"product_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Identifier for the product\"}, \"properties\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the property\"}, \"value\": {\"type\": [\"null\", \"string\"], \"description\": \"Value of the property\"}}}, \"description\": \"Any additional properties associated with the item\"}, \"variant_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Identifier for the variant of the item\"}, \"pre_tax_price\": {\"type\": [\"null\", \"number\"], \"description\": \"Price before tax\"}, \"variant_title\": {\"type\": [\"null\", \"string\"], \"description\": \"Title of the variant\"}, \"product_exists\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Whether the product exists\"}, \"total_discount\": {\"type\": [\"null\", \"number\"], \"description\": \"Total discount applied to the item\"}, \"origin_location\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the location\"}, \"zip\": {\"type\": [\"null\", \"string\"], \"description\": \"Zip code of the address\"}, \"city\": {\"type\": [\"null\", \"string\"], \"description\": \"City of the address\"}, \"name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the location\"}, \"address1\": {\"type\": [\"null\", \"string\"], \"description\": \"First line of address\"}, \"address2\": {\"type\": [\"null\", \"string\"], \"description\": \"Second line of address\"}, \"country_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Country code of the address\"}, \"province_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Province code of the address\"}}, \"description\": \"Origin address of the item\"}, \"requires_shipping\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Whether shipping is required\"}, \"fulfillment_status\": {\"type\": [\"null\", \"string\"], \"description\": \"Status of fulfillment\"}, \"total_discount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Total discount amount in shop currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Total discount amount in presentment currency\"}}, \"description\": \"Details of the total discount applied to the item\"}, \"fulfillment_service\": {\"type\": [\"null\", \"string\"], \"description\": \"Service used for fulfillment\"}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"Unique identifier for the item\"}, \"destination_location\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the location\"}, \"zip\": {\"type\": [\"null\", \"string\"], \"description\": \"Zip code of the address\"}, \"city\": {\"type\": [\"null\", \"string\"], \"description\": \"City of the address\"}, \"name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the location\"}, \"address1\": {\"type\": [\"null\", \"string\"], \"description\": \"First line of address\"}, \"address2\": {\"type\": [\"null\", \"string\"], \"description\": \"Second line of address\"}, \"country_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Country code of the address\"}, \"province_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Province code of the address\"}}, \"description\": \"Destination address of the item\"}, \"discount_allocations\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"], \"description\": \"Unique identifier for the discount\"}, \"amount\": {\"type\": [\"null\", \"string\"], \"description\": \"Amount of the discount\"}, \"amount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Discount amount in shop currency\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"Discount amount in presentment currency\"}}, \"description\": \"Details of the discount amount\"}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"Timestamp of when the discount was created\"}, \"description\": {\"type\": [\"null\", \"string\"], \"description\": \"Description of the discount\"}, \"application_type\": {\"type\": [\"null\", \"string\"], \"description\": \"Type of application of the discount\"}, \"discount_application_index\": {\"type\": [\"null\", \"number\"], \"description\": \"Index of the discount application\"}}}, \"description\": \"Details of any discounts applied to the item\"}, \"fulfillable_quantity\": {\"type\": [\"null\", \"integer\"], \"description\": \"Quantity that is fulfillable\"}, \"variant_inventory_management\": {\"type\": [\"null\", \"string\"], \"description\": \"Inventory management type for the variant\"}}}, \"description\": \"Details of the products within an order\"}, \"source_url\": {\"type\": [\"null\", \"string\"], \"description\": \"URL of the order's source\"}, \"tax_exempt\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the order is tax exempt\"}, \"updated_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the order was last updated\"}, \"checkout_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"The ID of the checkout that processed the order\"}, \"location_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"The location ID associated with the order\"}, \"source_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the order's source\"}, \"total_price\": {\"type\": [\"null\", \"number\"], \"description\": \"The total price of the order\"}, \"cancelled_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the order was canceled\"}, \"fulfillments\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"]}, \"name\": {\"type\": [\"null\", \"string\"]}, \"status\": {\"type\": [\"null\", \"string\"]}, \"receipt\": {\"type\": [\"null\", \"object\"]}, \"service\": {\"type\": [\"null\", \"string\"]}, \"order_id\": {\"type\": [\"null\", \"integer\"]}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"line_items\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"]}, \"sku\": {\"type\": [\"null\", \"string\"]}, \"name\": {\"type\": [\"null\", \"string\"]}, \"grams\": {\"type\": [\"null\", \"integer\"]}, \"price\": {\"type\": [\"null\", \"number\"]}, \"title\": {\"type\": [\"null\", \"string\"]}, \"duties\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"tax_lines\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"rate\": {\"type\": [\"null\", \"number\"]}, \"price\": {\"type\": [\"null\", \"string\"]}, \"title\": {\"type\": [\"null\", \"string\"]}, \"price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"channel_liable\": {\"type\": [\"null\", \"boolean\"]}}}}, \"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"]}, \"country_code_of_origin\": {\"type\": [\"null\", \"string\"]}, \"harmonized_system_code\": {\"type\": [\"null\", \"string\"]}}}}, \"vendor\": {\"type\": [\"null\", \"string\"]}, \"taxable\": {\"type\": [\"null\", \"boolean\"]}, \"quantity\": {\"type\": [\"null\", \"integer\"]}, \"gift_card\": {\"type\": [\"null\", \"boolean\"]}, \"price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"tax_lines\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"rate\": {\"type\": [\"null\", \"number\"]}, \"price\": {\"type\": [\"null\", \"number\"]}, \"title\": {\"type\": [\"null\", \"string\"]}, \"price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"channel_liable\": {\"type\": [\"null\", \"boolean\"]}}}}, \"product_id\": {\"type\": [\"null\", \"integer\"]}, \"properties\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"name\": {\"type\": [\"null\", \"string\"]}, \"value\": {\"type\": [\"null\", \"string\"]}}}}, \"variant_id\": {\"type\": [\"null\", \"integer\"]}, \"pre_tax_price\": {\"type\": [\"null\", \"number\"]}, \"variant_title\": {\"type\": [\"null\", \"string\"]}, \"product_exists\": {\"type\": [\"null\", \"boolean\"]}, \"total_discount\": {\"type\": [\"null\", \"number\"]}, \"origin_location\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"]}, \"zip\": {\"type\": [\"null\", \"string\"]}, \"city\": {\"type\": [\"null\", \"string\"]}, \"name\": {\"type\": [\"null\", \"string\"]}, \"address1\": {\"type\": [\"null\", \"string\"]}, \"address2\": {\"type\": [\"null\", \"string\"]}, \"country_code\": {\"type\": [\"null\", \"string\"]}, \"province_code\": {\"type\": [\"null\", \"string\"]}}}, \"requires_shipping\": {\"type\": [\"null\", \"boolean\"]}, \"fulfillment_status\": {\"type\": [\"null\", \"string\"]}, \"total_discount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"fulfillment_service\": {\"type\": [\"null\", \"string\"]}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"]}, \"destination_location\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"]}, \"zip\": {\"type\": [\"null\", \"string\"]}, \"city\": {\"type\": [\"null\", \"string\"]}, \"name\": {\"type\": [\"null\", \"string\"]}, \"address1\": {\"type\": [\"null\", \"string\"]}, \"address2\": {\"type\": [\"null\", \"string\"]}, \"country_code\": {\"type\": [\"null\", \"string\"]}, \"province_code\": {\"type\": [\"null\", \"string\"]}}}, \"discount_allocations\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"amount\": {\"type\": [\"null\", \"string\"]}, \"amount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"description\": {\"type\": [\"null\", \"string\"]}, \"application_type\": {\"type\": [\"null\", \"string\"]}, \"discount_application_index\": {\"type\": [\"null\", \"number\"]}}}}, \"fulfillable_quantity\": {\"type\": [\"null\", \"integer\"]}, \"variant_inventory_management\": {\"type\": [\"null\", \"string\"]}}}}, \"updated_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"location_id\": {\"type\": [\"null\", \"integer\"]}, \"tracking_url\": {\"type\": [\"null\", \"string\"]}, \"tracking_urls\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"string\"]}}, \"origin_address\": {\"type\": [\"null\", \"object\"], \"properties\": {\"zip\": {\"type\": [\"null\", \"string\"]}, \"city\": {\"type\": [\"null\", \"string\"]}, \"address1\": {\"type\": [\"null\", \"string\"]}, \"address2\": {\"type\": [\"null\", \"string\"]}, \"country_code\": {\"type\": [\"null\", \"string\"]}, \"province_code\": {\"type\": [\"null\", \"string\"]}}, \"additionalProperties\": true}, \"shipment_status\": {\"type\": [\"null\", \"string\"]}, \"tracking_number\": {\"type\": [\"null\", \"string\"]}, \"tracking_company\": {\"type\": [\"null\", \"string\"]}, \"tracking_numbers\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"string\"]}}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"]}}}}, \"landing_site\": {\"type\": [\"null\", \"string\"], \"description\": \"The landing site of the order\"}, \"order_number\": {\"type\": [\"null\", \"integer\"], \"description\": \"The unique number assigned to the order\"}, \"processed_at\": {\"type\": [\"null\", \"string\"], \"description\": \"The date and time when the order was processed\"}, \"total_weight\": {\"type\": [\"null\", \"integer\"], \"description\": \"The total weight of all items in the order\"}, \"cancel_reason\": {\"type\": [\"null\", \"string\"], \"description\": \"The reason provided if the order was canceled\"}, \"contact_email\": {\"type\": [\"null\", \"string\"], \"description\": \"The email address for order-related contacts\"}, \"payment_terms\": {\"type\": [\"null\", \"string\"], \"description\": \"The terms of payment for the order\"}, \"total_tax_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"The total tax amount in shop currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"The currency code for the total tax amount in shop currency\"}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"The total tax amount in presentment currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"The currency code for the total tax amount\"}}}}, \"description\": \"The details of the total tax applied to the order.\"}, \"checkout_token\": {\"type\": [\"null\", \"string\"], \"description\": \"Token representing the checkout associated with the order\"}, \"client_details\": {\"type\": [\"null\", \"object\"], \"properties\": {\"browser_ip\": {\"type\": [\"null\", \"string\"]}, \"user_agent\": {\"type\": [\"null\", \"string\"]}, \"session_hash\": {\"type\": [\"null\", \"string\"]}, \"browser_width\": {\"type\": [\"null\", \"integer\"]}, \"browser_height\": {\"type\": [\"null\", \"integer\"]}, \"accept_language\": {\"type\": [\"null\", \"string\"]}}}, \"discount_codes\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"code\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}, \"amount\": {\"type\": [\"null\", \"string\"]}}}}, \"referring_site\": {\"type\": [\"null\", \"string\"], \"description\": \"The referring site of the order\"}, \"shipping_lines\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"]}, \"code\": {\"type\": [\"null\", \"string\"]}, \"phone\": {\"type\": [\"null\", \"string\"]}, \"price\": {\"type\": [\"null\", \"number\"]}, \"title\": {\"type\": [\"null\", \"string\"]}, \"source\": {\"type\": [\"null\", \"string\"]}, \"price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"tax_lines\": {\"type\": [\"null\", \"array\"]}, \"discounted_price\": {\"type\": [\"null\", \"number\"]}, \"carrier_identifier\": {\"type\": [\"null\", \"string\"]}, \"discount_allocations\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"amount\": {\"type\": [\"null\", \"string\"]}, \"amount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"description\": {\"type\": [\"null\", \"string\"]}, \"application_type\": {\"type\": [\"null\", \"string\"]}, \"discount_application_index\": {\"type\": [\"null\", \"number\"]}}}}, \"discounted_price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"requested_fulfillment_service_id\": {\"type\": [\"null\", \"string\"]}}}}, \"subtotal_price\": {\"type\": [\"null\", \"number\"], \"description\": \"The subtotal price of the order\"}, \"taxes_included\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if taxes are included in the prices\"}, \"billing_address\": {\"type\": [\"null\", \"object\"], \"properties\": {\"zip\": {\"type\": [\"null\", \"string\"]}, \"city\": {\"type\": [\"null\", \"string\"]}, \"name\": {\"type\": [\"null\", \"string\"]}, \"phone\": {\"type\": [\"null\", \"string\"]}, \"company\": {\"type\": [\"null\", \"string\"]}, \"country\": {\"type\": [\"null\", \"string\"]}, \"address1\": {\"type\": [\"null\", \"string\"]}, \"address2\": {\"type\": [\"null\", \"string\"]}, \"latitude\": {\"type\": [\"null\", \"number\"]}, \"province\": {\"type\": [\"null\", \"string\"]}, \"last_name\": {\"type\": [\"null\", \"string\"]}, \"longitude\": {\"type\": [\"null\", \"number\"]}, \"first_name\": {\"type\": [\"null\", \"string\"]}, \"country_code\": {\"type\": [\"null\", \"string\"]}, \"province_code\": {\"type\": [\"null\", \"string\"]}}}, \"customer_locale\": {\"type\": [\"null\", \"string\"], \"description\": \"The locale of the customer\"}, \"deleted_message\": {\"type\": [\"null\", \"string\"], \"description\": \"Message provided when the order was deleted\"}, \"duties_included\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Whether duties included in the subtotal price of the order.\"}, \"estimated_taxes\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Estimated taxes for the order\"}, \"note_attributes\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the note attribute\"}, \"value\": {\"type\": [\"null\", \"string\"], \"description\": \"Value of the note attribute\"}}}, \"description\": \"Custom note attributes associated with the order\"}, \"total_discounts\": {\"type\": [\"null\", \"number\"], \"description\": \"The total amount of discounts applied to the order\"}, \"total_price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"total_price_usd\": {\"type\": [\"null\", \"number\"], \"description\": \"The total price of the order in USD\"}, \"financial_status\": {\"type\": [\"null\", \"string\"], \"description\": \"The financial status of the order\"}, \"landing_site_ref\": {\"type\": [\"null\", \"string\"], \"description\": \"Reference for the landing site of the order\"}, \"order_status_url\": {\"type\": [\"null\", \"string\"], \"description\": \"URL to check the status of the order\"}, \"shipping_address\": {\"type\": [\"null\", \"object\"], \"properties\": {\"zip\": {\"type\": [\"null\", \"string\"]}, \"city\": {\"type\": [\"null\", \"string\"]}, \"name\": {\"type\": [\"null\", \"string\"]}, \"phone\": {\"type\": [\"null\", \"string\"]}, \"company\": {\"type\": [\"null\", \"string\"]}, \"country\": {\"type\": [\"null\", \"string\"]}, \"address1\": {\"type\": [\"null\", \"string\"]}, \"address2\": {\"type\": [\"null\", \"string\"]}, \"latitude\": {\"type\": [\"null\", \"number\"]}, \"province\": {\"type\": [\"null\", \"string\"]}, \"last_name\": {\"type\": [\"null\", \"string\"]}, \"longitude\": {\"type\": [\"null\", \"number\"]}, \"first_name\": {\"type\": [\"null\", \"string\"]}, \"country_code\": {\"type\": [\"null\", \"string\"]}, \"province_code\": {\"type\": [\"null\", \"string\"]}}}, \"current_total_tax\": {\"type\": [\"null\", \"number\"], \"description\": \"The current total tax amount for the order\"}, \"source_identifier\": {\"type\": [\"null\", \"string\"], \"description\": \"Identifier for the order's source\"}, \"total_outstanding\": {\"type\": [\"null\", \"number\"], \"description\": \"The total outstanding amount for the order\"}, \"fulfillment_status\": {\"type\": [\"null\", \"string\"], \"description\": \"The fulfillment status of the order\"}, \"subtotal_price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"total_tip_received\": {\"type\": [\"null\", \"number\"], \"description\": \"The total tip amount received, if any\"}, \"confirmation_number\": {\"type\": [\"null\", \"string\"], \"description\": \"The unique number for confirming the order\"}, \"current_total_price\": {\"type\": [\"null\", \"number\"], \"description\": \"The current total price of the order\"}, \"deleted_description\": {\"type\": [\"null\", \"string\"], \"description\": \"Description provided when the order was deleted\"}, \"total_discounts_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"The unique identifier of the order in the GraphQL Admin API\"}, \"discount_allocations\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"amount\": {\"type\": [\"null\", \"string\"]}, \"amount_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"description\": {\"type\": [\"null\", \"string\"]}, \"application_type\": {\"type\": [\"null\", \"string\"]}, \"discount_application_index\": {\"type\": [\"null\", \"number\"]}}}}, \"presentment_currency\": {\"type\": [\"null\", \"string\"], \"description\": \"The currency used for presenting the order\"}, \"current_total_tax_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"discount_applications\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"type\": {\"type\": [\"null\", \"string\"]}, \"title\": {\"type\": [\"null\", \"string\"]}, \"value\": {\"type\": [\"null\", \"string\"]}, \"value_type\": {\"type\": [\"null\", \"string\"]}, \"description\": {\"type\": [\"null\", \"string\"]}, \"target_type\": {\"type\": [\"null\", \"string\"]}, \"target_selection\": {\"type\": [\"null\", \"string\"]}, \"allocation_method\": {\"type\": [\"null\", \"string\"]}}}}, \"payment_gateway_names\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"string\"]}}, \"current_subtotal_price\": {\"type\": [\"null\", \"number\"], \"description\": \"The current subtotal price of the order\"}, \"total_line_items_price\": {\"type\": [\"null\", \"number\"], \"description\": \"The total price of all line items in the order\"}, \"buyer_accepts_marketing\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the customer has agreed to receive marketing emails\"}, \"current_total_discounts\": {\"type\": [\"null\", \"number\"], \"description\": \"The current total discounts applied to the order\"}, \"current_total_price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"current_total_duties_set\": {\"type\": [\"null\", \"string\"], \"description\": \"The current total duties set for the order\"}, \"total_shipping_price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"The total shipping amount in shop currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"The currency code for the total shipping price in shop currency\"}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"The total shipping amount in presentment currency\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"The currency code for the total shipping price\"}}}}, \"description\": \"The details of the total shipping price for the order.\"}, \"merchant_of_record_app_id\": {\"type\": [\"null\", \"string\"], \"description\": \"The app ID of the merchant of record\"}, \"original_total_duties_set\": {\"type\": [\"null\", \"string\"], \"description\": \"The original total duties set for the order\"}, \"current_subtotal_price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"total_line_items_price_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"current_total_discounts_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"merchant_business_entity_id\": {\"type\": [\"null\", \"string\"], \"description\": \"The business entity ID of the merchant of record.\"}, \"current_total_additional_fees_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"original_total_additional_fees_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}}}}, \"total_cash_rounding_payment_adjustment_set\": {\"type\": [\"null\", \"object\"], \"properties\": {\"shop_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"The amount in the shop's local currency.\"}, \"presentment_money\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"string\"]}, \"currency_code\": {\"type\": [\"null\", \"string\"]}}, \"description\": \"The amount in the customer's presentment currency.\"}}, \"description\": \"The money set that represents the amount adjusted on the order total due to cash rounding.\"}}",
+          "additionalProperties": "true"
+        },
+        "default_cursor_field": [
+          "updated_at"
+        ],
+        "source_defined_cursor": true,
+        "source_defined_primary_key": [
+          [
+            "id"
+          ]
+        ]
+      },
+      "config": {
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "hashedFields": [],
+        "mappers": [],
+        "sync_mode": "incremental",
+        "destination_sync_mode": "append_dedup",
+        "cursor_field": [
+          "updated_at"
+        ],
+        "primary_key": [
+          [
+            "id"
+          ]
+        ],
+        "alias_name": "orders",
+        "field_selection_enabled": false,
+        "selected_fields": []
+      }
+    },
+    {
+      "stream": {
+        "name": "products",
+        "supportedSyncModes": [
+          "full_refresh",
+          "incremental"
+        ],
+        "isResumable": true,
+        "json_schema": {
+          "type": "[\"object\", \"null\"]",
+          "properties": "{\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"The unique identifier of the product.\"}, \"tags\": {\"type\": [\"null\", \"string\"], \"description\": \"Tags associated with the product.\"}, \"title\": {\"type\": [\"null\", \"string\"], \"description\": \"The title of the product.\"}, \"handle\": {\"type\": [\"null\", \"string\"], \"description\": \"The human-readable URL for the product.\"}, \"status\": {\"type\": [\"null\", \"string\"], \"description\": \"The status of the product.\"}, \"shop_url\": {\"type\": [\"null\", \"string\"], \"description\": \"The URL of the shop where the product is listed.\"}, \"variants\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"The unique identifier of the variant.\"}, \"sku\": {\"type\": [\"null\", \"string\"], \"description\": \"The stock keeping unit (SKU) of the variant.\"}, \"grams\": {\"type\": [\"null\", \"integer\"], \"description\": \"The weight of the variant in grams.\"}, \"price\": {\"type\": [\"null\", \"number\"], \"description\": \"The price of the variant.\"}, \"title\": {\"type\": [\"null\", \"string\"], \"description\": \"The title of the variant.\"}, \"weight\": {\"type\": [\"null\", \"number\"], \"description\": \"The weight of the variant.\"}, \"barcode\": {\"type\": [\"null\", \"string\"], \"description\": \"The barcode of the variant.\"}, \"option1\": {\"type\": [\"null\", \"string\"], \"description\": \"The value of option 1 for the variant.\"}, \"option2\": {\"type\": [\"null\", \"string\"], \"description\": \"The value of option 2 for the variant.\"}, \"option3\": {\"type\": [\"null\", \"string\"], \"description\": \"The value of option 3 for the variant.\"}, \"taxable\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the variant is taxable.\"}, \"image_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"The unique identifier of the image associated with the variant.\"}, \"position\": {\"type\": [\"null\", \"integer\"], \"description\": \"The position of the variant.\"}, \"tax_code\": {\"type\": [\"null\", \"string\"], \"description\": \"The tax code for the variant.\"}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the variant was created.\"}, \"product_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"The unique identifier of the product associated with the variant.\"}, \"updated_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the variant was last updated.\"}, \"weight_unit\": {\"type\": [\"null\", \"string\"], \"description\": \"The unit of weight for the variant.\"}, \"compare_at_price\": {\"type\": [\"null\", \"number\"], \"description\": \"The original price of the product before any discounts.\"}, \"inventory_policy\": {\"type\": [\"null\", \"string\"], \"description\": \"The inventory policy for the variant.\"}, \"inventory_item_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"The unique identifier of the inventory item associated with the variant.\"}, \"requires_shipping\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the variant requires shipping.\"}, \"inventory_quantity\": {\"type\": [\"null\", \"integer\"], \"description\": \"The available quantity of the variant.\"}, \"presentment_prices\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"price\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"The price amount.\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"The currency code of the price.\"}}, \"description\": \"The price of the product variant.\"}, \"compare_at_price\": {\"type\": [\"null\", \"number\"], \"description\": \"The compare at price in different currencies.\"}}}, \"description\": \"Prices displayed to customers in different currencies or formats.\"}, \"fulfillment_service\": {\"type\": [\"null\", \"string\"], \"description\": \"The fulfillment service for the variant.\"}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"The unique identifier of the variant in the Admin GraphQL API.\"}, \"inventory_management\": {\"type\": [\"null\", \"string\"], \"description\": \"The management method for the variant inventory.\"}, \"old_inventory_quantity\": {\"type\": [\"null\", \"integer\"], \"description\": \"The previous quantity of the variant before change.\"}}}, \"description\": \"Represents different versions or variations of the product.\"}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the product was created.\"}, \"deleted_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the product was deleted.\"}, \"updated_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the product was last updated.\"}, \"description\": {\"type\": [\"null\", \"string\"], \"description\": \"The product's description.\"}, \"product_type\": {\"type\": [\"null\", \"string\"], \"description\": \"The type or category of the product.\"}, \"published_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the product was published.\"}, \"total_variants\": {\"type\": [\"null\", \"integer\"], \"description\": \"The total number of variants available for the product.\"}, \"deleted_message\": {\"type\": [\"null\", \"string\"], \"description\": \"Message related to the deletion of the product.\"}, \"published_scope\": {\"type\": [\"null\", \"string\"], \"description\": \"The scope of where the product is available for purchase.\"}, \"total_inventory\": {\"type\": [\"null\", \"integer\"], \"description\": \"The total inventory count of the product.\"}, \"tracks_inventory\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates whether inventory tracking is enabled for the product.\"}, \"deleted_description\": {\"type\": [\"null\", \"string\"], \"description\": \"Description of the reason for deletion.\"}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"The unique identifier of the product in the Admin GraphQL API.\"}}",
+          "additionalProperties": "true"
+        },
+        "default_cursor_field": [
+          "updated_at"
+        ],
+        "source_defined_cursor": true,
+        "source_defined_primary_key": [
+          [
+            "id"
+          ]
+        ]
+      },
+      "config": {
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "hashedFields": [],
+        "mappers": [],
+        "sync_mode": "incremental",
+        "destination_sync_mode": "append_dedup",
+        "cursor_field": [
+          "updated_at"
+        ],
+        "primary_key": [
+          [
+            "id"
+          ]
+        ],
+        "alias_name": "products",
+        "field_selection_enabled": true,
+        "selected_fields": [
+          {
+            "field_path": [
+              "id"
+            ]
+          },
+          {
+            "field_path": [
+              "tags"
+            ]
+          },
+          {
+            "field_path": [
+              "title"
+            ]
+          },
+          {
+            "field_path": [
+              "handle"
+            ]
+          },
+          {
+            "field_path": [
+              "status"
+            ]
+          },
+          {
+            "field_path": [
+              "shop_url"
+            ]
+          },
+          {
+            "field_path": [
+              "variants"
+            ]
+          },
+          {
+            "field_path": [
+              "created_at"
+            ]
+          },
+          {
+            "field_path": [
+              "deleted_at"
+            ]
+          },
+          {
+            "field_path": [
+              "updated_at"
+            ]
+          },
+          {
+            "field_path": [
+              "description"
+            ]
+          },
+          {
+            "field_path": [
+              "product_type"
+            ]
+          },
+          {
+            "field_path": [
+              "published_at"
+            ]
+          },
+          {
+            "field_path": [
+              "total_variants"
+            ]
+          },
+          {
+            "field_path": [
+              "deleted_message"
+            ]
+          },
+          {
+            "field_path": [
+              "published_scope"
+            ]
+          },
+          {
+            "field_path": [
+              "total_inventory"
+            ]
+          },
+          {
+            "field_path": [
+              "tracks_inventory"
+            ]
+          },
+          {
+            "field_path": [
+              "deleted_description"
+            ]
+          },
+          {
+            "field_path": [
+              "admin_graphql_api_id"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "stream": {
+        "name": "product_variants",
+        "supportedSyncModes": [
+          "full_refresh",
+          "incremental"
+        ],
+        "isResumable": true,
+        "json_schema": {
+          "type": "[\"null\", \"object\"]",
+          "properties": "{\"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"The unique identifier for the variant\"}, \"sku\": {\"type\": [\"null\", \"string\"], \"description\": \"The unique SKU (stock keeping unit) of the variant\"}, \"grams\": {\"type\": [\"null\", \"integer\"], \"description\": \"The weight of the variant in grams\"}, \"price\": {\"type\": [\"null\", \"number\"], \"description\": \"The price of the variant\"}, \"title\": {\"type\": [\"null\", \"string\"], \"description\": \"The title of the variant\"}, \"barcode\": {\"type\": [\"null\", \"string\"], \"description\": \"The barcode associated with the variant\"}, \"tracked\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Whether inventory levels are tracked for the item.\"}, \"position\": {\"type\": [\"null\", \"integer\"], \"description\": \"The position of the variant in the product's list of variants\"}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the variant was created\"}, \"product_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"The unique identifier for the product associated with the variant\"}, \"updated_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\", \"description\": \"The date and time when the variant was last updated\"}, \"display_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Display name of the variant, based on product's title + variant's title.\"}, \"compare_at_price\": {\"type\": [\"null\", \"string\"], \"description\": \"The original price of the variant before any discount\"}, \"available_for_sale\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Whether the product variant is available for sale.\"}, \"presentment_prices\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"price\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"The amount of the price\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"The currency code of the price\"}}, \"description\": \"The price of the variant in a different currency\"}, \"compare_at_price\": {\"type\": [\"null\", \"object\"], \"properties\": {\"amount\": {\"type\": [\"null\", \"number\"], \"description\": \"The amount of the price\"}, \"currency_code\": {\"type\": [\"null\", \"string\"], \"description\": \"The currency code of the price\"}}}}}, \"description\": \"The prices of the variant for presentation in different currencies\"}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"The unique identifier for the variant used by the GraphQL Admin API\"}}",
+          "additionalProperties": "true"
+        },
+        "default_cursor_field": [
+          "updated_at"
+        ],
+        "source_defined_cursor": true,
+        "source_defined_primary_key": [
+          [
+            "id"
+          ]
+        ]
+      },
+      "config": {
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "hashedFields": [],
+        "mappers": [],
+        "sync_mode": "incremental",
+        "destination_sync_mode": "append_dedup",
+        "cursor_field": [
+          "updated_at"
+        ],
+        "primary_key": [
+          [
+            "id"
+          ]
+        ],
+        "alias_name": "product_variants",
+        "field_selection_enabled": true,
+        "selected_fields": [
+          {
+            "field_path": [
+              "id"
+            ]
+          },
+          {
+            "field_path": [
+              "sku"
+            ]
+          },
+          {
+            "field_path": [
+              "grams"
+            ]
+          },
+          {
+            "field_path": [
+              "price"
+            ]
+          },
+          {
+            "field_path": [
+              "title"
+            ]
+          },
+          {
+            "field_path": [
+              "barcode"
+            ]
+          },
+          {
+            "field_path": [
+              "tracked"
+            ]
+          },
+          {
+            "field_path": [
+              "position"
+            ]
+          },
+          {
+            "field_path": [
+              "created_at"
+            ]
+          },
+          {
+            "field_path": [
+              "product_id"
+            ]
+          },
+          {
+            "field_path": [
+              "updated_at"
+            ]
+          },
+          {
+            "field_path": [
+              "display_name"
+            ]
+          },
+          {
+            "field_path": [
+              "compare_at_price"
+            ]
+          },
+          {
+            "field_path": [
+              "available_for_sale"
+            ]
+          },
+          {
+            "field_path": [
+              "presentment_prices"
+            ]
+          },
+          {
+            "field_path": [
+              "admin_graphql_api_id"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

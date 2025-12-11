@@ -1,13 +1,19 @@
+# Airbyte
 variable "workspace_id" {}
 variable "airbyte_username" {}
 variable "airbyte_password" {}
-variable "shopify_api_password" {}
+
+# Shopify
 variable "shopify_store" {}
+variable "shopify_api_password" {}
+
+# Klaviyo
 variable "klaviyo_api_key" {}
+
+# MinIO / S3
 variable "minio_user" {}
 variable "minio_password" {}
 variable "minio_endpoint" {}
-variable "nessie_endpoint" {
-  type        = string
-  description = "Nessie catalog endpoint"
-}
+
+# Nessie
+variable "nessie_endpoint" {}
