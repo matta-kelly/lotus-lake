@@ -7,6 +7,8 @@ repositories:
     url: https://charts.bitnami.com/bitnami
   - name: nessie-helm
     url: https://charts.projectnessie.org
+  - name: trino
+    url: https://trinodb.github.io/charts
 
 releases:
   - name: minio
@@ -17,6 +19,14 @@ releases:
       - minio/values.yaml
       - rootUser: {{ requiredEnv "TF_VAR_minio_user" }}
         rootPassword: {{ requiredEnv "TF_VAR_minio_password" }}
+
+  - name: trino
+    namespace: trino
+    createNamespace: true
+    chart: trino/trino
+    version: "1.41.0"
+    values:
+      - trino/values.yaml
 
   - name: airbyte
     namespace: airbyte
