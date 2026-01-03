@@ -4,7 +4,7 @@ resource "airbyte_source" "shopify" {
   source_definition_id = "9da77001-af33-4bcd-be46-6252bf9342b9"
   connection_configuration = jsonencode({
     shop       = var.shopify_store
-    start_date = "2025-12-01"
+    start_date = "2025-12-25"
     credentials = {
       auth_method  = "api_password"
       api_password = var.shopify_api_password

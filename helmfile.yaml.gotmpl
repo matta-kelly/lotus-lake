@@ -26,12 +26,14 @@ releases:
     chart: trino/trino
     version: "1.41.0"
     values:
-      - trino/values.yaml
+      - trino/values.yaml.gotmpl
 
   - name: airbyte
     namespace: airbyte
     createNamespace: true
     chart: airbyte-v2/airbyte
+    values:
+      - airbyte/values.yaml
 
   - name: nessie-postgres
     namespace: nessie
