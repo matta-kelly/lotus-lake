@@ -1,5 +1,8 @@
 # Airbyte
 variable "workspace_id" {}
+variable "airbyte_server_url" {
+  default = "http://localhost:8080/api/"
+}
 variable "airbyte_username" {}
 variable "airbyte_password" {}
 

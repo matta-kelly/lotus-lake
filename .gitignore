@@ -3,3 +3,6 @@
 *.tfstate
 *.tfstate.backup
 *.tfstate.*.backup
+.venv/
+orchestration/target/
+orchestration/logs/

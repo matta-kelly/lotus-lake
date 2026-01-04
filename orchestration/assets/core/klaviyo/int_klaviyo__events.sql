@@ -1,17 +1,17 @@
-{{ config(tags=['core']) }}
+{{ config(tags=['core'], materialized='table') }}
 
 select
     -- identifiers
     id as event_id,
-    relationships.profile.data.id as profile_id,
-    relationships.metric.data.id as metric_id,
+    json_extract_scalar(json_parse(relationships), '$.profile.data.id') as profile_id,
+    json_extract_scalar(json_parse(relationships), '$.metric.data.id') as metric_id,
 
     -- timestamps
     datetime as event_datetime,
-    attributes.timestamp as event_timestamp,
+    json_extract_scalar(json_parse(attributes), '$.timestamp') as event_timestamp,
 
     -- event details
-    attributes.uuid as event_uuid,
-    attributes.event_properties as properties
+    json_extract_scalar(json_parse(attributes), '$.uuid') as event_uuid,
+    cast(json_extract(json_parse(attributes), '$.event_properties') as varchar) as properties
 
 from {{ source('klaviyo', 'events') }}

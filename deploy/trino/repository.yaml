@@ -1,0 +1,12 @@
+# ==============================================================================
+# Trino Helm Repository
+# ==============================================================================
+
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: trino
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://trinodb.github.io/charts

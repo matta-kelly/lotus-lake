@@ -1,0 +1,121 @@
+# ==============================================================================
+# Dagster Helm Release (lotus-lake)
+# ==============================================================================
+# Orchestration for this lake
+# ==============================================================================
+
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: dagster
+  namespace: lotus-lake
+spec:
+  interval: 30m
+  timeout: 10m
+  chart:
+    spec:
+      chart: dagster
+      version: "1.x"
+      sourceRef:
+        kind: HelmRepository
+        name: dagster
+        namespace: flux-system
+
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+
+  values:
+    # -------------------------------------------------------------------------
+    # Use external PostgreSQL (CNPG)
+    # -------------------------------------------------------------------------
+    postgresql:
+      enabled: false
+
+    generatePostgresqlPasswordSecret: false
+
+    dagsterWebserver:
+      env:
+        - name: DAGSTER_PG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: dagster-db-app
+              key: password
+
+    dagsterDaemon:
+      env:
+        - name: DAGSTER_PG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: dagster-db-app
+              key: password
+
+    global:
+      postgresqlSecretName: ""
+
+    runLauncher:
+      type: K8sRunLauncher
+      config:
+        k8sRunLauncher:
+          envSecrets:
+            - name: dagster-db-app
+
+    # -------------------------------------------------------------------------
+    # Instance config pointing to CNPG
+    # -------------------------------------------------------------------------
+    dagster-user-deployments:
+      enabled: true
+      deployments:
+        - name: lotus-lake
+          image:
+            repository: ghcr.io/lotusandluna/lotus-lake
+            tag: latest
+            pullPolicy: Always
+          dagsterApiGrpcArgs:
+            - "-m"
+            - "orchestration.definitions"
+          port: 3030
+          env:
+            - name: DAGSTER_PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dagster-db-app
+                  key: password
+            # Airbyte connection
+            - name: AIRBYTE_HOST
+              value: "http://airbyte-webapp.airbyte.svc.cluster.local"
+            # Trino connection
+            - name: TRINO_HOST
+              value: "trino.lotus-lake.svc.cluster.local"
+            - name: TRINO_PORT
+              value: "8080"
+
+    # -------------------------------------------------------------------------
+    # Ingress
+    # -------------------------------------------------------------------------
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      webserver:
+        host: dagster.${CLUSTER_DOMAIN}
+        path: /
+        pathType: Prefix
+        tls:
+          enabled: true
+          secretName: dagster-tls
+
+    # -------------------------------------------------------------------------
+    # Storage config
+    # -------------------------------------------------------------------------
+    computeLogManager:
+      type: S3ComputeLogManager
+      config:
+        s3ComputeLogManager:
+          bucket: lotus-lake-logs
+          endpointUrl: http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333
+          skipEmptyFiles: true

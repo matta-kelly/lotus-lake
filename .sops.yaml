@@ -1,0 +1,10 @@
+# ==============================================================================
+# SOPS Configuration
+# ==============================================================================
+# Uses same age key as h-kube since deploying to same cluster
+# ==============================================================================
+
+creation_rules:
+  - path_regex: .*\.yaml$
+    encrypted_regex: ^(data|stringData)$
+    age: age165ul5vra7q09yse7k0nharmt2jp0usw5tj2qwv2an9glyvxrr5ss5snxgj
