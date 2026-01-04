@@ -1,0 +1,90 @@
+{
+  "stream": "pages",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "body_html": {
+      "type": "unknown",
+      "description": "The HTML content of the page."
+    },
+    "deleted_message": {
+      "type": "string",
+      "description": "Message indicating why the page was deleted."
+    },
+    "author": {
+      "type": "string",
+      "description": "The author of the page."
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The timestamp when the page was created.",
+      "format": "date-time"
+    },
+    "handle": {
+      "type": "string",
+      "description": "The unique URL path segment for the page."
+    },
+    "title": {
+      "type": "string",
+      "description": "The title of the page."
+    },
+    "deleted_at": {
+      "type": "string",
+      "description": "The timestamp when the page was deleted.",
+      "format": "date-time"
+    },
+    "shop_id": {
+      "type": "integer",
+      "description": "The ID of the shop to which the page belongs."
+    },
+    "template_suffix": {
+      "type": "string",
+      "description": "The suffix of the liquid template used for the page."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The timestamp when the page was last updated.",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop associated with the page."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier for the page in the Admin GraphQL API."
+    },
+    "deleted_description": {
+      "type": "string",
+      "description": "Description of the reason for deletion of the page."
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier for the page."
+    },
+    "published_at": {
+      "type": "string",
+      "description": "The timestamp when the page was published.",
+      "format": "date-time"
+    }
+  }
+}

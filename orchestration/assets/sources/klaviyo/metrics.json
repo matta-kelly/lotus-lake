@@ -1,0 +1,95 @@
+{
+  "stream": "metrics",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated"
+    ]
+  },
+  "fields": {
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "flow-triggers": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "links": {
+              "type": "object",
+              "properties": {
+                "related": {
+                  "type": "string"
+                },
+                "self": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "type": "string"
+        }
+      }
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "integration": {
+          "type": "object"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

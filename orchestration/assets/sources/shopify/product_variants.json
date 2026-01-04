@@ -1,0 +1,251 @@
+{
+  "stream": "product_variants",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "presentment_prices": {
+      "type": "array",
+      "description": "The prices of the variant for presentation in different currencies",
+      "items": {
+        "compare_at_price": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "The amount of the price"
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "The currency code of the price"
+            }
+          }
+        },
+        "price": {
+          "type": "object",
+          "description": "The price of the variant in a different currency",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "The amount of the price"
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "The currency code of the price"
+            }
+          }
+        }
+      }
+    },
+    "requires_shipping": {
+      "type": "boolean",
+      "description": "Indicates whether the variant requires shipping"
+    },
+    "old_inventory_quantity": {
+      "type": "integer",
+      "description": "The previous inventory quantity for the variant"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the variant was created",
+      "format": "date-time"
+    },
+    "tracked": {
+      "type": "boolean",
+      "description": "Whether inventory levels are tracked for the item."
+    },
+    "title": {
+      "type": "string",
+      "description": "The title of the variant"
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the variant was last updated",
+      "format": "date-time"
+    },
+    "inventory_item_id": {
+      "type": "integer",
+      "description": "The unique identifier for the inventory item associated with the variant"
+    },
+    "price": {
+      "type": "number",
+      "description": "The price of the variant"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop where the variant is listed"
+    },
+    "product_id": {
+      "type": "integer",
+      "description": "The unique identifier for the product associated with the variant"
+    },
+    "option3": {
+      "type": "string",
+      "description": "The value for option 3 of the variant"
+    },
+    "options": {
+      "type": "array",
+      "description": "List of product options applied to the variant.",
+      "items": {
+        "option_value": {
+          "type": "object",
+          "description": "The product option\u2019s value object.",
+          "properties": {
+            "swatch": {
+              "type": "object",
+              "description": "The swatch associated with the product option value.",
+              "properties": {
+                "image": {
+                  "type": "object",
+                  "description": "An image representation of the swatch.",
+                  "properties": {
+                    "image": {
+                      "type": "object",
+                      "description": "An image associated with the product variant.",
+                      "properties": {
+                        "src": {
+                          "type": "string",
+                          "description": "The location of the image as URL associated with the product variant option."
+                        },
+                        "url": {
+                          "type": "string",
+                          "description": "The image URL associated with the product variant option."
+                        }
+                      }
+                    },
+                    "id": {
+                      "type": "string",
+                      "description": "A globally-unique ID of an image representation of the swatch."
+                    }
+                  }
+                },
+                "color": {
+                  "type": "string",
+                  "description": "The color representation of the swatch."
+                }
+              }
+            },
+            "name": {
+              "type": "string",
+              "description": "The name of the product option value."
+            },
+            "has_variants": {
+              "type": "boolean",
+              "description": "Whether the product option value has any linked variants."
+            },
+            "id": {
+              "type": "string",
+              "description": "A globally-unique ID."
+            }
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "The product option\u2019s name."
+        },
+        "value": {
+          "type": "string",
+          "description": "The product option\u2019s value."
+        }
+      }
+    },
+    "option1": {
+      "type": "string",
+      "description": "The value for option 1 of the variant"
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier for the variant"
+    },
+    "option2": {
+      "type": "string",
+      "description": "The value for option 2 of the variant"
+    },
+    "sku": {
+      "type": "string",
+      "description": "The unique SKU (stock keeping unit) of the variant"
+    },
+    "grams": {
+      "type": "integer",
+      "description": "The weight of the variant in grams"
+    },
+    "barcode": {
+      "type": "string",
+      "description": "The barcode associated with the variant"
+    },
+    "available_for_sale": {
+      "type": "boolean",
+      "description": "Whether the product variant is available for sale."
+    },
+    "inventory_quantity": {
+      "type": "integer",
+      "description": "The current inventory quantity for the variant"
+    },
+    "compare_at_price": {
+      "type": "string",
+      "description": "The original price of the variant before any discount"
+    },
+    "taxable": {
+      "type": "boolean",
+      "description": "Indicates whether taxes are applied to the variant"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "The location of the image as URL."
+    },
+    "weight": {
+      "type": "number",
+      "description": "The weight of the variant"
+    },
+    "display_name": {
+      "type": "string",
+      "description": "Display name of the variant, based on product's title + variant's title."
+    },
+    "image_src": {
+      "type": "string",
+      "description": "The location of the image as URL."
+    },
+    "inventory_policy": {
+      "type": "string",
+      "description": "The inventory policy for the variant"
+    },
+    "tax_code": {
+      "type": "string",
+      "description": "The tax code for the product variant."
+    },
+    "weight_unit": {
+      "type": "string",
+      "description": "The unit of measurement for the weight of the variant"
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier for the variant used by the GraphQL Admin API"
+    },
+    "position": {
+      "type": "integer",
+      "description": "The position of the variant in the product's list of variants"
+    },
+    "image_id": {
+      "type": "integer",
+      "description": "The unique identifier for the image associated with the variant"
+    }
+  }
+}

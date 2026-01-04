@@ -1,0 +1,81 @@
+{
+  "stream": "tender_transactions",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "processed_at"
+    ]
+  },
+  "fields": {
+    "amount": {
+      "type": "string",
+      "description": "The transaction amount in the specified currency."
+    },
+    "test": {
+      "type": "boolean",
+      "description": "Flag indicating whether the transaction was done in a testing environment."
+    },
+    "payment_details": {
+      "type": "object",
+      "description": "Details about the payment made for the transaction.",
+      "properties": {
+        "credit_card_number": {
+          "type": "string",
+          "description": "The masked credit card number used for payment."
+        },
+        "credit_card_company": {
+          "type": "string",
+          "description": "The company associated with the credit card used for payment."
+        }
+      }
+    },
+    "user_id": {
+      "type": "integer",
+      "description": "Unique identifier of the user associated with the transaction."
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop where the transaction took place."
+    },
+    "remote_reference": {
+      "type": "string",
+      "description": "Reference to an external system for the transaction."
+    },
+    "processed_at": {
+      "type": "string",
+      "description": "The date and time when the transaction was processed.",
+      "format": "date-time"
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency in which the transaction amount is stated."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Unique identifier for the tender transaction."
+    },
+    "order_id": {
+      "type": "integer",
+      "description": "The identifier of the order associated with the transaction."
+    },
+    "payment_method": {
+      "type": "string",
+      "description": "The method used for payment, e.g., credit card, PayPal, etc."
+    }
+  }
+}

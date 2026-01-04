@@ -1,0 +1,80 @@
+{
+  "stream": "collections",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "body_html": {
+      "type": "string",
+      "description": "The HTML content describing the collection."
+    },
+    "products_count": {
+      "type": "integer",
+      "description": "The number of products within the collection."
+    },
+    "handle": {
+      "type": "string",
+      "description": "A unique URL-friendly string that represents the collection."
+    },
+    "title": {
+      "type": "string",
+      "description": "The title or name of the collection."
+    },
+    "collection_type": {
+      "type": "string",
+      "description": "The type or category of the collection."
+    },
+    "published_scope": {
+      "type": "string",
+      "description": "The visibility of the collection to customers."
+    },
+    "template_suffix": {
+      "type": "string",
+      "description": "The name of the template that is used to render the collection."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The datetime when the collection was last updated.",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop where the collection belongs."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier for the collection in the Admin GraphQL API."
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier for the collection."
+    },
+    "published_at": {
+      "type": "string",
+      "description": "The datetime when the collection was published.",
+      "format": "date-time"
+    },
+    "sort_order": {
+      "type": "string",
+      "description": "The order in which the collection should be sorted."
+    }
+  }
+}

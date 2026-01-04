@@ -1,0 +1,264 @@
+{
+  "stream": "shop",
+  "options": {
+    "sync_modes": [
+      "full_refresh"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": []
+  },
+  "fields": {
+    "country": {
+      "type": "string",
+      "description": "The country where the shop is located"
+    },
+    "has_gift_cards": {
+      "type": "boolean",
+      "description": "Flag indicating if the shop offers gift cards"
+    },
+    "multi_location_enabled": {
+      "type": "boolean",
+      "description": "Flag indicating if multi-location is enabled for the shop"
+    },
+    "source": {
+      "type": "string",
+      "description": "The source of the shop data"
+    },
+    "province_code": {
+      "type": "string",
+      "description": "The code representing the province or state of the shop's location"
+    },
+    "money_with_currency_in_emails_format": {
+      "type": "string",
+      "description": "The format used for displaying money with currency in emails"
+    },
+    "plan_display_name": {
+      "type": "string",
+      "description": "The display name of the plan the shop is on"
+    },
+    "province": {
+      "type": "string",
+      "description": "The province or state where the shop is located"
+    },
+    "eligible_for_payments": {
+      "type": "boolean",
+      "description": "Flag indicating if the shop is eligible to receive payments"
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the shop"
+    },
+    "longitude": {
+      "type": "number",
+      "description": "The longitude coordinate of the shop's location"
+    },
+    "zip": {
+      "type": "string",
+      "description": "The ZIP or postal code of the shop's location"
+    },
+    "has_discounts": {
+      "type": "boolean",
+      "description": "Flag indicating if the shop offers discounts"
+    },
+    "force_ssl": {
+      "type": "boolean",
+      "description": "Flag indicating if SSL is enforced for the shop"
+    },
+    "password_enabled": {
+      "type": "boolean",
+      "description": "Flag indicating if password login is enabled for the shop"
+    },
+    "eligible_for_card_reader_giveaway": {
+      "type": "boolean",
+      "description": "Flag indicating if the shop is eligible for a card reader giveaway"
+    },
+    "iana_timezone": {
+      "type": "string",
+      "description": "The IANA timezone of the shop"
+    },
+    "auto_configure_tax_inclusivity": {
+      "type": "string",
+      "description": "Flag indicating if taxes are automatically configured to be inclusive"
+    },
+    "enabled_presentment_currencies": {
+      "type": "array",
+      "description": "The list of currencies enabled for presenting prices",
+      "items": {
+        "type": "string"
+      }
+    },
+    "plan_name": {
+      "type": "string",
+      "description": "The name of the plan the shop is on"
+    },
+    "requires_extra_payments_agreement": {
+      "type": "boolean",
+      "description": "Flag indicating if an extra payments agreement is required"
+    },
+    "country_code": {
+      "type": "string",
+      "description": "The country code of the shop's location"
+    },
+    "weight_unit": {
+      "type": "string",
+      "description": "The unit used for measuring weight"
+    },
+    "cookie_consent_level": {
+      "type": "string",
+      "description": "The level of cookie consent set for the shop"
+    },
+    "phone": {
+      "type": "string",
+      "description": "The phone number associated with the shop"
+    },
+    "domain": {
+      "type": "string",
+      "description": "The domain of the shop"
+    },
+    "customer_email": {
+      "type": "string",
+      "description": "The email address of the shop's customer support"
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the shop"
+    },
+    "county_taxes": {
+      "type": "boolean",
+      "description": "Flag indicating if county taxes are applicable"
+    },
+    "money_with_currency_format": {
+      "type": "string",
+      "description": "The format used for displaying money with currency"
+    },
+    "money_in_emails_format": {
+      "type": "string",
+      "description": "The format used for displaying money in emails"
+    },
+    "finances": {
+      "type": "boolean",
+      "description": "Financial information related to the shop"
+    },
+    "shop_owner": {
+      "type": "string",
+      "description": "The owner of the shop"
+    },
+    "pre_launch_enabled": {
+      "type": "boolean",
+      "description": "Flag indicating if pre-launch settings are enabled"
+    },
+    "city": {
+      "type": "string",
+      "description": "The city where the shop is located"
+    },
+    "timezone": {
+      "type": "string",
+      "description": "The timezone of the shop"
+    },
+    "latitude": {
+      "type": "number",
+      "description": "The latitude coordinate of the shop's location"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the shop was created",
+      "format": "date-time"
+    },
+    "taxes_included": {
+      "type": "boolean",
+      "description": "Flag indicating if taxes are included in prices"
+    },
+    "checkout_api_supported": {
+      "type": "boolean",
+      "description": "Flag indicating if the shop supports the checkout API"
+    },
+    "setup_required": {
+      "type": "boolean",
+      "description": "Flag indicating if setup is required for the shop"
+    },
+    "money_format": {
+      "type": "string",
+      "description": "The format used for displaying money"
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the shop was last updated",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop"
+    },
+    "country_name": {
+      "type": "string",
+      "description": "The name of the country where the shop is located"
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency used in the shop"
+    },
+    "email": {
+      "type": "string",
+      "description": "The email address associated with the shop"
+    },
+    "primary_location_id": {
+      "type": "integer",
+      "description": "The ID of the primary location of the shop"
+    },
+    "google_apps_login_enabled": {
+      "type": "boolean",
+      "description": "Flag indicating if Google Apps login is enabled for the shop"
+    },
+    "address2": {
+      "type": "string",
+      "description": "The second line of the shop's address"
+    },
+    "address1": {
+      "type": "string",
+      "description": "The first line of the shop's address"
+    },
+    "primary_locale": {
+      "type": "string",
+      "description": "The primary locale set for the shop"
+    },
+    "has_storefront": {
+      "type": "boolean",
+      "description": "Flag indicating if the shop has a visible storefront"
+    },
+    "tax_shipping": {
+      "type": "boolean",
+      "description": "Flag indicating if taxes are applicable to shipping"
+    },
+    "transactional_sms_disabled": {
+      "type": "boolean",
+      "description": "Flag indicating if transactional SMS is disabled"
+    },
+    "google_apps_domain": {
+      "type": "string",
+      "description": "The Google Apps domain associated with the shop"
+    },
+    "myshopify_domain": {
+      "type": "string",
+      "description": "The MyShopify domain of the shop"
+    },
+    "visitor_tracking_consent_preference": {
+      "type": "string",
+      "description": "The visitor tracking consent preference set for the shop"
+    },
+    "marketing_sms_consent_enabled_at_checkout": {
+      "type": "boolean",
+      "description": "Flag indicating if SMS marketing consent is enabled at checkout"
+    }
+  }
+}

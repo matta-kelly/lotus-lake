@@ -1,0 +1,90 @@
+{
+  "stream": "blogs",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "id"
+    ]
+  },
+  "fields": {
+    "deleted_message": {
+      "type": "string",
+      "description": "A message associated with the deletion of the blog."
+    },
+    "feedburner_location": {
+      "type": "integer",
+      "description": "The location information related to Feedburner."
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the blog was created.",
+      "format": "date-time"
+    },
+    "handle": {
+      "type": "string",
+      "description": "The unique handle used in the blog's URL."
+    },
+    "title": {
+      "type": "string",
+      "description": "The title of the blog."
+    },
+    "deleted_at": {
+      "type": "string",
+      "description": "The date and time when the blog was deleted, if applicable.",
+      "format": "date-time"
+    },
+    "tags": {
+      "type": "string",
+      "description": "Tags associated with the blog."
+    },
+    "feedburner": {
+      "type": "string",
+      "description": "The Feedburner date for the blog.",
+      "format": "date-time"
+    },
+    "template_suffix": {
+      "type": "string",
+      "description": "The template suffix used in the blog's layout."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the blog was last updated.",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop associated with the blog."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier for the blog within the admin GraphQL API."
+    },
+    "deleted_description": {
+      "type": "string",
+      "description": "A description of the reason for deleting the blog."
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier for the blog."
+    },
+    "commentable": {
+      "type": "string",
+      "description": "Indicates whether comments are allowed on the blog."
+    }
+  }
+}

@@ -1,0 +1,638 @@
+{
+  "stream": "products",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "body_html": {
+      "type": "string",
+      "description": "The HTML description of the product."
+    },
+    "deleted_message": {
+      "type": "string",
+      "description": "Message related to the deletion of the product."
+    },
+    "media_count": {
+      "type": "integer",
+      "description": "The total count of media (images/videos) associated with the product."
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the product was created.",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "The product's description."
+    },
+    "variants": {
+      "type": "array",
+      "description": "Represents different versions or variations of the product.",
+      "items": {
+        "presentment_prices": {
+          "type": "array",
+          "description": "Prices displayed to customers in different currencies or formats.",
+          "items": {
+            "compare_at_price": {
+              "type": "number",
+              "description": "The compare at price in different currencies."
+            },
+            "price": {
+              "type": "object",
+              "description": "The price of the product variant.",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "description": "The price amount."
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "The currency code of the price."
+                }
+              }
+            }
+          }
+        },
+        "inventory_management": {
+          "type": "string",
+          "description": "The management method for the variant inventory."
+        },
+        "requires_shipping": {
+          "type": "boolean",
+          "description": "Indicates if the variant requires shipping."
+        },
+        "old_inventory_quantity": {
+          "type": "integer",
+          "description": "The previous quantity of the variant before change."
+        },
+        "created_at": {
+          "type": "string",
+          "description": "The date and time when the variant was created.",
+          "format": "date-time"
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the variant."
+        },
+        "updated_at": {
+          "type": "string",
+          "description": "The date and time when the variant was last updated.",
+          "format": "date-time"
+        },
+        "inventory_item_id": {
+          "type": "integer",
+          "description": "The unique identifier of the inventory item associated with the variant."
+        },
+        "price": {
+          "type": "number",
+          "description": "The price of the variant."
+        },
+        "product_id": {
+          "type": "integer",
+          "description": "The unique identifier of the product associated with the variant."
+        },
+        "option3": {
+          "type": "string",
+          "description": "The value of option 3 for the variant."
+        },
+        "option1": {
+          "type": "string",
+          "description": "The value of option 1 for the variant."
+        },
+        "id": {
+          "type": "integer",
+          "description": "The unique identifier of the variant."
+        },
+        "option2": {
+          "type": "string",
+          "description": "The value of option 2 for the variant."
+        },
+        "sku": {
+          "type": "string",
+          "description": "The stock keeping unit (SKU) of the variant."
+        },
+        "grams": {
+          "type": "integer",
+          "description": "The weight of the variant in grams."
+        },
+        "barcode": {
+          "type": "string",
+          "description": "The barcode of the variant."
+        },
+        "inventory_quantity": {
+          "type": "integer",
+          "description": "The available quantity of the variant."
+        },
+        "compare_at_price": {
+          "type": "number",
+          "description": "The original price of the product before any discounts."
+        },
+        "taxable": {
+          "type": "boolean",
+          "description": "Indicates if the variant is taxable."
+        },
+        "fulfillment_service": {
+          "type": "string",
+          "description": "The fulfillment service for the variant."
+        },
+        "weight": {
+          "type": "number",
+          "description": "The weight of the variant."
+        },
+        "inventory_policy": {
+          "type": "string",
+          "description": "The inventory policy for the variant."
+        },
+        "tax_code": {
+          "type": "string",
+          "description": "The tax code for the variant."
+        },
+        "weight_unit": {
+          "type": "string",
+          "description": "The unit of weight for the variant."
+        },
+        "admin_graphql_api_id": {
+          "type": "string",
+          "description": "The unique identifier of the variant in the Admin GraphQL API."
+        },
+        "position": {
+          "type": "integer",
+          "description": "The position of the variant."
+        },
+        "image_id": {
+          "type": "integer",
+          "description": "The unique identifier of the image associated with the variant."
+        }
+      }
+    },
+    "title": {
+      "type": "string",
+      "description": "The title of the product."
+    },
+    "featured_media": {
+      "type": "object",
+      "description": "The featured media for the product.",
+      "properties": {
+        "preview": {
+          "type": "object",
+          "description": "The preview image for the media.",
+          "properties": {
+            "image": {
+              "type": "object",
+              "description": "The preview image for the media. Returns 'null' until status is 'READY'",
+              "properties": {
+                "alt_text": {
+                  "type": "string",
+                  "description": "A word or phrase to share the nature or contents of an image."
+                },
+                "id": {
+                  "type": "string",
+                  "description": "A unique ID for the image."
+                }
+              }
+            },
+            "status": {
+              "type": "string",
+              "description": "Current status of the preview image."
+            }
+          }
+        },
+        "media_errors": {
+          "type": "array",
+          "description": "Any errors which have occurred on the media.",
+          "items": {
+            "code": {
+              "type": "string",
+              "description": "Code representing the type of error."
+            },
+            "details": {
+              "type": "string",
+              "description": "Additional details regarding the error."
+            },
+            "message": {
+              "type": "string",
+              "description": "Translated error message."
+            }
+          }
+        },
+        "media_content_type": {
+          "type": "string",
+          "description": "The media content type."
+        },
+        "alt": {
+          "type": "string",
+          "description": "A word or phrase to share the nature or contents of a media."
+        },
+        "media_warnings": {
+          "type": "array",
+          "description": "The warnings attached to the media.",
+          "items": {
+            "code": {
+              "type": "string",
+              "description": "The code representing the type of warning."
+            },
+            "message": {
+              "type": "string",
+              "description": "Translated warning message."
+            }
+          }
+        },
+        "id": {
+          "type": "string",
+          "description": "A globally-unique ID."
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the media."
+        }
+      }
+    },
+    "feedback": {
+      "type": "object",
+      "description": "Information about the product that's provided through resource feedback.",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "Summary of resource feedback pertaining to the resource."
+        },
+        "details": {
+          "type": "object",
+          "description": "List of AppFeedback detailing issues regarding a resource.",
+          "properties": {
+            "app": {
+              "type": "object",
+              "description": "The application associated to the feedback.",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "A globally-unique ID."
+                }
+              }
+            },
+            "link": {
+              "type": "object",
+              "description": "A link to where merchants can resolve errors.",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "description": "The URL that the link visits."
+                }
+              }
+            },
+            "messages": {
+              "type": "object",
+              "description": "The feedback message presented to the merchant.",
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "description": "The path to the input field that caused the error."
+                },
+                "message": {
+                  "type": "string",
+                  "description": "The error message."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "template_suffix": {
+      "type": "string",
+      "description": "The template suffix used for the product."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the product was last updated.",
+      "format": "date-time"
+    },
+    "price_range_v2": {
+      "type": "object",
+      "description": "The price range of the product with prices formatted as decimals.",
+      "properties": {
+        "min_variant_price": {
+          "type": "object",
+          "description": "The lowest variant's price.",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "Decimal money amount."
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "Currency of the money."
+            }
+          }
+        },
+        "max_variant_price": {
+          "type": "object",
+          "description": "The highest variant's price.",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "Decimal money amount."
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "Currency of the money."
+            }
+          }
+        }
+      }
+    },
+    "vendor": {
+      "type": "string",
+      "description": "The vendor or manufacturer of the product."
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop where the product is listed."
+    },
+    "options": {
+      "type": "array",
+      "description": "Represents different customizable options available for the product.",
+      "items": {
+        "values": {
+          "type": "array",
+          "description": "Possible values that can be selected for each option.",
+          "items": {
+            "type": "string",
+            "description": "List of values associated with the product option."
+          }
+        },
+        "product_id": {
+          "type": "integer",
+          "description": "The unique identifier of the product."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the product option."
+        },
+        "id": {
+          "type": "integer",
+          "description": "The unique identifier of the product option."
+        },
+        "position": {
+          "type": "integer",
+          "description": "The position of the product option."
+        }
+      }
+    },
+    "deleted_description": {
+      "type": "string",
+      "description": "Description of the reason for deletion."
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the product."
+    },
+    "seo": {
+      "type": "object",
+      "description": "SEO information of the product.",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "SEO Description."
+        },
+        "title": {
+          "type": "string",
+          "description": "SEO Title."
+        }
+      }
+    },
+    "published_at": {
+      "type": "string",
+      "description": "The date and time when the product was published.",
+      "format": "date-time"
+    },
+    "image": {
+      "type": "object",
+      "description": "Represents the main product image linked to one or more variants.",
+      "properties": {
+        "updated_at": {
+          "type": "string",
+          "description": "The date and time when the image was last updated.",
+          "format": "date-time"
+        },
+        "src": {
+          "type": "string",
+          "description": "The URL of the image source."
+        },
+        "product_id": {
+          "type": "integer",
+          "description": "The unique identifier of the product associated with the image."
+        },
+        "admin_graphql_api_id": {
+          "type": "string",
+          "description": "The unique identifier of the image in the Admin GraphQL API."
+        },
+        "alt": {
+          "type": "string",
+          "description": "The alternative text for the image."
+        },
+        "width": {
+          "type": "integer",
+          "description": "The width of the image."
+        },
+        "created_at": {
+          "type": "string",
+          "description": "The date and time when the image was created.",
+          "format": "date-time"
+        },
+        "variant_ids": {
+          "type": "array",
+          "description": "Array of variant IDs associated with this image.",
+          "items": {
+            "type": "integer",
+            "description": "List of variant IDs associated with the image."
+          }
+        },
+        "id": {
+          "type": "integer",
+          "description": "The unique identifier of the image."
+        },
+        "position": {
+          "type": "integer",
+          "description": "The position of the image."
+        },
+        "height": {
+          "type": "integer",
+          "description": "The height of the image."
+        }
+      }
+    },
+    "online_store_url": {
+      "type": "string",
+      "description": "The URL of the product on the online store."
+    },
+    "images": {
+      "type": "array",
+      "description": "Represents a collection of additional images related to the product.",
+      "items": {
+        "updated_at": {
+          "type": "string",
+          "description": "The date and time when the image was last updated.",
+          "format": "date-time"
+        },
+        "src": {
+          "type": "string",
+          "description": "The URL of the image source."
+        },
+        "product_id": {
+          "type": "integer",
+          "description": "The unique identifier of the product associated with the image."
+        },
+        "admin_graphql_api_id": {
+          "type": "string",
+          "description": "The unique identifier of the image in the Admin GraphQL API."
+        },
+        "alt": {
+          "type": "string",
+          "description": "The alternative text for the image."
+        },
+        "width": {
+          "type": "integer",
+          "description": "The width of the image."
+        },
+        "created_at": {
+          "type": "string",
+          "description": "The date and time when the image was created.",
+          "format": "date-time"
+        },
+        "variant_ids": {
+          "type": "array",
+          "description": "Array of variant IDs associated with each image.",
+          "items": {
+            "type": "integer",
+            "description": "List of variant IDs associated with the image."
+          }
+        },
+        "id": {
+          "type": "integer",
+          "description": "The unique identifier of the image."
+        },
+        "position": {
+          "type": "integer",
+          "description": "The position of the image."
+        },
+        "height": {
+          "type": "integer",
+          "description": "The height of the image."
+        }
+      }
+    },
+    "requires_sellin_plan": {
+      "type": "boolean",
+      "description": "Whether the product can only be purchased with a selling plan (subscription)"
+    },
+    "handle": {
+      "type": "string",
+      "description": "The human-readable URL for the product."
+    },
+    "online_store_preview_url": {
+      "type": "string",
+      "description": "The URL for previewing the product on the online store."
+    },
+    "deleted_at": {
+      "type": "string",
+      "description": "The date and time when the product was deleted.",
+      "format": "date-time"
+    },
+    "featured_image": {
+      "type": "object",
+      "description": "The featured image for the product.",
+      "properties": {
+        "alt_text": {
+          "type": "string",
+          "description": "A word or phrase to share the nature or contents of an image."
+        },
+        "width": {
+          "type": "integer",
+          "description": "The original width of the image in pixels. Returns null if the image isn't hosted by Shopify."
+        },
+        "id": {
+          "type": "string",
+          "description": "A unique ID for the image."
+        },
+        "url": {
+          "type": "string",
+          "description": "The location of the image as a URL."
+        },
+        "height": {
+          "type": "integer",
+          "description": "The original height of the image in pixels. Returns null if the image isn't hosted by Shopify."
+        }
+      }
+    },
+    "legacy_resource_id": {
+      "type": "string",
+      "description": "The legacy resource ID of the product."
+    },
+    "tags": {
+      "type": "string",
+      "description": "Tags associated with the product."
+    },
+    "has_out_of_stock_variants": {
+      "type": "boolean",
+      "description": "Whether the product has out of stock variants."
+    },
+    "published_scope": {
+      "type": "string",
+      "description": "The scope of where the product is available for purchase."
+    },
+    "total_inventory": {
+      "type": "integer",
+      "description": "The total inventory count of the product."
+    },
+    "total_variants": {
+      "type": "integer",
+      "description": "The total number of variants available for the product."
+    },
+    "product_type": {
+      "type": "string",
+      "description": "The type or category of the product."
+    },
+    "tracks_inventory": {
+      "type": "boolean",
+      "description": "Indicates whether inventory tracking is enabled for the product."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier of the product in the Admin GraphQL API."
+    },
+    "description_html": {
+      "type": "string",
+      "description": "The product's description in HTML format."
+    },
+    "status": {
+      "type": "string",
+      "description": "The status of the product."
+    },
+    "is_gift_card": {
+      "type": "boolean",
+      "description": "Indicates whether the product is a gift card."
+    },
+    "has_only_default_variant": {
+      "type": "boolean",
+      "description": "Whether the product has only a single variant with the default option and value."
+    }
+  }
+}

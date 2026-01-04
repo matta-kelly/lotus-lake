@@ -1,0 +1,347 @@
+{
+  "stream": "profiles",
+  "sync_mode": "incremental",
+  "destination_sync_mode": "append_dedup",
+  "backfill": false,
+  "primary_key": [
+    [
+      "id"
+    ]
+  ],
+  "cursor_field": [
+    "updated"
+  ],
+  "selected": true,
+  "fields": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "type": "string"
+        }
+      }
+    },
+    "updated": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "segments": {
+      "type": "object"
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "location": {
+          "type": "object",
+          "properties": {
+            "ip": {
+              "type": "string"
+            },
+            "zip": {
+              "type": "string"
+            },
+            "city": {
+              "type": "string"
+            },
+            "region": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            },
+            "address1": {
+              "type": "string"
+            },
+            "address2": {
+              "type": "string"
+            },
+            "latitude": {
+              "type": "unknown"
+            },
+            "timezone": {
+              "type": "string"
+            },
+            "longitude": {
+              "type": "unknown"
+            }
+          }
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "properties": {
+          "type": "object"
+        },
+        "external_id": {
+          "type": "string"
+        },
+        "anonymous_id": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "phone_number": {
+          "type": "string"
+        },
+        "subscriptions": {
+          "type": "object",
+          "properties": {
+            "sms": {
+              "type": "object",
+              "properties": {
+                "marketing": {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string"
+                    },
+                    "consent": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "last_updated": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "method_detail": {
+                      "type": "string"
+                    },
+                    "consent_timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "can_receive_sms_marketing": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "transactional": {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string"
+                    },
+                    "consent": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "last_updated": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "method_detail": {
+                      "type": "string"
+                    },
+                    "consent_timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "can_receive_sms_marketing": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "email": {
+              "type": "object",
+              "properties": {
+                "marketing": {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string"
+                    },
+                    "consent": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "double_optin": {
+                      "type": "boolean"
+                    },
+                    "last_updated": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "suppressions": {
+                      "type": "array",
+                      "items": {
+                        "reason": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    },
+                    "method_detail": {
+                      "type": "string"
+                    },
+                    "consent_timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "list_suppressions": {
+                      "type": "array",
+                      "items": {
+                        "reason": {
+                          "type": "string"
+                        },
+                        "list_id": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    },
+                    "custom_method_detail": {
+                      "type": "string"
+                    },
+                    "can_receive_email_marketing": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "mobile_push": {
+              "type": "object",
+              "properties": {
+                "marketing": {
+                  "type": "object",
+                  "properties": {
+                    "consent": {
+                      "type": "string"
+                    },
+                    "consent_timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "can_receive_sms_marketing": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "last_event_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "predictive_analytics": {
+          "type": "object",
+          "properties": {
+            "total_clv": {
+              "type": "number"
+            },
+            "historic_clv": {
+              "type": "number"
+            },
+            "predicted_clv": {
+              "type": "number"
+            },
+            "churn_probability": {
+              "type": "number"
+            },
+            "average_order_value": {
+              "type": "number"
+            },
+            "historic_number_of_orders": {
+              "type": "integer"
+            },
+            "predicted_number_of_orders": {
+              "type": "number"
+            },
+            "average_days_between_orders": {
+              "type": "number"
+            },
+            "expected_date_of_next_order": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "lists": {
+          "type": "object",
+          "properties": {
+            "links": {
+              "type": "object",
+              "properties": {
+                "self": {
+                  "type": "string"
+                },
+                "related": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "segments": {
+          "type": "object",
+          "properties": {
+            "links": {
+              "type": "object",
+              "properties": {
+                "self": {
+                  "type": "string"
+                },
+                "related": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

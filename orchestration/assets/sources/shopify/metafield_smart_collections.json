@@ -1,0 +1,80 @@
+{
+  "stream": "metafield_smart_collections",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "value_type": {
+      "type": "string",
+      "description": "The type of value stored in the metafield (e.g., string, integer, json_string)."
+    },
+    "owner_id": {
+      "type": "integer",
+      "description": "The ID of the resource to which the metafield is attached."
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the metafield was created.",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "The detailed description of the metafield data."
+    },
+    "type": {
+      "type": "string",
+      "description": "The data type of the metafield value (e.g., string, integer)."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the metafield was last updated.",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop where the metafield belongs."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier for the metafield in the GraphQL admin API."
+    },
+    "namespace": {
+      "type": "string",
+      "description": "The container for a set of metafields. Typically corresponds to a section of the store."
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier for the metafield."
+    },
+    "value": {
+      "type": "string",
+      "description": "The actual value of the metafield."
+    },
+    "owner_resource": {
+      "type": "string",
+      "description": "The resource type (e.g., Product, Collection) to which the metafield is attached."
+    },
+    "key": {
+      "type": "string",
+      "description": "The key or name associated with the metafield."
+    }
+  }
+}

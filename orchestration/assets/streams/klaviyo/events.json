@@ -1,0 +1,139 @@
+{
+  "stream": "events",
+  "sync_mode": "incremental",
+  "destination_sync_mode": "append_dedup",
+  "backfill": false,
+  "primary_key": [
+    [
+      "id"
+    ]
+  ],
+  "cursor_field": [
+    "datetime"
+  ],
+  "selected": true,
+  "fields": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "type": "string"
+        }
+      }
+    },
+    "datetime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "datetime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "timestamp": {
+          "type": "integer"
+        },
+        "event_properties": {
+          "type": "object"
+        }
+      }
+    },
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "metric": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "links": {
+              "type": "object",
+              "properties": {
+                "self": {
+                  "type": "string"
+                },
+                "related": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "profile": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "links": {
+              "type": "object",
+              "properties": {
+                "self": {
+                  "type": "string"
+                },
+                "related": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "attributions": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "links": {
+              "type": "object",
+              "properties": {
+                "self": {
+                  "type": "string"
+                },
+                "related": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

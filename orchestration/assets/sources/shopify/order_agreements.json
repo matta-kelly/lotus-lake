@@ -1,0 +1,190 @@
+{
+  "stream": "order_agreements",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the order was last updated",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "URL of the shop where the order was placed."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The original order id reference for the shopify api"
+    },
+    "agreements": {
+      "type": "array",
+      "description": "A list of sales agreements associated with the order.",
+      "items": {
+        "reason": {
+          "type": "string",
+          "description": "The reason the agremeent was created."
+        },
+        "admin_graphql_api_id": {
+          "type": "string",
+          "description": "The original agreement id reference for the shopify api"
+        },
+        "happened_at": {
+          "type": "string",
+          "description": "The date and time at which the agreement occured.",
+          "format": "date-time"
+        },
+        "id": {
+          "type": "integer",
+          "description": "The unique ID for the agreement."
+        },
+        "sales": {
+          "type": "array",
+          "items": {
+            "quantity": {
+              "type": "integer",
+              "description": "The number of units either ordered or intended to be returned."
+            },
+            "line_item": {
+              "type": "object",
+              "description": "The line item for the associated sale.",
+              "properties": {
+                "admin_graphql_api_id": {
+                  "type": "string",
+                  "description": "The original agreement-sales-related line item id reference for the shopify api"
+                },
+                "id": {
+                  "type": "integer",
+                  "description": "A globally-unique line item ID."
+                }
+              }
+            },
+            "action_type": {
+              "type": "string",
+              "description": "The type of order action that the sale represents."
+            },
+            "total_amount": {
+              "type": "object",
+              "description": "The total sale amount after taxes and discounts.",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "Amount in shop currency.",
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "description": "Decimal money amount."
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency of the money."
+                    }
+                  }
+                }
+              }
+            },
+            "line_type": {
+              "type": "string",
+              "description": "The line type assocated with the sale."
+            },
+            "admin_graphql_api_id": {
+              "type": "string",
+              "description": "The original agreement-related sale id reference for the shopify api"
+            },
+            "total_tax_amount": {
+              "type": "object",
+              "description": "The total amount of taxes for the sale.",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "Amount in shop currency.",
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "description": "Decimal money amount."
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency of the money."
+                    }
+                  }
+                }
+              }
+            },
+            "id": {
+              "type": "integer",
+              "description": "The unique ID for the sale."
+            },
+            "total_discount_amount_before_taxes": {
+              "type": "object",
+              "description": "The total discounts allocated to the sale before taxes.",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "Amount in shop currency.",
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "description": "Decimal money amount."
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency of the money."
+                    }
+                  }
+                }
+              }
+            },
+            "total_discount_amount_after_taxes": {
+              "type": "object",
+              "description": "The total discounts allocated to the sale after taxes.",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "Amount in shop currency.",
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "description": "Decimal money amount."
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency of the money."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the order was created",
+      "format": "date-time"
+    },
+    "id": {
+      "type": "integer",
+      "description": "A globally-unique Order ID"
+    }
+  }
+}

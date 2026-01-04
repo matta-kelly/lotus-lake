@@ -1,0 +1,356 @@
+{
+  "stream": "global_exclusions",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated"
+    ]
+  },
+  "fields": {
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "lists": {
+          "type": "object",
+          "properties": {
+            "links": {
+              "type": "object",
+              "properties": {
+                "related": {
+                  "type": "string"
+                },
+                "self": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "segments": {
+          "type": "object",
+          "properties": {
+            "links": {
+              "type": "object",
+              "properties": {
+                "related": {
+                  "type": "string"
+                },
+                "self": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "type": "string"
+        }
+      }
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "type": "string"
+        },
+        "subscriptions": {
+          "type": "object",
+          "properties": {
+            "sms": {
+              "type": "object",
+              "properties": {
+                "marketing": {
+                  "type": "object",
+                  "properties": {
+                    "last_updated": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "method": {
+                      "type": "string"
+                    },
+                    "consent_timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "consent": {
+                      "type": "string"
+                    },
+                    "can_receive_sms_marketing": {
+                      "type": "boolean"
+                    },
+                    "method_detail": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                },
+                "transactional": {
+                  "type": "object",
+                  "properties": {
+                    "last_updated": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "method": {
+                      "type": "string"
+                    },
+                    "consent_timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "consent": {
+                      "type": "string"
+                    },
+                    "can_receive_sms_marketing": {
+                      "type": "boolean"
+                    },
+                    "method_detail": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            },
+            "mobile_push": {
+              "type": "object",
+              "properties": {
+                "marketing": {
+                  "type": "object",
+                  "properties": {
+                    "consent_timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "consent": {
+                      "type": "string"
+                    },
+                    "can_receive_sms_marketing": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "email": {
+              "type": "object",
+              "properties": {
+                "marketing": {
+                  "type": "object",
+                  "properties": {
+                    "custom_method_detail": {
+                      "type": "string"
+                    },
+                    "list_suppressions": {
+                      "type": "array",
+                      "items": {
+                        "reason": {
+                          "type": "string"
+                        },
+                        "list_id": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    },
+                    "last_updated": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "suppressions": {
+                      "type": "array",
+                      "items": {
+                        "reason": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    },
+                    "method": {
+                      "type": "string"
+                    },
+                    "can_receive_email_marketing": {
+                      "type": "boolean"
+                    },
+                    "double_optin": {
+                      "type": "boolean"
+                    },
+                    "consent_timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "consent": {
+                      "type": "string"
+                    },
+                    "method_detail": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "last_event_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "external_id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "predictive_analytics": {
+          "type": "object",
+          "properties": {
+            "historic_clv": {
+              "type": "number"
+            },
+            "average_days_between_orders": {
+              "type": "number"
+            },
+            "predicted_number_of_orders": {
+              "type": "number"
+            },
+            "churn_probability": {
+              "type": "number"
+            },
+            "historic_number_of_orders": {
+              "type": "integer"
+            },
+            "average_order_value": {
+              "type": "number"
+            },
+            "total_clv": {
+              "type": "number"
+            },
+            "expected_date_of_next_order": {
+              "type": "string"
+            },
+            "predicted_clv": {
+              "type": "number"
+            }
+          }
+        },
+        "anonymous_id": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "location": {
+          "type": "object",
+          "properties": {
+            "zip": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            },
+            "city": {
+              "type": "string"
+            },
+            "address2": {
+              "type": "string"
+            },
+            "address1": {
+              "type": "string"
+            },
+            "timezone": {
+              "type": "string"
+            },
+            "ip": {
+              "type": "string"
+            },
+            "latitude": {
+              "type": "unknown"
+            },
+            "region": {
+              "type": "string"
+            },
+            "longitude": {
+              "type": "unknown"
+            }
+          }
+        },
+        "phone_number": {
+          "type": "string"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "properties": {
+          "type": "object"
+        }
+      }
+    },
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "segments": {
+      "type": "object"
+    }
+  }
+}

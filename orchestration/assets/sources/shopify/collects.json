@@ -1,0 +1,60 @@
+{
+  "stream": "collects",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "id"
+    ]
+  },
+  "fields": {
+    "collection_id": {
+      "type": "integer",
+      "description": "The unique identifier for the collection."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the collect was last updated.",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop associated with the collect."
+    },
+    "product_id": {
+      "type": "integer",
+      "description": "The unique identifier of the product."
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the collect was created.",
+      "format": "date-time"
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier for the collect."
+    },
+    "position": {
+      "type": "integer",
+      "description": "The position of the product in the collection."
+    },
+    "sort_value": {
+      "type": "string",
+      "description": "The value used to sort the products in the collection."
+    }
+  }
+}

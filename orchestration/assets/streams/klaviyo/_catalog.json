@@ -1,0 +1,435 @@
+{
+  "streams": [
+    {
+      "stream": {
+        "name": "campaigns",
+        "supportedSyncModes": [
+          "full_refresh",
+          "incremental"
+        ],
+        "json_schema": {
+          "type": "[\"null\", \"object\"]",
+          "properties": "{\"relationships\": {\"type\": [\"null\", \"object\"], \"properties\": {\"campaign-messages\": {\"type\": [\"null\", \"object\"], \"properties\": {\"data\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"related\": {\"type\": [\"null\", \"string\"]}, \"self\": {\"type\": [\"null\", \"string\"]}}}}}, \"tags\": {\"type\": [\"null\", \"object\"], \"properties\": {\"data\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"related\": {\"type\": [\"null\", \"string\"]}, \"self\": {\"type\": [\"null\", \"string\"]}}}}}}}, \"updated_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"self\": {\"type\": [\"null\", \"string\"]}}}, \"attributes\": {\"type\": [\"null\", \"object\"], \"properties\": {\"send_options\": {\"type\": [\"null\", \"object\"], \"properties\": {\"use_smart_sending\": {\"type\": [\"null\", \"boolean\"]}, \"ignore_unsubscribes\": {\"type\": [\"null\", \"boolean\"]}}}, \"channel\": {\"type\": [\"null\", \"string\"]}, \"created_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"scheduled_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"tracking_options\": {\"type\": [\"null\", \"object\"], \"properties\": {\"add_tracking_params\": {\"type\": [\"null\", \"boolean\"]}, \"is_add_utm\": {\"type\": [\"null\", \"boolean\"]}, \"utm_params\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"name\": {\"type\": [\"null\", \"string\"]}, \"value\": {\"type\": [\"null\", \"string\"]}}}}, \"is_tracking_clicks\": {\"type\": [\"null\", \"boolean\"]}, \"is_tracking_opens\": {\"type\": [\"null\", \"boolean\"]}}}, \"message\": {\"type\": [\"null\", \"string\"]}, \"archived\": {\"type\": [\"null\", \"boolean\"]}, \"send_strategy\": {\"type\": [\"null\", \"object\"], \"properties\": {\"options_static\": {\"type\": [\"null\", \"object\"], \"properties\": {\"datetime\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"send_past_recipients_immediately\": {\"type\": [\"null\", \"boolean\"]}, \"is_local\": {\"type\": [\"null\", \"boolean\"]}}}, \"method\": {\"type\": [\"null\", \"string\"]}, \"options_throttled\": {\"type\": [\"null\", \"object\"], \"properties\": {\"datetime\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"throttle_percentage\": {\"type\": [\"null\", \"integer\"]}}}, \"options_sto\": {\"type\": [\"null\", \"object\"], \"properties\": {\"date\": {\"type\": [\"null\", \"string\"], \"format\": \"date\"}}}}}, \"send_time\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"updated_at\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"name\": {\"type\": [\"null\", \"string\"]}, \"audiences\": {\"type\": [\"null\", \"object\"], \"properties\": {\"excluded\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": \"string\"}}, \"included\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": \"string\"}}}}, \"status\": {\"type\": [\"null\", \"string\"]}}}, \"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}}",
+          "additionalProperties": "true"
+        },
+        "default_cursor_field": [
+          "updated_at"
+        ],
+        "source_defined_cursor": true,
+        "source_defined_primary_key": [
+          [
+            "id"
+          ]
+        ]
+      },
+      "config": {
+        "selected": true,
+        "suggested": false,
+        "sync_mode": "incremental",
+        "destination_sync_mode": "append_dedup",
+        "cursor_field": [
+          "updated_at"
+        ],
+        "primary_key": [
+          [
+            "id"
+          ]
+        ],
+        "alias_name": "campaigns",
+        "field_selection_enabled": true,
+        "selected_fields": [
+          {
+            "field_path": [
+              "id"
+            ]
+          },
+          {
+            "field_path": [
+              "type"
+            ]
+          },
+          {
+            "field_path": [
+              "links"
+            ]
+          },
+          {
+            "field_path": [
+              "attributes"
+            ]
+          },
+          {
+            "field_path": [
+              "updated_at"
+            ]
+          },
+          {
+            "field_path": [
+              "relationships"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "stream": {
+        "name": "events",
+        "supportedSyncModes": [
+          "full_refresh",
+          "incremental"
+        ],
+        "json_schema": {
+          "type": "[\"null\", \"object\"]",
+          "properties": "{\"relationships\": {\"type\": [\"null\", \"object\"], \"properties\": {\"metric\": {\"type\": [\"null\", \"object\"], \"properties\": {\"data\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"related\": {\"type\": [\"null\", \"string\"]}, \"self\": {\"type\": [\"null\", \"string\"]}}}}}, \"profile\": {\"type\": [\"null\", \"object\"], \"properties\": {\"data\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"related\": {\"type\": [\"null\", \"string\"]}, \"self\": {\"type\": [\"null\", \"string\"]}}}}}, \"attributions\": {\"type\": [\"null\", \"object\"], \"properties\": {\"data\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"related\": {\"type\": [\"null\", \"string\"]}, \"self\": {\"type\": [\"null\", \"string\"]}}}}}}}, \"datetime\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"self\": {\"type\": [\"null\", \"string\"]}}}, \"attributes\": {\"type\": [\"null\", \"object\"], \"properties\": {\"datetime\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"uuid\": {\"type\": [\"null\", \"string\"]}, \"timestamp\": {\"type\": [\"null\", \"integer\"]}, \"event_properties\": {\"type\": [\"null\", \"object\"]}}}, \"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}}",
+          "additionalProperties": "true"
+        },
+        "default_cursor_field": [
+          "datetime"
+        ],
+        "source_defined_cursor": true,
+        "source_defined_primary_key": [
+          [
+            "id"
+          ]
+        ]
+      },
+      "config": {
+        "selected": true,
+        "suggested": false,
+        "sync_mode": "incremental",
+        "destination_sync_mode": "append_dedup",
+        "cursor_field": [
+          "datetime"
+        ],
+        "primary_key": [
+          [
+            "id"
+          ]
+        ],
+        "alias_name": "events",
+        "field_selection_enabled": true,
+        "selected_fields": [
+          {
+            "field_path": [
+              "id"
+            ]
+          },
+          {
+            "field_path": [
+              "type"
+            ]
+          },
+          {
+            "field_path": [
+              "links"
+            ]
+          },
+          {
+            "field_path": [
+              "datetime"
+            ]
+          },
+          {
+            "field_path": [
+              "attributes"
+            ]
+          },
+          {
+            "field_path": [
+              "relationships"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "stream": {
+        "name": "flows",
+        "supportedSyncModes": [
+          "full_refresh",
+          "incremental"
+        ],
+        "json_schema": {
+          "type": "[\"null\", \"object\"]",
+          "properties": "{\"relationships\": {\"type\": [\"null\", \"object\"], \"properties\": {\"flow-actions\": {\"type\": [\"null\", \"object\"], \"properties\": {\"data\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"related\": {\"type\": [\"null\", \"string\"]}, \"self\": {\"type\": [\"null\", \"string\"]}}}}}, \"tags\": {\"type\": [\"null\", \"object\"], \"properties\": {\"data\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"related\": {\"type\": [\"null\", \"string\"]}, \"self\": {\"type\": [\"null\", \"string\"]}}}}}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"self\": {\"type\": [\"null\", \"string\"]}}}, \"attributes\": {\"type\": [\"null\", \"object\"], \"properties\": {\"archived\": {\"type\": [\"null\", \"boolean\"]}, \"created\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"trigger_type\": {\"type\": [\"null\", \"string\"]}, \"name\": {\"type\": [\"null\", \"string\"]}, \"updated\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"status\": {\"type\": [\"null\", \"string\"]}}}, \"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}, \"updated\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}}",
+          "additionalProperties": "true"
+        },
+        "default_cursor_field": [
+          "updated"
+        ],
+        "source_defined_cursor": true,
+        "source_defined_primary_key": [
+          [
+            "id"
+          ]
+        ]
+      },
+      "config": {
+        "selected": true,
+        "suggested": false,
+        "sync_mode": "incremental",
+        "destination_sync_mode": "append_dedup",
+        "cursor_field": [
+          "updated"
+        ],
+        "primary_key": [
+          [
+            "id"
+          ]
+        ],
+        "alias_name": "flows",
+        "field_selection_enabled": true,
+        "selected_fields": [
+          {
+            "field_path": [
+              "id"
+            ]
+          },
+          {
+            "field_path": [
+              "type"
+            ]
+          },
+          {
+            "field_path": [
+              "links"
+            ]
+          },
+          {
+            "field_path": [
+              "updated"
+            ]
+          },
+          {
+            "field_path": [
+              "attributes"
+            ]
+          },
+          {
+            "field_path": [
+              "relationships"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "stream": {
+        "name": "lists",
+        "supportedSyncModes": [
+          "full_refresh",
+          "incremental"
+        ],
+        "json_schema": {
+          "type": "[\"null\", \"object\"]",
+          "properties": "{\"relationships\": {\"type\": [\"null\", \"object\"], \"properties\": {\"profiles\": {\"type\": [\"null\", \"object\"], \"properties\": {\"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"related\": {\"type\": [\"null\", \"string\"]}, \"self\": {\"type\": [\"null\", \"string\"]}}}}}, \"flow-triggers\": {\"type\": [\"null\", \"object\"], \"properties\": {\"data\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"related\": {\"type\": [\"null\", \"string\"]}, \"self\": {\"type\": [\"null\", \"string\"]}}}}}, \"tags\": {\"type\": [\"null\", \"object\"], \"properties\": {\"data\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"related\": {\"type\": [\"null\", \"string\"]}, \"self\": {\"type\": [\"null\", \"string\"]}}}}}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"self\": {\"type\": [\"null\", \"string\"]}}}, \"attributes\": {\"type\": [\"null\", \"object\"], \"properties\": {\"created\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"name\": {\"type\": [\"null\", \"string\"]}, \"updated\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"opt_in_process\": {\"type\": [\"null\", \"string\"]}}}, \"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}, \"updated\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}}",
+          "additionalProperties": "true"
+        },
+        "default_cursor_field": [
+          "updated"
+        ],
+        "source_defined_cursor": true,
+        "source_defined_primary_key": [
+          [
+            "id"
+          ]
+        ]
+      },
+      "config": {
+        "selected": true,
+        "suggested": false,
+        "sync_mode": "incremental",
+        "destination_sync_mode": "append_dedup",
+        "cursor_field": [
+          "updated"
+        ],
+        "primary_key": [
+          [
+            "id"
+          ]
+        ],
+        "alias_name": "lists",
+        "field_selection_enabled": true,
+        "selected_fields": [
+          {
+            "field_path": [
+              "id"
+            ]
+          },
+          {
+            "field_path": [
+              "type"
+            ]
+          },
+          {
+            "field_path": [
+              "links"
+            ]
+          },
+          {
+            "field_path": [
+              "updated"
+            ]
+          },
+          {
+            "field_path": [
+              "attributes"
+            ]
+          },
+          {
+            "field_path": [
+              "relationships"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "stream": {
+        "name": "metrics",
+        "supportedSyncModes": [
+          "full_refresh",
+          "incremental"
+        ],
+        "json_schema": {
+          "type": "[\"null\", \"object\"]",
+          "properties": "{\"relationships\": {\"type\": [\"null\", \"object\"], \"properties\": {\"flow-triggers\": {\"type\": [\"null\", \"object\"], \"properties\": {\"data\": {\"type\": [\"null\", \"object\"], \"properties\": {\"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"related\": {\"type\": [\"null\", \"string\"]}, \"self\": {\"type\": [\"null\", \"string\"]}}}}}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"self\": {\"type\": [\"null\", \"string\"]}}}, \"attributes\": {\"type\": [\"null\", \"object\"], \"properties\": {\"created\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"name\": {\"type\": [\"null\", \"string\"]}, \"integration\": {\"type\": [\"null\", \"object\"]}, \"updated\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}}}, \"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}, \"updated\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}}",
+          "additionalProperties": "true"
+        },
+        "default_cursor_field": [
+          "updated"
+        ],
+        "source_defined_cursor": true,
+        "source_defined_primary_key": [
+          [
+            "id"
+          ]
+        ]
+      },
+      "config": {
+        "selected": true,
+        "suggested": false,
+        "sync_mode": "incremental",
+        "destination_sync_mode": "append_dedup",
+        "cursor_field": [
+          "updated"
+        ],
+        "primary_key": [
+          [
+            "id"
+          ]
+        ],
+        "alias_name": "metrics",
+        "field_selection_enabled": true,
+        "selected_fields": [
+          {
+            "field_path": [
+              "id"
+            ]
+          },
+          {
+            "field_path": [
+              "type"
+            ]
+          },
+          {
+            "field_path": [
+              "links"
+            ]
+          },
+          {
+            "field_path": [
+              "updated"
+            ]
+          },
+          {
+            "field_path": [
+              "attributes"
+            ]
+          },
+          {
+            "field_path": [
+              "relationships"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "stream": {
+        "name": "profiles",
+        "supportedSyncModes": [
+          "full_refresh",
+          "incremental"
+        ],
+        "json_schema": {
+          "type": "[\"null\", \"object\"]",
+          "properties": "{\"relationships\": {\"type\": [\"null\", \"object\"], \"properties\": {\"lists\": {\"type\": [\"null\", \"object\"], \"properties\": {\"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"related\": {\"type\": [\"null\", \"string\"]}, \"self\": {\"type\": [\"null\", \"string\"]}}}}}, \"segments\": {\"type\": [\"null\", \"object\"], \"properties\": {\"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"related\": {\"type\": [\"null\", \"string\"]}, \"self\": {\"type\": [\"null\", \"string\"]}}}}}}}, \"links\": {\"type\": [\"null\", \"object\"], \"properties\": {\"self\": {\"type\": [\"null\", \"string\"]}}}, \"attributes\": {\"type\": [\"null\", \"object\"], \"properties\": {\"image\": {\"type\": [\"null\", \"string\"]}, \"subscriptions\": {\"type\": [\"null\", \"object\"], \"properties\": {\"sms\": {\"type\": [\"null\", \"object\"], \"properties\": {\"marketing\": {\"type\": [\"null\", \"object\"], \"properties\": {\"last_updated\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"method\": {\"type\": [\"null\", \"string\"]}, \"consent_timestamp\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"consent\": {\"type\": [\"null\", \"string\"]}, \"can_receive_sms_marketing\": {\"type\": [\"null\", \"boolean\"]}, \"method_detail\": {\"type\": [\"null\", \"string\"]}, \"timestamp\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}}}, \"transactional\": {\"type\": [\"null\", \"object\"], \"properties\": {\"last_updated\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"method\": {\"type\": [\"null\", \"string\"]}, \"consent_timestamp\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"consent\": {\"type\": [\"null\", \"string\"]}, \"can_receive_sms_marketing\": {\"type\": [\"null\", \"boolean\"]}, \"method_detail\": {\"type\": [\"null\", \"string\"]}, \"timestamp\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}}}}}, \"mobile_push\": {\"type\": [\"null\", \"object\"], \"properties\": {\"marketing\": {\"type\": [\"null\", \"object\"], \"properties\": {\"consent_timestamp\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"consent\": {\"type\": [\"null\", \"string\"]}, \"can_receive_sms_marketing\": {\"type\": [\"null\", \"boolean\"]}}}}}, \"email\": {\"type\": [\"null\", \"object\"], \"properties\": {\"marketing\": {\"type\": [\"null\", \"object\"], \"properties\": {\"custom_method_detail\": {\"type\": [\"null\", \"string\"]}, \"list_suppressions\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"reason\": {\"type\": [\"null\", \"string\"]}, \"list_id\": {\"type\": [\"null\", \"string\"]}, \"timestamp\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}}}}, \"last_updated\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"suppressions\": {\"type\": [\"null\", \"array\"], \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"reason\": {\"type\": [\"null\", \"string\"]}, \"timestamp\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}}}}, \"method\": {\"type\": [\"null\", \"string\"]}, \"can_receive_email_marketing\": {\"type\": [\"null\", \"boolean\"]}, \"double_optin\": {\"type\": [\"null\", \"boolean\"]}, \"consent_timestamp\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"consent\": {\"type\": [\"null\", \"string\"]}, \"method_detail\": {\"type\": [\"null\", \"string\"]}, \"timestamp\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}}}}}}}, \"last_event_date\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"created\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"last_name\": {\"type\": [\"null\", \"string\"]}, \"external_id\": {\"type\": [\"null\", \"string\"]}, \"title\": {\"type\": [\"null\", \"string\"]}, \"locale\": {\"type\": [\"null\", \"string\"]}, \"predictive_analytics\": {\"type\": [\"null\", \"object\"], \"properties\": {\"historic_clv\": {\"type\": [\"null\", \"number\"]}, \"average_days_between_orders\": {\"type\": [\"null\", \"number\"]}, \"predicted_number_of_orders\": {\"type\": [\"null\", \"number\"]}, \"churn_probability\": {\"type\": [\"null\", \"number\"]}, \"historic_number_of_orders\": {\"type\": [\"null\", \"integer\"]}, \"average_order_value\": {\"type\": [\"null\", \"number\"]}, \"total_clv\": {\"type\": [\"null\", \"number\"]}, \"expected_date_of_next_order\": {\"type\": [\"null\", \"string\"]}, \"predicted_clv\": {\"type\": [\"null\", \"number\"]}}}, \"anonymous_id\": {\"type\": [\"null\", \"string\"]}, \"organization\": {\"type\": [\"null\", \"string\"]}, \"location\": {\"type\": [\"null\", \"object\"], \"properties\": {\"zip\": {\"type\": [\"null\", \"string\"]}, \"country\": {\"type\": [\"null\", \"string\"]}, \"city\": {\"type\": [\"null\", \"string\"]}, \"address2\": {\"type\": [\"null\", \"string\"]}, \"address1\": {\"type\": [\"null\", \"string\"]}, \"timezone\": {\"type\": [\"null\", \"string\"]}, \"ip\": {\"type\": [\"null\", \"string\"]}, \"latitude\": {\"type\": [\"null\", \"unknown\"]}, \"region\": {\"type\": [\"null\", \"string\"]}, \"longitude\": {\"type\": [\"null\", \"unknown\"]}}}, \"phone_number\": {\"type\": [\"null\", \"string\"]}, \"updated\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"first_name\": {\"type\": [\"null\", \"string\"]}, \"email\": {\"type\": [\"null\", \"string\"]}, \"properties\": {\"type\": [\"null\", \"object\"]}}}, \"id\": {\"type\": [\"null\", \"string\"]}, \"type\": {\"type\": [\"null\", \"string\"]}, \"updated\": {\"type\": [\"null\", \"string\"], \"format\": \"date-time\"}, \"segments\": {\"type\": [\"null\", \"object\"]}}",
+          "additionalProperties": "true"
+        },
+        "default_cursor_field": [
+          "updated"
+        ],
+        "source_defined_cursor": true,
+        "source_defined_primary_key": [
+          [
+            "id"
+          ]
+        ]
+      },
+      "config": {
+        "selected": true,
+        "suggested": false,
+        "sync_mode": "incremental",
+        "destination_sync_mode": "append_dedup",
+        "cursor_field": [
+          "updated"
+        ],
+        "primary_key": [
+          [
+            "id"
+          ]
+        ],
+        "alias_name": "profiles",
+        "field_selection_enabled": true,
+        "selected_fields": [
+          {
+            "field_path": [
+              "id"
+            ]
+          },
+          {
+            "field_path": [
+              "type"
+            ]
+          },
+          {
+            "field_path": [
+              "links"
+            ]
+          },
+          {
+            "field_path": [
+              "updated"
+            ]
+          },
+          {
+            "field_path": [
+              "segments"
+            ]
+          },
+          {
+            "field_path": [
+              "attributes"
+            ]
+          },
+          {
+            "field_path": [
+              "relationships"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

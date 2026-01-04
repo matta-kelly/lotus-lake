@@ -1,0 +1,119 @@
+{
+  "stream": "flows",
+  "sync_mode": "incremental",
+  "destination_sync_mode": "append_dedup",
+  "backfill": false,
+  "primary_key": [
+    [
+      "id"
+    ]
+  ],
+  "cursor_field": [
+    "updated"
+  ],
+  "selected": true,
+  "fields": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "type": "string"
+        }
+      }
+    },
+    "updated": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "archived": {
+          "type": "boolean"
+        },
+        "trigger_type": {
+          "type": "string"
+        }
+      }
+    },
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "links": {
+              "type": "object",
+              "properties": {
+                "self": {
+                  "type": "string"
+                },
+                "related": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "flow-actions": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "links": {
+              "type": "object",
+              "properties": {
+                "self": {
+                  "type": "string"
+                },
+                "related": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

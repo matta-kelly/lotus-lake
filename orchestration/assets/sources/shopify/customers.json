@@ -1,0 +1,314 @@
+{
+  "stream": "customers",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "note": {
+      "type": "string",
+      "description": "Additional notes or comments related to the customer."
+    },
+    "addresses": {
+      "type": "array",
+      "description": "List of addresses associated with the customer",
+      "items": {
+        "zip": {
+          "type": "string",
+          "description": "Postal or ZIP code of the customer's address."
+        },
+        "country": {
+          "type": "string",
+          "description": "Customer's country."
+        },
+        "city": {
+          "type": "string",
+          "description": "City where the customer is located."
+        },
+        "address2": {
+          "type": "string",
+          "description": "Second line of customer's address."
+        },
+        "address1": {
+          "type": "string",
+          "description": "First line of customer's address."
+        },
+        "last_name": {
+          "type": "string",
+          "description": "Customer's last name."
+        },
+        "province_code": {
+          "type": "string",
+          "description": "Province or state code."
+        },
+        "country_code": {
+          "type": "string",
+          "description": "Country code of the customer's country."
+        },
+        "default": {
+          "type": "boolean",
+          "description": "Indicates if this address is the default address for the customer."
+        },
+        "province": {
+          "type": "string",
+          "description": "Province or state where the customer is located."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Customer's phone number."
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name associated with the address."
+        },
+        "country_name": {
+          "type": "string",
+          "description": "Name of the customer's country."
+        },
+        "company": {
+          "type": "string",
+          "description": "Customer's company name."
+        },
+        "id": {
+          "type": "integer",
+          "description": "Unique identifier for the address."
+        },
+        "customer_id": {
+          "type": "integer",
+          "description": "Unique identifier for the customer."
+        },
+        "first_name": {
+          "type": "string",
+          "description": "Customer's first name."
+        }
+      }
+    },
+    "last_order_name": {
+      "type": "string",
+      "description": "Name of the customer's last order."
+    },
+    "created_at": {
+      "type": "string",
+      "description": "Timestamp when the customer was created.",
+      "format": "date-time"
+    },
+    "multipass_identifier": {
+      "type": "string",
+      "description": "Multipass identifier for the customer."
+    },
+    "accepts_marketing_updated_at": {
+      "type": "unknown",
+      "description": "Timestamp when the marketing consent status was last updated."
+    },
+    "default_address": {
+      "type": "object",
+      "description": "Customer's default address",
+      "properties": {
+        "zip": {
+          "type": "string",
+          "description": "Postal or ZIP code of the customer's default address."
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of the customer's default address."
+        },
+        "city": {
+          "type": "string",
+          "description": "City where the customer's default address is located."
+        },
+        "address2": {
+          "type": "string",
+          "description": "Second line of customer's default address."
+        },
+        "address1": {
+          "type": "string",
+          "description": "First line of customer's default address."
+        },
+        "last_name": {
+          "type": "string",
+          "description": "Customer's last name associated with the default address."
+        },
+        "province_code": {
+          "type": "string",
+          "description": "Province or state code of the customer's default address."
+        },
+        "country_code": {
+          "type": "string",
+          "description": "Country code of the customer's default address."
+        },
+        "default": {
+          "type": "boolean",
+          "description": "Indicates if this is the default address for the customer."
+        },
+        "province": {
+          "type": "string",
+          "description": "Province or state where the customer's default address is located."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Customer's phone number associated with the default address."
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name associated with the default address."
+        },
+        "country_name": {
+          "type": "string",
+          "description": "Name of the country for the customer's default address."
+        },
+        "company": {
+          "type": "string",
+          "description": "Customer's company name associated with the default address."
+        },
+        "id": {
+          "type": "integer",
+          "description": "Unique identifier for the default address."
+        },
+        "customer_id": {
+          "type": "integer",
+          "description": "Unique identifier for the customer."
+        },
+        "first_name": {
+          "type": "string",
+          "description": "Customer's first name associated with the default address."
+        }
+      }
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "Timestamp when the customer data was last updated.",
+      "format": "date-time"
+    },
+    "accepts_marketing": {
+      "type": "boolean",
+      "description": "Indicates if the customer has agreed to receive marketing materials."
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "URL of the customer's associated shop."
+    },
+    "currency": {
+      "type": "string",
+      "description": "Currency associated with the customer."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Unique identifier for the customer."
+    },
+    "state": {
+      "type": "string",
+      "description": "Current state or status of the customer."
+    },
+    "marketing_opt_in_level": {
+      "type": "string",
+      "description": "Level of opt-in for marketing activities."
+    },
+    "first_name": {
+      "type": "string",
+      "description": "Customer's first name."
+    },
+    "email": {
+      "type": "string",
+      "description": "Customer's email address."
+    },
+    "total_spent": {
+      "type": "number",
+      "description": "Total amount spent by the customer."
+    },
+    "last_order_id": {
+      "type": "integer",
+      "description": "Unique identifier for the customer's last order."
+    },
+    "tax_exempt": {
+      "type": "boolean",
+      "description": "Indicates if the customer is tax exempt."
+    },
+    "email_marketing_consent": {
+      "type": "object",
+      "description": "Indicates if the customer has consented to receive marketing emails",
+      "properties": {
+        "consent_updated_at": {
+          "type": "string",
+          "description": "Timestamp when the email marketing consent was last updated.",
+          "format": "date-time"
+        },
+        "state": {
+          "type": "string",
+          "description": "Current state of email marketing consent."
+        },
+        "opt_in_level": {
+          "type": "string",
+          "description": "Level of opt-in for email marketing."
+        }
+      }
+    },
+    "last_name": {
+      "type": "string",
+      "description": "Customer's last name."
+    },
+    "verified_email": {
+      "type": "boolean",
+      "description": "Indicates if the customer's email address has been verified."
+    },
+    "tags": {
+      "type": "string",
+      "description": "Tags associated with the customer for categorization."
+    },
+    "orders_count": {
+      "type": "integer",
+      "description": "Total number of orders placed by the customer."
+    },
+    "sms_marketing_consent": {
+      "type": "object",
+      "description": "Indicates if the customer has consented to receive marketing SMS messages",
+      "properties": {
+        "consent_updated_at": {
+          "type": "string",
+          "description": "Timestamp when the SMS marketing consent was last updated.",
+          "format": "date-time"
+        },
+        "consent_collected_from": {
+          "type": "string",
+          "description": "Source from which SMS marketing consent was collected."
+        },
+        "state": {
+          "type": "string",
+          "description": "Current state of SMS marketing consent."
+        },
+        "opt_in_level": {
+          "type": "string",
+          "description": "Level of opt-in for SMS marketing."
+        }
+      }
+    },
+    "phone": {
+      "type": "string",
+      "description": "Customer's phone number."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "Unique identifier for the customer in the Admin GraphQL API."
+    },
+    "tax_exemptions": {
+      "type": "string",
+      "description": "Information about tax exemptions for the customer."
+    }
+  }
+}

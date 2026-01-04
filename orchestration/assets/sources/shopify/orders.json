@@ -1,0 +1,2959 @@
+{
+  "stream": "orders",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "original_total_additional_fees_set": {
+      "type": "object",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "total_price_usd": {
+      "type": "number",
+      "description": "The total price of the order in USD"
+    },
+    "billing_address": {
+      "type": "object",
+      "properties": {
+        "zip": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "address2": {
+          "type": "string"
+        },
+        "address1": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "number"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "province_code": {
+          "type": "string"
+        },
+        "country_code": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "company": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "longitude": {
+          "type": "number"
+        }
+      }
+    },
+    "line_items": {
+      "type": "array",
+      "description": "Details of the products within an order",
+      "items": {
+        "variant_title": {
+          "type": "string",
+          "description": "Title of the variant"
+        },
+        "origin_location": {
+          "type": "object",
+          "description": "Origin address of the item",
+          "properties": {
+            "zip": {
+              "type": "string",
+              "description": "Zip code of the address"
+            },
+            "country_code": {
+              "type": "string",
+              "description": "Country code of the address"
+            },
+            "city": {
+              "type": "string",
+              "description": "City of the address"
+            },
+            "address2": {
+              "type": "string",
+              "description": "Second line of address"
+            },
+            "address1": {
+              "type": "string",
+              "description": "First line of address"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the location"
+            },
+            "id": {
+              "type": "integer",
+              "description": "Unique identifier for the location"
+            },
+            "province_code": {
+              "type": "string",
+              "description": "Province code of the address"
+            }
+          }
+        },
+        "total_discount": {
+          "type": "number",
+          "description": "Total discount applied to the item"
+        },
+        "fulfillment_status": {
+          "type": "string",
+          "description": "Status of fulfillment"
+        },
+        "gift_card": {
+          "type": "boolean",
+          "description": "Whether the item is a gift card"
+        },
+        "requires_shipping": {
+          "type": "boolean",
+          "description": "Whether shipping is required"
+        },
+        "total_discount_set": {
+          "type": "object",
+          "description": "Details of the total discount applied to the item",
+          "properties": {
+            "shop_money": {
+              "type": "object",
+              "description": "Total discount amount in shop currency",
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "currency_code": {
+                  "type": "string"
+                }
+              }
+            },
+            "presentment_money": {
+              "type": "object",
+              "description": "Total discount amount in presentment currency",
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "currency_code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the item"
+        },
+        "product_exists": {
+          "type": "boolean",
+          "description": "Whether the product exists"
+        },
+        "variant_id": {
+          "type": "integer",
+          "description": "Identifier for the variant of the item"
+        },
+        "tax_lines": {
+          "type": "array",
+          "description": "Details of tax lines associated with the item",
+          "items": {
+            "channel_liable": {
+              "type": "boolean",
+              "description": "Whether the channel is liable for the tax"
+            },
+            "rate": {
+              "type": "number",
+              "description": "Tax rate"
+            },
+            "price": {
+              "type": "number",
+              "description": "Price of the tax"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the tax"
+            },
+            "price_set": {
+              "type": "object",
+              "description": "Details of the tax price",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "Tax price in shop currency",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "description": "Tax price in presentment currency",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the item"
+        },
+        "vendor": {
+          "type": "string",
+          "description": "Vendor of the item"
+        },
+        "product_id": {
+          "type": "integer",
+          "description": "Identifier for the product"
+        },
+        "id": {
+          "type": "integer",
+          "description": "Unique identifier for the item"
+        },
+        "sku": {
+          "type": "string",
+          "description": "Stock keeping unit of the item"
+        },
+        "grams": {
+          "type": "integer",
+          "description": "Weight in grams"
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "Quantity of the item"
+        },
+        "fulfillable_quantity": {
+          "type": "integer",
+          "description": "Quantity that is fulfillable"
+        },
+        "taxable": {
+          "type": "boolean",
+          "description": "Whether the item is taxable"
+        },
+        "fulfillment_service": {
+          "type": "string",
+          "description": "Service used for fulfillment"
+        },
+        "discount_allocations": {
+          "type": "array",
+          "description": "Details of any discounts applied to the item",
+          "items": {
+            "amount": {
+              "type": "string",
+              "description": "Amount of the discount"
+            },
+            "discount_application_index": {
+              "type": "number",
+              "description": "Index of the discount application"
+            },
+            "application_type": {
+              "type": "string",
+              "description": "Type of application of the discount"
+            },
+            "created_at": {
+              "type": "string",
+              "description": "Timestamp of when the discount was created",
+              "format": "date-time"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the discount"
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for the discount"
+            },
+            "amount_set": {
+              "type": "object",
+              "description": "Details of the discount amount",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "Discount amount in shop currency",
+                  "properties": {
+                    "amount": {
+                      "type": "string"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "description": "Discount amount in presentment currency",
+                  "properties": {
+                    "amount": {
+                      "type": "string"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "variant_inventory_management": {
+          "type": "string",
+          "description": "Inventory management type for the variant"
+        },
+        "admin_graphql_api_id": {
+          "type": "string",
+          "description": "Unique identifier for the item"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the item"
+        },
+        "destination_location": {
+          "type": "object",
+          "description": "Destination address of the item",
+          "properties": {
+            "zip": {
+              "type": "string",
+              "description": "Zip code of the address"
+            },
+            "country_code": {
+              "type": "string",
+              "description": "Country code of the address"
+            },
+            "city": {
+              "type": "string",
+              "description": "City of the address"
+            },
+            "address2": {
+              "type": "string",
+              "description": "Second line of address"
+            },
+            "address1": {
+              "type": "string",
+              "description": "First line of address"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the location"
+            },
+            "id": {
+              "type": "integer",
+              "description": "Unique identifier for the location"
+            },
+            "province_code": {
+              "type": "string",
+              "description": "Province code of the address"
+            }
+          }
+        },
+        "price_set": {
+          "type": "object",
+          "description": "Details of the item price",
+          "properties": {
+            "shop_money": {
+              "type": "object",
+              "description": "Item price in shop currency",
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "currency_code": {
+                  "type": "string"
+                }
+              }
+            },
+            "presentment_money": {
+              "type": "object",
+              "description": "Item price in presentment currency",
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "currency_code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "properties": {
+          "type": "array",
+          "description": "Any additional properties associated with the item",
+          "items": {
+            "name": {
+              "type": "string",
+              "description": "Name of the property"
+            },
+            "value": {
+              "type": "string",
+              "description": "Value of the property"
+            }
+          }
+        },
+        "duties": {
+          "type": "array",
+          "description": "Details of any duties associated with the item",
+          "items": {
+            "shop_money": {
+              "type": "object",
+              "description": "Duty amount in shop currency",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "description": "Duty amount"
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "Currency code of the duty amount"
+                }
+              }
+            },
+            "presentment_money": {
+              "type": "object",
+              "description": "Duty amount in presentment currency",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "description": "Duty amount"
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "Currency code of the duty amount"
+                }
+              }
+            },
+            "tax_lines": {
+              "type": "array",
+              "description": "Details of tax lines associated with the duty",
+              "items": {
+                "channel_liable": {
+                  "type": "boolean",
+                  "description": "Whether the channel is liable for the tax"
+                },
+                "rate": {
+                  "type": "number",
+                  "description": "Tax rate"
+                },
+                "price": {
+                  "type": "string",
+                  "description": "Price of the tax"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Title of the tax"
+                },
+                "price_set": {
+                  "type": "object",
+                  "description": "Details of the tax price",
+                  "properties": {
+                    "shop_money": {
+                      "type": "object",
+                      "description": "Tax price in shop currency",
+                      "properties": {
+                        "amount": {
+                          "type": "string"
+                        },
+                        "currency_code": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "presentment_money": {
+                      "type": "object",
+                      "description": "Tax price in presentment currency",
+                      "properties": {
+                        "amount": {
+                          "type": "string"
+                        },
+                        "currency_code": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "admin_graphql_api_id": {
+              "type": "string",
+              "description": "Unique identifier for the duty"
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for the duty"
+            },
+            "country_code_of_origin": {
+              "type": "string",
+              "description": "Country code of origin for the duty"
+            },
+            "harmonized_system_code": {
+              "type": "string",
+              "description": "Harmonized system code for the duty"
+            }
+          }
+        },
+        "pre_tax_price": {
+          "type": "number",
+          "description": "Price before tax"
+        }
+      }
+    },
+    "presentment_currency": {
+      "type": "string",
+      "description": "The currency used for presenting the order"
+    },
+    "total_cash_rounding_payment_adjustment_set": {
+      "type": "object",
+      "description": "The money set that represents the amount adjusted on the order total due to cash rounding.",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "description": "The amount in the shop's local currency.",
+          "properties": {
+            "amount": {
+              "type": "string"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "description": "The amount in the customer's presentment currency.",
+          "properties": {
+            "amount": {
+              "type": "string"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "location_id": {
+      "type": "integer",
+      "description": "The location ID associated with the order"
+    },
+    "landing_site": {
+      "type": "string",
+      "description": "The landing site of the order"
+    },
+    "number": {
+      "type": "integer",
+      "description": "The order number"
+    },
+    "merchant_business_entity_id": {
+      "type": "string",
+      "description": "The business entity ID of the merchant of record."
+    },
+    "checkout_id": {
+      "type": "integer",
+      "description": "The ID of the checkout that processed the order"
+    },
+    "tax_lines": {
+      "type": "array",
+      "items": {
+        "channel_liable": {
+          "type": "boolean"
+        },
+        "rate": {
+          "type": "number"
+        },
+        "price": {
+          "type": "number"
+        },
+        "title": {
+          "type": "string"
+        },
+        "price_set": {
+          "type": "object",
+          "properties": {
+            "shop_money": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "currency_code": {
+                  "type": "string"
+                }
+              }
+            },
+            "presentment_money": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "currency_code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "checkout_token": {
+      "type": "string",
+      "description": "Token representing the checkout associated with the order"
+    },
+    "current_total_discounts": {
+      "type": "number",
+      "description": "The current total discounts applied to the order"
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the order"
+    },
+    "app_id": {
+      "type": "integer",
+      "description": "The ID of the app that created the order"
+    },
+    "order_status_url": {
+      "type": "string",
+      "description": "URL to check the status of the order"
+    },
+    "device_id": {
+      "type": "string",
+      "description": "The ID of the device used to place the order"
+    },
+    "payment_gateway_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "discount_allocations": {
+      "type": "array",
+      "items": {
+        "amount": {
+          "type": "string"
+        },
+        "discount_application_index": {
+          "type": "number"
+        },
+        "application_type": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "amount_set": {
+          "type": "object",
+          "properties": {
+            "shop_money": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string"
+                },
+                "currency_code": {
+                  "type": "string"
+                }
+              }
+            },
+            "presentment_money": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string"
+                },
+                "currency_code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "deleted_at": {
+      "type": "string",
+      "description": "The date and time when the order was deleted",
+      "format": "date-time"
+    },
+    "tags": {
+      "type": "string",
+      "description": "Tags associated with the order"
+    },
+    "current_subtotal_price_set": {
+      "type": "object",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "phone": {
+      "type": "string",
+      "description": "The phone number of the customer"
+    },
+    "user_id": {
+      "type": "number",
+      "description": "The unique identifier of the user associated with the order"
+    },
+    "note_attributes": {
+      "type": "array",
+      "description": "Custom note attributes associated with the order",
+      "items": {
+        "name": {
+          "type": "string",
+          "description": "Name of the note attribute"
+        },
+        "value": {
+          "type": "string",
+          "description": "Value of the note attribute"
+        }
+      }
+    },
+    "total_tax_set": {
+      "type": "object",
+      "description": "The details of the total tax applied to the order.",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "The total tax amount in shop currency"
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "The currency code for the total tax amount in shop currency"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "The total tax amount in presentment currency"
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "The currency code for the total tax amount"
+            }
+          }
+        }
+      }
+    },
+    "discount_codes": {
+      "type": "array",
+      "items": {
+        "amount": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "current_subtotal_price": {
+      "type": "number",
+      "description": "The current subtotal price of the order"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the order was created",
+      "format": "date-time"
+    },
+    "total_line_items_price_set": {
+      "type": "object",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "buyer_accepts_marketing": {
+      "type": "boolean",
+      "description": "Indicates if the customer has agreed to receive marketing emails"
+    },
+    "confirmed": {
+      "type": "boolean",
+      "description": "Indicates if the order has been confirmed"
+    },
+    "refunds": {
+      "type": "array",
+      "description": "Information about the refunds associated with the order",
+      "items": {
+        "note": {
+          "type": "string",
+          "description": "Additional note associated with the refund"
+        },
+        "order_adjustments": {
+          "type": "array",
+          "description": "Adjustments made to the order related to the refund",
+          "items": {
+            "tax_amount": {
+              "type": "string",
+              "description": "Tax amount of the adjustment"
+            },
+            "tax_amount_set": {
+              "type": "object",
+              "description": "Set of tax amounts for the adjustment",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "Shop tax amount of the adjustment",
+                  "properties": {
+                    "amount": {
+                      "type": "string",
+                      "description": "Amount in shop currency"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code for shop amount"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "description": "Presentment tax amount of the adjustment",
+                  "properties": {
+                    "amount": {
+                      "type": "string",
+                      "description": "Amount in presentment currency"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code for presentment amount"
+                    }
+                  }
+                }
+              }
+            },
+            "reason": {
+              "type": "string",
+              "description": "Reason for the adjustment"
+            },
+            "amount": {
+              "type": "string",
+              "description": "Amount of the adjustment"
+            },
+            "kind": {
+              "type": "string",
+              "description": "Type of adjustment"
+            },
+            "id": {
+              "type": "integer",
+              "description": "Unique ID of the adjustment"
+            },
+            "amount_set": {
+              "type": "object",
+              "description": "Set of amounts for the adjustment",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "Shop amount of adjustment",
+                  "properties": {
+                    "amount": {
+                      "type": "string",
+                      "description": "Amount in shop currency"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code for shop amount"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "description": "Presentment amount of adjustment",
+                  "properties": {
+                    "amount": {
+                      "type": "string",
+                      "description": "Amount in presentment currency"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code for presentment amount"
+                    }
+                  }
+                }
+              }
+            },
+            "order_id": {
+              "type": "integer",
+              "description": "ID of the order associated with the adjustment"
+            },
+            "refund_id": {
+              "type": "integer",
+              "description": "ID of the refund associated with the adjustment"
+            }
+          }
+        },
+        "restock": {
+          "type": "boolean",
+          "description": "Indicates if restocking is required"
+        },
+        "created_at": {
+          "type": "string",
+          "description": "Timestamp for when the refund was created",
+          "format": "date-time"
+        },
+        "total_duties_set": {
+          "type": "object",
+          "description": "Set of total duties for the order",
+          "properties": {
+            "shop_money": {
+              "type": "object",
+              "description": "Shop total duties",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "description": "Amount in shop currency"
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "Currency code for shop amount"
+                }
+              }
+            },
+            "presentment_money": {
+              "type": "object",
+              "description": "Presentment total duties",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "description": "Amount in presentment currency"
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "Currency code for presentment amount"
+                }
+              }
+            }
+          }
+        },
+        "transactions": {
+          "type": "array",
+          "description": "Information about transactions related to the refund",
+          "items": {
+            "amount": {
+              "type": "string",
+              "description": "Amount of the transaction"
+            },
+            "test": {
+              "type": "boolean",
+              "description": "Indicates if the transaction is a test"
+            },
+            "device_id": {
+              "type": "integer",
+              "description": "ID of the device used for the transaction"
+            },
+            "payment_details": {
+              "type": "object",
+              "description": "Details about the payment",
+              "properties": {
+                "credit_card_wallet": {
+                  "type": "string",
+                  "description": "Wallet used for the credit card"
+                },
+                "credit_card_number": {
+                  "type": "string",
+                  "description": "Number of the credit card"
+                },
+                "avs_result_code": {
+                  "type": "string",
+                  "description": "AVS (Address Verification System) result code"
+                },
+                "buyer_action_info": {
+                  "type": "string",
+                  "description": "Additional info on buyer action"
+                },
+                "credit_card_expiration_year": {
+                  "type": "integer",
+                  "description": "Expiration year of the credit card"
+                },
+                "credit_card_expiration_month": {
+                  "type": "integer",
+                  "description": "Expiration month of the credit card"
+                },
+                "cvv_result_code": {
+                  "type": "string",
+                  "description": "CVV (Card Verification Value) result code"
+                },
+                "credit_card_bin": {
+                  "type": "string",
+                  "description": "BIN (Bank Identification Number) of the credit card"
+                },
+                "credit_card_name": {
+                  "type": "string",
+                  "description": "Name on the credit card"
+                },
+                "credit_card_company": {
+                  "type": "string",
+                  "description": "Company of the credit card"
+                }
+              }
+            },
+            "kind": {
+              "type": "string",
+              "description": "Type of transaction"
+            },
+            "created_at": {
+              "type": "string",
+              "description": "Timestamp for when the transaction was created"
+            },
+            "message": {
+              "type": "string",
+              "description": "Message related to the transaction"
+            },
+            "location_id": {
+              "type": "integer",
+              "description": "ID of the location"
+            },
+            "authorization": {
+              "type": "string",
+              "description": "Authorization code of the transaction"
+            },
+            "user_id": {
+              "type": "integer",
+              "description": "ID of the user associated with the transaction"
+            },
+            "parent_id": {
+              "type": "integer",
+              "description": "ID of the parent transaction"
+            },
+            "payment_id": {
+              "type": "string",
+              "description": "ID of the payment"
+            },
+            "admin_graphql_api_id": {
+              "type": "string",
+              "description": "Unique ID of the transaction in the GraphQL Admin API"
+            },
+            "processed_at": {
+              "type": "string",
+              "description": "Timestamp for when the transaction was processed"
+            },
+            "receipt": {
+              "type": "object",
+              "description": "Receipt information for the transaction",
+              "properties": {
+                "paid_amount": {
+                  "type": "string",
+                  "description": "Amount paid"
+                }
+              }
+            },
+            "currency": {
+              "type": "string",
+              "description": "Currency of the transaction"
+            },
+            "error_code": {
+              "type": "string",
+              "description": "Error code of the transaction"
+            },
+            "id": {
+              "type": "integer",
+              "description": "Unique ID of the transaction"
+            },
+            "order_id": {
+              "type": "integer",
+              "description": "ID of the order associated with the transaction"
+            },
+            "gateway": {
+              "type": "string",
+              "description": "Payment gateway used for the transaction"
+            },
+            "source_name": {
+              "type": "string",
+              "description": "Name of the transaction source"
+            },
+            "status": {
+              "type": "string",
+              "description": "Status of the transaction"
+            }
+          }
+        },
+        "refund_line_items": {
+          "type": "array",
+          "description": "Information about the line items included in the refund",
+          "items": {
+            "quantity": {
+              "type": "integer",
+              "description": "Quantity of the line item included in the refund"
+            },
+            "line_item": {
+              "type": "object",
+              "description": "Information about the line item in the refund",
+              "properties": {
+                "variant_title": {
+                  "type": "string",
+                  "description": "Title of the variant associated with the line item"
+                },
+                "total_discount": {
+                  "type": "string",
+                  "description": "Total discount applied to the line item"
+                },
+                "fulfillment_status": {
+                  "type": "string",
+                  "description": "Status of fulfillment"
+                },
+                "gift_card": {
+                  "type": "boolean",
+                  "description": "Indicates if line item is a gift card"
+                },
+                "requires_shipping": {
+                  "type": "boolean",
+                  "description": "Indicates if shipping is required for the line item"
+                },
+                "total_discount_set": {
+                  "type": "object",
+                  "description": "Set of total discounts for the line item",
+                  "properties": {
+                    "shop_money": {
+                      "type": "object",
+                      "description": "Shop total discount of the line item",
+                      "properties": {
+                        "amount": {
+                          "type": "string",
+                          "description": "Amount in shop currency"
+                        },
+                        "currency_code": {
+                          "type": "string",
+                          "description": "Currency code for shop amount"
+                        }
+                      }
+                    },
+                    "presentment_money": {
+                      "type": "object",
+                      "description": "Presentment total discount of the line item",
+                      "properties": {
+                        "amount": {
+                          "type": "string",
+                          "description": "Amount in presentment currency"
+                        },
+                        "currency_code": {
+                          "type": "string",
+                          "description": "Currency code for presentment amount"
+                        }
+                      }
+                    }
+                  }
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Title of the line item"
+                },
+                "product_exists": {
+                  "type": "boolean",
+                  "description": "Indicates if the product for the line item exists"
+                },
+                "variant_id": {
+                  "type": "integer",
+                  "description": "ID of the variant associated with the line item"
+                },
+                "tax_lines": {
+                  "type": "array",
+                  "description": "Information about tax applied to the line item",
+                  "items": {
+                    "channel_liable": {
+                      "type": "boolean",
+                      "description": "Indicates if the channel is liable for the tax"
+                    },
+                    "rate": {
+                      "type": "number",
+                      "description": "Tax rate applied to the line item"
+                    },
+                    "price": {
+                      "type": "string",
+                      "description": "Tax price applied to the line item"
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "Title of the tax applied"
+                    },
+                    "price_set": {
+                      "type": "object",
+                      "description": "Set of tax prices for the line item",
+                      "properties": {
+                        "shop_money": {
+                          "type": "object",
+                          "description": "Shop tax price of the line item",
+                          "properties": {
+                            "amount": {
+                              "type": "string",
+                              "description": "Amount in shop currency"
+                            },
+                            "currency_code": {
+                              "type": "string",
+                              "description": "Currency code for shop amount"
+                            }
+                          }
+                        },
+                        "presentment_money": {
+                          "type": "object",
+                          "description": "Presentment tax price of the line item",
+                          "properties": {
+                            "amount": {
+                              "type": "string",
+                              "description": "Amount in presentment currency"
+                            },
+                            "currency_code": {
+                              "type": "string",
+                              "description": "Currency code for presentment amount"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "price": {
+                  "type": "string",
+                  "description": "Price of the line item"
+                },
+                "vendor": {
+                  "type": "string",
+                  "description": "Vendor of the line item"
+                },
+                "product_id": {
+                  "type": "integer",
+                  "description": "ID of the associated product"
+                },
+                "id": {
+                  "type": "integer",
+                  "description": "Unique ID of the line item"
+                },
+                "sku": {
+                  "type": "string",
+                  "description": "Stock keeping unit of the line item"
+                },
+                "grams": {
+                  "type": "number",
+                  "description": "Weight of the line item in grams"
+                },
+                "quantity": {
+                  "type": "integer",
+                  "description": "Quantity of the line item"
+                },
+                "fulfillable_quantity": {
+                  "type": "integer",
+                  "description": "Quantity fulfillable for the line item"
+                },
+                "taxable": {
+                  "type": "boolean",
+                  "description": "Indicates if the line item is taxable"
+                },
+                "fulfillment_service": {
+                  "type": "string",
+                  "description": "Service responsible for fulfillment"
+                },
+                "discount_allocations": {
+                  "type": "array",
+                  "description": "Allocations of discounts for the line item",
+                  "items": {
+                    "amount": {
+                      "type": "string",
+                      "description": "Amount of the discount"
+                    },
+                    "discount_application_index": {
+                      "type": "number",
+                      "description": "Index of the discount application"
+                    },
+                    "amount_set": {
+                      "type": "object",
+                      "description": "Set of amounts for the discount allocation",
+                      "properties": {
+                        "shop_money": {
+                          "type": "object",
+                          "description": "Shop amount of the discount allocation",
+                          "properties": {
+                            "amount": {
+                              "type": "string",
+                              "description": "Amount in shop currency"
+                            },
+                            "currency_code": {
+                              "type": "string",
+                              "description": "Currency code for shop amount"
+                            }
+                          }
+                        },
+                        "presentment_money": {
+                          "type": "object",
+                          "description": "Presentment amount of the discount allocation",
+                          "properties": {
+                            "amount": {
+                              "type": "string",
+                              "description": "Amount in presentment currency"
+                            },
+                            "currency_code": {
+                              "type": "string",
+                              "description": "Currency code for presentment amount"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "variant_inventory_management": {
+                  "type": "string",
+                  "description": "Type of inventory management for the variant"
+                },
+                "admin_graphql_api_id": {
+                  "type": "string",
+                  "description": "Unique ID of the line item in the GraphQL Admin API"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Name of the line item"
+                },
+                "price_set": {
+                  "type": "object",
+                  "description": "Set of prices for the line item",
+                  "properties": {
+                    "shop_money": {
+                      "type": "object",
+                      "description": "Shop price of the line item",
+                      "properties": {
+                        "amount": {
+                          "type": "string",
+                          "description": "Amount in shop currency"
+                        },
+                        "currency_code": {
+                          "type": "string",
+                          "description": "Currency code for shop amount"
+                        }
+                      }
+                    },
+                    "presentment_money": {
+                      "type": "object",
+                      "description": "Presentment price of the line item",
+                      "properties": {
+                        "amount": {
+                          "type": "string",
+                          "description": "Amount in presentment currency"
+                        },
+                        "currency_code": {
+                          "type": "string",
+                          "description": "Currency code for presentment amount"
+                        }
+                      }
+                    }
+                  }
+                },
+                "properties": {
+                  "type": "array",
+                  "description": "Additional properties of the line item",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "duties": {
+                  "type": "array",
+                  "description": "Information about duties of the line item",
+                  "items": {
+                    "duty_id": {
+                      "type": "integer",
+                      "description": "ID of the duty"
+                    },
+                    "amount_set": {
+                      "type": "object",
+                      "description": "Set of amounts for the duties of the line item",
+                      "properties": {
+                        "shop_money": {
+                          "type": "object",
+                          "description": "Shop amount of duty for the line item",
+                          "properties": {
+                            "amount": {
+                              "type": "number",
+                              "description": "Amount in shop currency"
+                            },
+                            "currency_code": {
+                              "type": "string",
+                              "description": "Currency code for shop amount"
+                            }
+                          }
+                        },
+                        "presentment_money": {
+                          "type": "object",
+                          "description": "Presentment amount of duty for the line item",
+                          "properties": {
+                            "amount": {
+                              "type": "number",
+                              "description": "Amount in presentment currency"
+                            },
+                            "currency_code": {
+                              "type": "string",
+                              "description": "Currency code for presentment amount"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "line_item_id": {
+              "type": "integer",
+              "description": "ID of the line item included in the refund"
+            },
+            "subtotal": {
+              "type": "number",
+              "description": "Subtotal of the line item included in the refund"
+            },
+            "total_tax_set": {
+              "type": "object",
+              "description": "Set of total taxes for the line item included in the refund",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "Shop total tax of the line item",
+                  "properties": {
+                    "amount": {
+                      "type": "string",
+                      "description": "Amount in shop currency"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code for shop amount"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "description": "Presentment total tax of the line item",
+                  "properties": {
+                    "amount": {
+                      "type": "string",
+                      "description": "Amount in presentment currency"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code for presentment amount"
+                    }
+                  }
+                }
+              }
+            },
+            "id": {
+              "type": "integer",
+              "description": "Unique ID of the refund line item"
+            },
+            "subtotal_set": {
+              "type": "object",
+              "description": "Set of subtotals for the line item included in the refund",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "Shop subtotal of the line item",
+                  "properties": {
+                    "amount": {
+                      "type": "string",
+                      "description": "Amount in shop currency"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code for shop amount"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "description": "Presentment subtotal of the line item",
+                  "properties": {
+                    "amount": {
+                      "type": "string",
+                      "description": "Amount in presentment currency"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code for presentment amount"
+                    }
+                  }
+                }
+              }
+            },
+            "total_tax": {
+              "type": "number",
+              "description": "Total tax for the line item included in the refund"
+            },
+            "location_id": {
+              "type": "integer",
+              "description": "ID of the location"
+            },
+            "restock_type": {
+              "type": "string",
+              "description": "Type of restocking"
+            }
+          }
+        },
+        "user_id": {
+          "type": "integer",
+          "description": "ID of the user associated with the refund"
+        },
+        "admin_graphql_api_id": {
+          "type": "string",
+          "description": "Unique ID of the refund in the GraphQL Admin API"
+        },
+        "processed_at": {
+          "type": "string",
+          "description": "Timestamp for when the refund was processed",
+          "format": "date-time"
+        },
+        "id": {
+          "type": "integer",
+          "description": "Unique ID of the refund"
+        },
+        "order_id": {
+          "type": "integer",
+          "description": "ID of the order for which the refund is created"
+        },
+        "duties": {
+          "type": "array",
+          "description": "Information about duties for the refund",
+          "items": {
+            "duty_id": {
+              "type": "integer",
+              "description": "ID of the duty"
+            },
+            "amount_set": {
+              "type": "object",
+              "description": "Set of amounts for duties",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "Shop amount of duty",
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "description": "Amount in shop currency"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code for shop amount"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "description": "Presentment amount of duty",
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "description": "Amount in presentment currency"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code for presentment amount"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the order was last updated",
+      "format": "date-time"
+    },
+    "referring_site": {
+      "type": "string",
+      "description": "The referring site of the order"
+    },
+    "deleted_description": {
+      "type": "string",
+      "description": "Description provided when the order was deleted"
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency used for the order"
+    },
+    "email": {
+      "type": "string",
+      "description": "The email address of the customer"
+    },
+    "total_price_set": {
+      "type": "object",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "total_line_items_price": {
+      "type": "number",
+      "description": "The total price of all line items in the order"
+    },
+    "token": {
+      "type": "string",
+      "description": "Token associated with the order"
+    },
+    "current_total_price": {
+      "type": "number",
+      "description": "The current total price of the order"
+    },
+    "financial_status": {
+      "type": "string",
+      "description": "The financial status of the order"
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier of the order in the GraphQL Admin API"
+    },
+    "cancelled_at": {
+      "type": "string",
+      "description": "The date and time when the order was canceled",
+      "format": "date-time"
+    },
+    "confirmation_number": {
+      "type": "string",
+      "description": "The unique number for confirming the order"
+    },
+    "deleted_message": {
+      "type": "string",
+      "description": "Message provided when the order was deleted"
+    },
+    "fulfillment_status": {
+      "type": "string",
+      "description": "The fulfillment status of the order"
+    },
+    "current_total_discounts_set": {
+      "type": "object",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "total_discounts_set": {
+      "type": "object",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "original_total_duties_set": {
+      "type": "string",
+      "description": "The original total duties set for the order"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "URL of the order's source"
+    },
+    "source_identifier": {
+      "type": "string",
+      "description": "Identifier for the order's source"
+    },
+    "reference": {
+      "type": "string",
+      "description": "Reference associated with the order"
+    },
+    "merchant_of_record_app_id": {
+      "type": "string",
+      "description": "The app ID of the merchant of record"
+    },
+    "customer_locale": {
+      "type": "string",
+      "description": "The locale of the customer"
+    },
+    "current_total_additional_fees_set": {
+      "type": "object",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "subtotal_price": {
+      "type": "number",
+      "description": "The subtotal price of the order"
+    },
+    "closed_at": {
+      "type": "string",
+      "description": "The date and time when the order was closed",
+      "format": "date-time"
+    },
+    "test": {
+      "type": "boolean",
+      "description": "Indicates if the order is a test order"
+    },
+    "current_total_price_set": {
+      "type": "object",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "total_shipping_price_set": {
+      "type": "object",
+      "description": "The details of the total shipping price for the order.",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "The total shipping amount in shop currency"
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "The currency code for the total shipping price in shop currency"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "The total shipping amount in presentment currency"
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "The currency code for the total shipping price"
+            }
+          }
+        }
+      }
+    },
+    "tax_exempt": {
+      "type": "boolean",
+      "description": "Indicates if the order is tax exempt"
+    },
+    "subtotal_price_set": {
+      "type": "object",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "total_tax": {
+      "type": "number",
+      "description": "The total tax amount for the order"
+    },
+    "shipping_lines": {
+      "type": "array",
+      "items": {
+        "code": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "discount_allocations": {
+          "type": "array",
+          "items": {
+            "amount": {
+              "type": "string"
+            },
+            "discount_application_index": {
+              "type": "number"
+            },
+            "application_type": {
+              "type": "string"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "amount_set": {
+              "type": "object",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "string"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "string"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "carrier_identifier": {
+          "type": "string"
+        },
+        "discounted_price_set": {
+          "type": "object",
+          "properties": {
+            "shop_money": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "currency_code": {
+                  "type": "string"
+                }
+              }
+            },
+            "presentment_money": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "currency_code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "discounted_price": {
+          "type": "number"
+        },
+        "tax_lines": {
+          "type": "array"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "price_set": {
+          "type": "object",
+          "properties": {
+            "shop_money": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "currency_code": {
+                  "type": "string"
+                }
+              }
+            },
+            "presentment_money": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "currency_code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "requested_fulfillment_service_id": {
+          "type": "string"
+        }
+      }
+    },
+    "current_total_tax": {
+      "type": "number",
+      "description": "The current total tax amount for the order"
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the order"
+    },
+    "cart_token": {
+      "type": "string",
+      "description": "Token representing the cart associated with the order"
+    },
+    "landing_site_ref": {
+      "type": "string",
+      "description": "Reference for the landing site of the order"
+    },
+    "note": {
+      "type": "string",
+      "description": "Additional notes related to the order"
+    },
+    "estimated_taxes": {
+      "type": "boolean",
+      "description": "Estimated taxes for the order"
+    },
+    "current_total_tax_set": {
+      "type": "object",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency_code": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "total_outstanding": {
+      "type": "number",
+      "description": "The total outstanding amount for the order"
+    },
+    "order_number": {
+      "type": "integer",
+      "description": "The unique number assigned to the order"
+    },
+    "discount_applications": {
+      "type": "array",
+      "items": {
+        "allocation_method": {
+          "type": "string"
+        },
+        "value_type": {
+          "type": "string"
+        },
+        "target_type": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "target_selection": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "taxes_included": {
+      "type": "boolean",
+      "description": "Indicates if taxes are included in the prices"
+    },
+    "payment_terms": {
+      "type": "string",
+      "description": "The terms of payment for the order"
+    },
+    "total_weight": {
+      "type": "integer",
+      "description": "The total weight of all items in the order"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "The email address for order-related contacts"
+    },
+    "total_discounts": {
+      "type": "number",
+      "description": "The total amount of discounts applied to the order"
+    },
+    "fulfillments": {
+      "type": "array",
+      "items": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "origin_address": {
+          "type": "object",
+          "properties": {
+            "zip": {
+              "type": "string"
+            },
+            "country_code": {
+              "type": "string"
+            },
+            "city": {
+              "type": "string"
+            },
+            "address2": {
+              "type": "string"
+            },
+            "address1": {
+              "type": "string"
+            },
+            "province_code": {
+              "type": "string"
+            }
+          }
+        },
+        "line_items": {
+          "type": "array",
+          "items": {
+            "variant_title": {
+              "type": "string"
+            },
+            "origin_location": {
+              "type": "object",
+              "properties": {
+                "zip": {
+                  "type": "string"
+                },
+                "country_code": {
+                  "type": "string"
+                },
+                "city": {
+                  "type": "string"
+                },
+                "address2": {
+                  "type": "string"
+                },
+                "address1": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "integer"
+                },
+                "province_code": {
+                  "type": "string"
+                }
+              }
+            },
+            "total_discount": {
+              "type": "number"
+            },
+            "fulfillment_status": {
+              "type": "string"
+            },
+            "gift_card": {
+              "type": "boolean"
+            },
+            "requires_shipping": {
+              "type": "boolean"
+            },
+            "total_discount_set": {
+              "type": "object",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "title": {
+              "type": "string"
+            },
+            "product_exists": {
+              "type": "boolean"
+            },
+            "variant_id": {
+              "type": "integer"
+            },
+            "tax_lines": {
+              "type": "array",
+              "items": {
+                "channel_liable": {
+                  "type": "boolean"
+                },
+                "rate": {
+                  "type": "number"
+                },
+                "price": {
+                  "type": "number"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "price_set": {
+                  "type": "object",
+                  "properties": {
+                    "shop_money": {
+                      "type": "object",
+                      "properties": {
+                        "amount": {
+                          "type": "number"
+                        },
+                        "currency_code": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "presentment_money": {
+                      "type": "object",
+                      "properties": {
+                        "amount": {
+                          "type": "number"
+                        },
+                        "currency_code": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "price": {
+              "type": "number"
+            },
+            "vendor": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "integer"
+            },
+            "id": {
+              "type": "integer"
+            },
+            "sku": {
+              "type": "string"
+            },
+            "grams": {
+              "type": "integer"
+            },
+            "quantity": {
+              "type": "integer"
+            },
+            "fulfillable_quantity": {
+              "type": "integer"
+            },
+            "taxable": {
+              "type": "boolean"
+            },
+            "fulfillment_service": {
+              "type": "string"
+            },
+            "discount_allocations": {
+              "type": "array",
+              "items": {
+                "amount": {
+                  "type": "string"
+                },
+                "discount_application_index": {
+                  "type": "number"
+                },
+                "application_type": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "amount_set": {
+                  "type": "object",
+                  "properties": {
+                    "shop_money": {
+                      "type": "object",
+                      "properties": {
+                        "amount": {
+                          "type": "string"
+                        },
+                        "currency_code": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "presentment_money": {
+                      "type": "object",
+                      "properties": {
+                        "amount": {
+                          "type": "string"
+                        },
+                        "currency_code": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "variant_inventory_management": {
+              "type": "string"
+            },
+            "admin_graphql_api_id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "destination_location": {
+              "type": "object",
+              "properties": {
+                "zip": {
+                  "type": "string"
+                },
+                "country_code": {
+                  "type": "string"
+                },
+                "city": {
+                  "type": "string"
+                },
+                "address2": {
+                  "type": "string"
+                },
+                "address1": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "integer"
+                },
+                "province_code": {
+                  "type": "string"
+                }
+              }
+            },
+            "price_set": {
+              "type": "object",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "properties": {
+              "type": "array",
+              "items": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            },
+            "duties": {
+              "type": "array",
+              "items": {
+                "shop_money": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "string"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "string"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "tax_lines": {
+                  "type": "array",
+                  "items": {
+                    "channel_liable": {
+                      "type": "boolean"
+                    },
+                    "rate": {
+                      "type": "number"
+                    },
+                    "price": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "price_set": {
+                      "type": "object",
+                      "properties": {
+                        "shop_money": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "string"
+                            },
+                            "currency_code": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "presentment_money": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "string"
+                            },
+                            "currency_code": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "admin_graphql_api_id": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "country_code_of_origin": {
+                  "type": "string"
+                },
+                "harmonized_system_code": {
+                  "type": "string"
+                }
+              }
+            },
+            "pre_tax_price": {
+              "type": "number"
+            }
+          }
+        },
+        "tracking_company": {
+          "type": "string"
+        },
+        "tracking_urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "location_id": {
+          "type": "integer"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "service": {
+          "type": "string"
+        },
+        "admin_graphql_api_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "tracking_number": {
+          "type": "string"
+        },
+        "receipt": {
+          "type": "object"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "tracking_numbers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "order_id": {
+          "type": "integer"
+        },
+        "tracking_url": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "shipment_status": {
+          "type": "string"
+        }
+      }
+    },
+    "po_number": {
+      "type": "string",
+      "description": "The purchase order number"
+    },
+    "client_details": {
+      "type": "object",
+      "properties": {
+        "session_hash": {
+          "type": "string"
+        },
+        "accept_language": {
+          "type": "string"
+        },
+        "browser_width": {
+          "type": "integer"
+        },
+        "browser_height": {
+          "type": "integer"
+        },
+        "browser_ip": {
+          "type": "string"
+        },
+        "user_agent": {
+          "type": "string"
+        }
+      }
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "URL of the shop associated with the order"
+    },
+    "processed_at": {
+      "type": "string",
+      "description": "The date and time when the order was processed"
+    },
+    "company": {
+      "type": "string",
+      "description": "The name of the company associated with the order"
+    },
+    "shipping_address": {
+      "type": "object",
+      "properties": {
+        "zip": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "address2": {
+          "type": "string"
+        },
+        "address1": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "number"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "province_code": {
+          "type": "string"
+        },
+        "country_code": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "company": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "longitude": {
+          "type": "number"
+        }
+      }
+    },
+    "browser_ip": {
+      "type": "string",
+      "description": "The IP address of the customer's browser"
+    },
+    "source_name": {
+      "type": "string",
+      "description": "Name of the order's source"
+    },
+    "total_price": {
+      "type": "number",
+      "description": "The total price of the order"
+    },
+    "current_total_duties_set": {
+      "type": "string",
+      "description": "The current total duties set for the order"
+    },
+    "duties_included": {
+      "type": "boolean",
+      "description": "Whether duties included in the subtotal price of the order."
+    },
+    "total_tip_received": {
+      "type": "number",
+      "description": "The total tip amount received, if any"
+    },
+    "cancel_reason": {
+      "type": "string",
+      "description": "The reason provided if the order was canceled"
+    },
+    "customer": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "type": "string"
+        },
+        "last_order_name": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "multipass_identifier": {
+          "type": "string"
+        },
+        "accepts_marketing_updated_at": {
+          "type": "string"
+        },
+        "default_address": {
+          "type": "object",
+          "properties": {
+            "zip": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            },
+            "city": {
+              "type": "string"
+            },
+            "address2": {
+              "type": "string"
+            },
+            "address1": {
+              "type": "string"
+            },
+            "last_name": {
+              "type": "string"
+            },
+            "province_code": {
+              "type": "string"
+            },
+            "country_code": {
+              "type": "string"
+            },
+            "default": {
+              "type": "boolean"
+            },
+            "province": {
+              "type": "string"
+            },
+            "phone": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "country_name": {
+              "type": "string"
+            },
+            "company": {
+              "type": "string"
+            },
+            "id": {
+              "type": "integer"
+            },
+            "customer_id": {
+              "type": "integer"
+            },
+            "first_name": {
+              "type": "string"
+            }
+          }
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "accepts_marketing": {
+          "type": "boolean"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "state": {
+          "type": "string"
+        },
+        "marketing_opt_in_level": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "total_spent": {
+          "type": "number"
+        },
+        "last_order_id": {
+          "type": "integer"
+        },
+        "tax_exempt": {
+          "type": "boolean"
+        },
+        "email_marketing_consent": {
+          "type": "object",
+          "properties": {
+            "consent_updated_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "consent_collected_from": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string"
+            },
+            "opt_in_level": {
+              "type": "string"
+            }
+          }
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "verified_email": {
+          "type": "boolean"
+        },
+        "tags": {
+          "type": "string"
+        },
+        "orders_count": {
+          "type": "integer"
+        },
+        "sms_marketing_consent": {
+          "type": "object",
+          "properties": {
+            "consent_updated_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "consent_collected_from": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string"
+            },
+            "opt_in_level": {
+              "type": "string"
+            }
+          }
+        },
+        "phone": {
+          "type": "string"
+        },
+        "admin_graphql_api_id": {
+          "type": "string"
+        },
+        "tax_exemptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

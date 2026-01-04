@@ -1,0 +1,825 @@
+{
+  "stream": "abandoned_checkouts",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "note": {
+      "type": "string",
+      "description": "Checkout note"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "Date and time when the checkout was created",
+      "format": "date-time"
+    },
+    "billing_address": {
+      "type": "object",
+      "description": "Information about the billing address associated with the checkout",
+      "properties": {
+        "zip": {
+          "type": "string",
+          "description": "Zip code of the customer's billing address"
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of the customer's billing address"
+        },
+        "city": {
+          "type": "string",
+          "description": "City of the customer's billing address"
+        },
+        "address2": {
+          "type": "string",
+          "description": "Second line of the customer's billing address"
+        },
+        "address1": {
+          "type": "string",
+          "description": "First line of the customer's billing address"
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude coordinate of the billing address"
+        },
+        "last_name": {
+          "type": "string",
+          "description": "Last name of the customer"
+        },
+        "province_code": {
+          "type": "string",
+          "description": "State or province code of the customer's billing address"
+        },
+        "country_code": {
+          "type": "string",
+          "description": "Country code of the customer's billing address"
+        },
+        "province": {
+          "type": "string",
+          "description": "State or province of the customer's billing address"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number associated with the billing address"
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name associated with the billing address"
+        },
+        "company": {
+          "type": "string",
+          "description": "Company name in the billing address"
+        },
+        "first_name": {
+          "type": "string",
+          "description": "First name of the customer"
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude coordinate of the billing address"
+        }
+      }
+    },
+    "source": {
+      "type": "string",
+      "description": "Source of the checkout"
+    },
+    "line_items": {
+      "type": "array",
+      "description": "List of purchased items in the checkout",
+      "items": {
+        "variant_title": {
+          "type": "string",
+          "description": "Title of the product variant"
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "Quantity of the product"
+        },
+        "variant_id": {
+          "type": "integer",
+          "description": "ID of the product variant"
+        },
+        "fulfillment_service": {
+          "type": "string",
+          "description": "Service used for fulfillment"
+        },
+        "requires_shipping": {
+          "type": "boolean",
+          "description": "Indicates if shipping is required"
+        },
+        "price": {
+          "type": "string",
+          "description": "Price of the line item"
+        },
+        "vendor": {
+          "type": "string",
+          "description": "Vendor of the product"
+        },
+        "product_id": {
+          "type": "integer",
+          "description": "ID of the product in the line item"
+        },
+        "sku": {
+          "type": "string",
+          "description": "SKU of the product"
+        },
+        "grams": {
+          "type": "number",
+          "description": "Weight in grams"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the line item"
+        }
+      }
+    },
+    "taxes_included": {
+      "type": "boolean",
+      "description": "Indicates if taxes are included in prices"
+    },
+    "presentment_currency": {
+      "type": "string",
+      "description": "Currency used for presentation"
+    },
+    "buyer_accepts_marketing": {
+      "type": "boolean",
+      "description": "Indicates if the buyer accepts marketing"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "URL of the source"
+    },
+    "location_id": {
+      "type": "integer",
+      "description": "ID of the location"
+    },
+    "total_weight": {
+      "type": "integer",
+      "description": "Total weight of all line items"
+    },
+    "landing_site": {
+      "type": "string",
+      "description": "URL of the landing site"
+    },
+    "source_identifier": {
+      "type": "string",
+      "description": "Identifier of the source"
+    },
+    "total_discounts": {
+      "type": "number",
+      "description": "Total discounts applied"
+    },
+    "tax_lines": {
+      "type": "array",
+      "description": "List of tax lines associated with the checkout",
+      "items": {
+        "rate": {
+          "type": "number",
+          "description": "Tax rate"
+        },
+        "zone": {
+          "type": "string",
+          "description": "Tax zone"
+        },
+        "compare_at": {
+          "type": "string",
+          "description": "Comparison price of the tax"
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the tax line"
+        },
+        "source": {
+          "type": "string",
+          "description": "Source of the tax"
+        },
+        "position": {
+          "type": "integer",
+          "description": "Position of the tax line"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the tax"
+        },
+        "price_set": {
+          "type": "object",
+          "description": "Price details of the tax line",
+          "properties": {
+            "shop_money": {
+              "type": "object",
+              "description": "Tax amount in the shop's currency",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "description": "Amount in shop currency"
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "Currency code in shop currency"
+                }
+              }
+            },
+            "presentment_money": {
+              "type": "object",
+              "description": "Tax amount in the currency of presentation",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "description": "Amount in presentment currency"
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "Currency code in presentment currency"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "Date and time of last checkout update",
+      "format": "date-time"
+    },
+    "referring_site": {
+      "type": "string",
+      "description": "Site that referred the customer"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "URL of the shop"
+    },
+    "customer_locale": {
+      "type": "string",
+      "description": "Locale of the customer"
+    },
+    "currency": {
+      "type": "string",
+      "description": "Currency used for the checkout"
+    },
+    "id": {
+      "type": "integer",
+      "description": "ID of the checkout"
+    },
+    "shipping_address": {
+      "type": "object",
+      "description": "Information about the shipping address for the checkout",
+      "properties": {
+        "zip": {
+          "type": "string",
+          "description": "Zip code of the customer's shipping address"
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of the customer's shipping address"
+        },
+        "city": {
+          "type": "string",
+          "description": "City of the customer's shipping address"
+        },
+        "address2": {
+          "type": "string",
+          "description": "Second line of the customer's shipping address"
+        },
+        "address1": {
+          "type": "string",
+          "description": "First line of the customer's shipping address"
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude coordinate of the shipping address"
+        },
+        "last_name": {
+          "type": "string",
+          "description": "Last name of the customer"
+        },
+        "province_code": {
+          "type": "string",
+          "description": "State or province code of the customer's shipping address"
+        },
+        "country_code": {
+          "type": "string",
+          "description": "Country code of the customer's shipping address"
+        },
+        "province": {
+          "type": "string",
+          "description": "State or province of the customer's shipping address"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number associated with the shipping address"
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name associated with the shipping address"
+        },
+        "company": {
+          "type": "string",
+          "description": "Company name in the shipping address"
+        },
+        "first_name": {
+          "type": "string",
+          "description": "First name of the customer"
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude coordinate of the shipping address"
+        }
+      }
+    },
+    "abandoned_checkout_url": {
+      "type": "string",
+      "description": "The URL to access the abandoned checkout"
+    },
+    "email": {
+      "type": "string",
+      "description": "Customer's email"
+    },
+    "source_name": {
+      "type": "string",
+      "description": "Name of the source"
+    },
+    "subtotal_price": {
+      "type": "number",
+      "description": "Subtotal price of the checkout"
+    },
+    "closed_at": {
+      "type": "string",
+      "description": "Date and time when the checkout was closed",
+      "format": "date-time"
+    },
+    "device_id": {
+      "type": "integer",
+      "description": "ID of the device used for checkout"
+    },
+    "total_price": {
+      "type": "number",
+      "description": "Total price of the checkout"
+    },
+    "total_line_items_price": {
+      "type": "number",
+      "description": "Total price of all line items"
+    },
+    "total_tax": {
+      "type": "number",
+      "description": "Total tax amount"
+    },
+    "token": {
+      "type": "string",
+      "description": "Token associated with the checkout"
+    },
+    "completed_at": {
+      "type": "string",
+      "description": "Date and time when the checkout was completed",
+      "format": "date-time"
+    },
+    "shipping_lines": {
+      "type": "array",
+      "description": "List of shipping methods selected for the checkout",
+      "items": {
+        "code": {
+          "type": "string",
+          "description": "Code of the shipping line"
+        },
+        "markup": {
+          "type": "string",
+          "description": "Markup on the shipping line"
+        },
+        "api_client_id": {
+          "type": "integer",
+          "description": "ID of the API client"
+        },
+        "delivery_category": {
+          "type": "string",
+          "description": "Category of delivery"
+        },
+        "source": {
+          "type": "string",
+          "description": "Source of the shipping line"
+        },
+        "carrier_service_id": {
+          "type": "integer",
+          "description": "ID of the carrier service"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the shipping line"
+        },
+        "carrier_identifier": {
+          "type": "string",
+          "description": "Identifier of the carrier"
+        },
+        "tax_lines": {
+          "type": "array",
+          "description": "List of tax lines associated with the shipping method",
+          "items": {
+            "rate": {
+              "type": "number",
+              "description": "Tax rate"
+            },
+            "zone": {
+              "type": "string",
+              "description": "Tax zone"
+            },
+            "compare_at": {
+              "type": "string",
+              "description": "Comparison price"
+            },
+            "price": {
+              "type": "number",
+              "description": "Price of the tax line"
+            },
+            "source": {
+              "type": "string",
+              "description": "Source of the tax"
+            },
+            "position": {
+              "type": "integer",
+              "description": "Position of the tax line"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the tax"
+            },
+            "price_set": {
+              "type": "object",
+              "description": "Price details of the tax line",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "Tax amount in the shop's currency",
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "description": "Amount in shop currency"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code in shop currency"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "description": "Tax amount in the currency of presentation",
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "description": "Amount in presentment currency"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code in presentment currency"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number associated with the shipping line"
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the shipping line"
+        },
+        "validation_context": {
+          "type": "string",
+          "description": "Validation context for the shipping line"
+        },
+        "id": {
+          "type": "string",
+          "description": "ID of the shipping line"
+        },
+        "applied_discounts": {
+          "type": "array",
+          "description": "List of applied discounts",
+          "items": {
+            "type": "string"
+          }
+        },
+        "requested_fulfillment_service_id": {
+          "type": "string",
+          "description": "ID of the requested fulfillment service"
+        }
+      }
+    },
+    "phone": {
+      "type": "string",
+      "description": "Customer's phone number"
+    },
+    "user_id": {
+      "type": "integer",
+      "description": "ID of the user associated with the checkout"
+    },
+    "note_attributes": {
+      "type": "array",
+      "description": "Additional notes or attributes associated with the checkout",
+      "items": {
+        "name": {
+          "type": "string",
+          "description": "Name of the attribute"
+        },
+        "value": {
+          "type": "string",
+          "description": "Value of the attribute"
+        }
+      }
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the checkout"
+    },
+    "cart_token": {
+      "type": "string",
+      "description": "Token associated with the cart"
+    },
+    "discount_codes": {
+      "type": "array",
+      "description": "List of discount codes applied to the checkout",
+      "items": {
+        "amount": {
+          "type": "string",
+          "description": "Amount of the discount"
+        },
+        "code": {
+          "type": "string",
+          "description": "Discount code used"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the discount"
+        }
+      }
+    },
+    "gateway": {
+      "type": "string",
+      "description": "Payment gateway used"
+    },
+    "customer": {
+      "type": "object",
+      "description": "Details of the customer who initiated the checkout",
+      "properties": {
+        "total_spent": {
+          "type": "number",
+          "description": "Total amount spent by the customer"
+        },
+        "note": {
+          "type": "string",
+          "description": "Customer note"
+        },
+        "addresses": {
+          "type": "array",
+          "description": "List of addresses associated with the customer",
+          "items": {
+            "zip": {
+              "type": "string",
+              "description": "Zip code of the customer's address"
+            },
+            "country": {
+              "type": "string",
+              "description": "Country of the customer's address"
+            },
+            "city": {
+              "type": "string",
+              "description": "City of the customer's address"
+            },
+            "address2": {
+              "type": "string",
+              "description": "Second line of the customer's address"
+            },
+            "address1": {
+              "type": "string",
+              "description": "First line of the customer's address"
+            },
+            "last_name": {
+              "type": "string",
+              "description": "Last name of the customer"
+            },
+            "province_code": {
+              "type": "string",
+              "description": "State or province code of the customer's address"
+            },
+            "country_code": {
+              "type": "string",
+              "description": "Country code of the customer's address"
+            },
+            "default": {
+              "type": "boolean",
+              "description": "Indicates if it's the default address for the customer"
+            },
+            "province": {
+              "type": "string",
+              "description": "State or province of the customer's address"
+            },
+            "phone": {
+              "type": "string",
+              "description": "Phone number associated with the address"
+            },
+            "name": {
+              "type": "string",
+              "description": "Full name associated with the address"
+            },
+            "country_name": {
+              "type": "string",
+              "description": "Country name of the customer's address"
+            },
+            "company": {
+              "type": "string",
+              "description": "Company name in the address"
+            },
+            "id": {
+              "type": "integer",
+              "description": "Address ID"
+            },
+            "customer_id": {
+              "type": "integer",
+              "description": "ID of the customer"
+            },
+            "first_name": {
+              "type": "string",
+              "description": "First name of the customer"
+            }
+          }
+        },
+        "last_order_name": {
+          "type": "string",
+          "description": "Name of the customer's last order"
+        },
+        "last_order_id": {
+          "type": "integer",
+          "description": "ID of the customer's last order"
+        },
+        "last_name": {
+          "type": "string",
+          "description": "Last name of the customer"
+        },
+        "created_at": {
+          "type": "string",
+          "description": "Date and time when the customer was created",
+          "format": "date-time"
+        },
+        "multipass_identifier": {
+          "type": "string",
+          "description": "Identifier for multipass login"
+        },
+        "verified_email": {
+          "type": "boolean",
+          "description": "Indicates if the email is verified"
+        },
+        "tags": {
+          "type": "string",
+          "description": "Tags associated with the customer"
+        },
+        "accepts_marketing_updated_at": {
+          "type": "unknown",
+          "description": "Date and time of last update to marketing acceptance"
+        },
+        "orders_count": {
+          "type": "integer",
+          "description": "Number of orders made by the customer"
+        },
+        "default_address": {
+          "type": "object",
+          "description": "Default shipping address of the customer",
+          "properties": {
+            "zip": {
+              "type": "string",
+              "description": "Zip code of the customer's default address"
+            },
+            "country": {
+              "type": "string",
+              "description": "Country of the customer's default address"
+            },
+            "city": {
+              "type": "string",
+              "description": "City of the customer's default address"
+            },
+            "address2": {
+              "type": "string",
+              "description": "Second line of the customer's default address"
+            },
+            "address1": {
+              "type": "string",
+              "description": "First line of the customer's default address"
+            },
+            "last_name": {
+              "type": "string",
+              "description": "Last name of the customer"
+            },
+            "province_code": {
+              "type": "string",
+              "description": "State or province code of the customer's default address"
+            },
+            "country_code": {
+              "type": "string",
+              "description": "Country code of the customer's default address"
+            },
+            "default": {
+              "type": "boolean",
+              "description": "Indicates if it's the default address for the customer"
+            },
+            "province": {
+              "type": "string",
+              "description": "State or province of the customer's default address"
+            },
+            "phone": {
+              "type": "string",
+              "description": "Phone number associated with the default address"
+            },
+            "name": {
+              "type": "string",
+              "description": "Full name associated with the default address"
+            },
+            "country_name": {
+              "type": "string",
+              "description": "Country name of the customer's default address"
+            },
+            "company": {
+              "type": "string",
+              "description": "Company name in the default address"
+            },
+            "id": {
+              "type": "integer",
+              "description": "Address ID"
+            },
+            "customer_id": {
+              "type": "integer",
+              "description": "ID of the customer"
+            },
+            "first_name": {
+              "type": "string",
+              "description": "First name of the customer"
+            }
+          }
+        },
+        "updated_at": {
+          "type": "string",
+          "description": "Date and time of last customer update",
+          "format": "date-time"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number associated with the customer"
+        },
+        "accepts_marketing": {
+          "type": "boolean",
+          "description": "Indicates if the customer accepts marketing"
+        },
+        "admin_graphql_api_id": {
+          "type": "string",
+          "description": "GraphQL ID of the customer"
+        },
+        "tax_exemptions": {
+          "type": "array",
+          "description": "Any tax exemptions applicable to the customer",
+          "items": {
+            "type": "string",
+            "description": "List of tax exemptions"
+          }
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency used for the customer"
+        },
+        "id": {
+          "type": "integer",
+          "description": "ID of the customer"
+        },
+        "state": {
+          "type": "string",
+          "description": "State of the customer"
+        },
+        "first_name": {
+          "type": "string",
+          "description": "First name of the customer"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email of the customer"
+        }
+      }
+    }
+  }
+}

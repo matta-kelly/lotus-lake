@@ -1,0 +1,262 @@
+{
+  "stream": "order_risks",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "assessments": {
+      "type": "array",
+      "description": "The risk assessments for an order.",
+      "items": {
+        "risk_level": {
+          "type": "string",
+          "description": "The likelihood that the order is fraudulent, based on this risk assessment"
+        },
+        "provider": {
+          "type": "object",
+          "description": "The app that provided the assessment, null if the assessment was provided by Shopify",
+          "properties": {
+            "app_store_app_url": {
+              "type": "string",
+              "description": "App store page URL of the app"
+            },
+            "privacy_policy_url": {
+              "type": "string",
+              "description": "Link to app privacy policy"
+            },
+            "previously_installed": {
+              "type": "boolean",
+              "description": "Whether the app was previously installed on the current shop"
+            },
+            "install_url": {
+              "type": "string",
+              "description": "Webpage where you can install the app"
+            },
+            "developer_type": {
+              "type": "string",
+              "description": "The type of app developer"
+            },
+            "public_category": {
+              "type": "string",
+              "description": "The public category for the app"
+            },
+            "developer_name": {
+              "type": "string",
+              "description": "The name of the app developer"
+            },
+            "app_store_developer_url": {
+              "type": "string",
+              "description": "App store page URL of the developer who created the app"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the app"
+            },
+            "pricing_details": {
+              "type": "string",
+              "description": "Detailed information about the app pricing"
+            },
+            "handle": {
+              "type": "string",
+              "description": "Handle of the app"
+            },
+            "published": {
+              "type": "boolean",
+              "description": "Whether the app is published to the Shopify App Store"
+            },
+            "title": {
+              "type": "string",
+              "description": "Name of the app"
+            },
+            "webhook_api_version": {
+              "type": "string",
+              "description": "The webhook API version for the app"
+            },
+            "shopify_developed": {
+              "type": "boolean",
+              "description": "Whether the app was developed by Shopify"
+            },
+            "pricing_details_summary": {
+              "type": "string",
+              "description": "Summary of the app pricing details"
+            },
+            "feedback": {
+              "type": "object",
+              "description": "Feedback from this app about the store",
+              "properties": {
+                "link": {
+                  "type": "object",
+                  "description": "A link to where merchants can resolve errors",
+                  "properties": {
+                    "label": {
+                      "type": "string",
+                      "description": "A context-sensitive label for the link"
+                    },
+                    "url": {
+                      "type": "string",
+                      "description": "The URL that the link visits"
+                    }
+                  }
+                },
+                "messages": {
+                  "type": "array",
+                  "description": "The feedback message presented to the merchant",
+                  "items": {
+                    "field": {
+                      "type": "string",
+                      "description": "The path to the input field that caused the error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "The error message"
+                    }
+                  }
+                }
+              }
+            },
+            "is_post_purchase_app_in_use": {
+              "type": "boolean",
+              "description": "Whether the app is the post purchase app in use"
+            },
+            "features": {
+              "type": "array",
+              "description": "A list of app features that are shown in the Shopify App Store listing.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "failed_requirements": {
+              "type": "array",
+              "description": "Requirements that must be met before the app can be installed",
+              "items": {
+                "action": {
+                  "type": "object",
+                  "description": "Action to be taken to resolve a failed requirement, including URL link",
+                  "properties": {
+                    "action_id": {
+                      "type": "string",
+                      "description": "The unique identifier of the navigation item"
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "The name of the navigation item"
+                    },
+                    "url": {
+                      "type": "string",
+                      "description": "The URL of the page that the navigation item links to"
+                    }
+                  }
+                },
+                "message": {
+                  "type": "string",
+                  "description": "A concise set of copy strings to be displayed to merchants, to guide them in resolving problems your app encounters when trying to make use of their Shop and its resources"
+                }
+              }
+            },
+            "admin_graphql_api_id": {
+              "type": "string",
+              "description": "A globally-unique provider ID"
+            },
+            "uninstall_message": {
+              "type": "string",
+              "description": "Message that appears when the app is uninstalled"
+            },
+            "provider_id": {
+              "type": "integer",
+              "description": "A globally-unique provider ID, represented as integer"
+            },
+            "embedded": {
+              "type": "boolean",
+              "description": "Whether the app uses the Embedded App SDK"
+            }
+          }
+        },
+        "facts": {
+          "type": "array",
+          "description": "Optional facts used to describe the risk assessment",
+          "items": {
+            "sentiment": {
+              "type": "string",
+              "description": "Indicates whether the fact is a negative, neutral or positive contributor with regards to risk"
+            },
+            "description": {
+              "type": "string",
+              "description": "A description of the risk fact"
+            }
+          }
+        }
+      }
+    },
+    "display": {
+      "type": "boolean",
+      "description": "Flag to determine if the risk should be displayed to the merchant."
+    },
+    "recommendation": {
+      "type": "string",
+      "description": "Suggested action to mitigate the risk."
+    },
+    "merchant_message": {
+      "type": "string",
+      "description": "Message shown to the merchant regarding the risk."
+    },
+    "source": {
+      "type": "string",
+      "description": "Source of the risk notification."
+    },
+    "message": {
+      "type": "string",
+      "description": "Description of the risk associated with the order."
+    },
+    "score": {
+      "type": "number",
+      "description": "Numerical score indicating the level of risk."
+    },
+    "checkout_id": {
+      "type": "integer",
+      "description": "The unique identifier of the checkout associated with the order."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the order and the risk was last updated",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "URL of the shop where the order was placed."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The original id reference for the shopify api"
+    },
+    "cause_cancel": {
+      "type": "boolean",
+      "description": "Reason indicating why the order is at risk of cancellation."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Unique identifier for the order risk entry."
+    },
+    "order_id": {
+      "type": "integer",
+      "description": "The identifier of the order to which the risk is related."
+    }
+  }
+}

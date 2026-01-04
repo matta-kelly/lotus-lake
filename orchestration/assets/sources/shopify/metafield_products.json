@@ -1,0 +1,80 @@
+{
+  "stream": "metafield_products",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "value_type": {
+      "type": "string",
+      "description": "A representation of the type of the value (for example, 'string' or 'integer')."
+    },
+    "owner_id": {
+      "type": "integer",
+      "description": "The unique identifier of the resource that owns the metafield."
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time the metafield was created in ISO 8601 format.",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "The description of the metafield, providing additional information."
+    },
+    "type": {
+      "type": "string",
+      "description": "The type of the metafield value, such as 'string', 'integer', 'json_string', etc."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time the metafield was last updated in ISO 8601 format.",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The shop URL where the metafield is associated with."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "A unique identifier for the metafield used in the Shopify Admin GraphQL API."
+    },
+    "namespace": {
+      "type": "string",
+      "description": "The namespace for the metafield, helping to group related metafields together."
+    },
+    "id": {
+      "type": "integer",
+      "description": "A unique identifier for the metafield."
+    },
+    "value": {
+      "type": "string",
+      "description": "The actual value of the metafield based on its type."
+    },
+    "owner_resource": {
+      "type": "string",
+      "description": "The type of resource that owns the metafield, such as 'product' or 'collection'."
+    },
+    "key": {
+      "type": "string",
+      "description": "The key or name that identifies the metafield."
+    }
+  }
+}

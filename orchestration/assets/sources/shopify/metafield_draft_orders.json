@@ -1,0 +1,80 @@
+{
+  "stream": "metafield_draft_orders",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "value_type": {
+      "type": "string",
+      "description": "The data type of the value of the metafield draft order."
+    },
+    "owner_id": {
+      "type": "integer",
+      "description": "The unique identifier of the owner (e.g., shop) associated with the metafield draft order."
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the metafield draft order was created.",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "The textual description of the metafield draft order."
+    },
+    "type": {
+      "type": "string",
+      "description": "The type of the metafield draft order."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the metafield draft order was last updated.",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop to which the metafield draft order belongs."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier of the metafield draft order within the admin GraphQL API."
+    },
+    "namespace": {
+      "type": "string",
+      "description": "The namespace of the metafield draft order."
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the metafield draft order."
+    },
+    "value": {
+      "type": "string",
+      "description": "The value of the metafield draft order."
+    },
+    "owner_resource": {
+      "type": "string",
+      "description": "The type of owner resource (e.g., shop) associated with the metafield draft order."
+    },
+    "key": {
+      "type": "string",
+      "description": "The key associated with the metafield draft order."
+    }
+  }
+}

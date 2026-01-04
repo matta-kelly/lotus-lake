@@ -1,0 +1,631 @@
+{
+  "stream": "fulfillments",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the fulfillment was created.",
+      "format": "date-time"
+    },
+    "origin_address": {
+      "type": "object",
+      "description": "Address information for the origin of the fulfillment",
+      "properties": {
+        "zip": {
+          "type": "string",
+          "description": "The postal/ZIP code of the origin address."
+        },
+        "country_code": {
+          "type": "string",
+          "description": "The country code of the origin address."
+        },
+        "city": {
+          "type": "string",
+          "description": "The city of the origin address."
+        },
+        "address2": {
+          "type": "string",
+          "description": "The second line of the origin address."
+        },
+        "address1": {
+          "type": "string",
+          "description": "The first line of the origin address."
+        },
+        "province_code": {
+          "type": "string",
+          "description": "The province code of the origin address."
+        }
+      }
+    },
+    "line_items": {
+      "type": "array",
+      "description": "Information about line items included in the fulfillment",
+      "items": {
+        "variant_title": {
+          "type": "string",
+          "description": "The title of the variant associated with the line item."
+        },
+        "total_discount": {
+          "type": "string",
+          "description": "The total discount applied to the line item."
+        },
+        "fulfillment_status": {
+          "type": "string",
+          "description": "The status of the fulfillment."
+        },
+        "gift_card": {
+          "type": "boolean",
+          "description": "Indicates if the line item is a gift card."
+        },
+        "requires_shipping": {
+          "type": "boolean",
+          "description": "Indicates if the line item requires shipping."
+        },
+        "fulfillment_line_item_id": {
+          "type": "integer",
+          "description": "The unique identifier of the fulfillment line item."
+        },
+        "total_discount_set": {
+          "type": "object",
+          "description": "Set of total discounts for the line item",
+          "properties": {
+            "shop_money": {
+              "type": "object",
+              "description": "Total discount amount in shop's currency",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "description": "The amount of total discount in the shop currency."
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "The currency code of the total discount amount."
+                }
+              }
+            },
+            "presentment_money": {
+              "type": "object",
+              "description": "Total discount amount in presentment currency",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "description": "The amount of total discount in the presentment currency."
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "The currency code of the total discount amount."
+                }
+              }
+            }
+          }
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the line item."
+        },
+        "product_exists": {
+          "type": "boolean",
+          "description": "Indicates if the product associated with the line item exists."
+        },
+        "variant_id": {
+          "type": "integer",
+          "description": "The unique identifier of the associated variant."
+        },
+        "tax_lines": {
+          "type": "array",
+          "description": "Tax lines related to the line item",
+          "items": {
+            "channel_liable": {
+              "type": "boolean",
+              "description": "Indicates if the channel is liable for the tax."
+            },
+            "rate": {
+              "type": "number",
+              "description": "The tax rate."
+            },
+            "price": {
+              "type": "number",
+              "description": "The price of the tax line."
+            },
+            "title": {
+              "type": "string",
+              "description": "The title of the tax line."
+            },
+            "price_set": {
+              "type": "object",
+              "description": "Set of prices for tax lines",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "The tax line price in the shop currency.",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "description": "The tax line price in the presentment currency.",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "price": {
+          "type": "string",
+          "description": "The price of the line item."
+        },
+        "vendor": {
+          "type": "string",
+          "description": "The vendor of the product associated with the line item."
+        },
+        "product_id": {
+          "type": "integer",
+          "description": "The unique identifier of the associated product."
+        },
+        "id": {
+          "type": "integer",
+          "description": "The unique identifier of the line item."
+        },
+        "sku": {
+          "type": "string",
+          "description": "The SKU of the line item."
+        },
+        "grams": {
+          "type": "number",
+          "description": "The weight of the line item in grams."
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "The quantity of the line item."
+        },
+        "fulfillable_quantity": {
+          "type": "integer",
+          "description": "The quantity that can be fulfilled."
+        },
+        "taxable": {
+          "type": "boolean",
+          "description": "Indicates if the line item is taxable."
+        },
+        "fulfillment_service": {
+          "type": "string",
+          "description": "The service used for fulfillment."
+        },
+        "discount_allocations": {
+          "type": "array",
+          "description": "List of discount allocations associated with the line item",
+          "items": {
+            "amount": {
+              "type": "string",
+              "description": "The amount of discount allocation."
+            },
+            "discount_application_index": {
+              "type": "number",
+              "description": "The index of the discount application."
+            },
+            "application_type": {
+              "type": "string",
+              "description": "The type of discount application."
+            },
+            "created_at": {
+              "type": "string",
+              "description": "The date and time when the discount allocation was created.",
+              "format": "date-time"
+            },
+            "description": {
+              "type": "string",
+              "description": "The description of the discount allocation."
+            },
+            "id": {
+              "type": "string",
+              "description": "The unique identifier of the discount allocation."
+            },
+            "amount_set": {
+              "type": "object",
+              "description": "Set of amounts for discount allocations",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "The discount allocation amount in the shop currency.",
+                  "properties": {
+                    "amount": {
+                      "type": "string"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "description": "The discount allocation amount in the presentment currency.",
+                  "properties": {
+                    "amount": {
+                      "type": "string"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "variant_inventory_management": {
+          "type": "string",
+          "description": "The inventory management method for the variant."
+        },
+        "admin_graphql_api_id": {
+          "type": "string",
+          "description": "The unique identifier of the line item in the Admin GraphQL API."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the line item."
+        },
+        "price_set": {
+          "type": "object",
+          "description": "Set of prices for the line item",
+          "properties": {
+            "shop_money": {
+              "type": "object",
+              "description": "Price in shop's currency",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "description": "The amount of the line item price in the shop currency."
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "The currency code of the line item price."
+                }
+              }
+            },
+            "presentment_money": {
+              "type": "object",
+              "description": "Price in presentment currency",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "description": "The amount of the line item price in the presentment currency."
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "The currency code of the line item price."
+                }
+              }
+            }
+          }
+        },
+        "properties": {
+          "type": "array",
+          "description": "Other properties related to the line item",
+          "items": {
+            "type": "string",
+            "description": "Additional properties associated with the line item."
+          }
+        },
+        "duties": {
+          "type": "array",
+          "description": "Information about duties associated with the line item",
+          "items": {
+            "shop_money": {
+              "type": "object",
+              "description": "Duties amount in shop's currency",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "description": "The amount of duty in the shop currency."
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "The currency code of the duty amount."
+                }
+              }
+            },
+            "presentment_money": {
+              "type": "object",
+              "description": "Duties amount in presentment currency",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "description": "The amount of duty in the presentment currency."
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "The currency code of the duty amount."
+                }
+              }
+            },
+            "tax_lines": {
+              "type": "array",
+              "description": "Tax lines related to duties",
+              "items": {
+                "channel_liable": {
+                  "type": "boolean",
+                  "description": "Indicates if the channel is liable for the tax."
+                },
+                "rate": {
+                  "type": "number",
+                  "description": "The tax rate."
+                },
+                "price": {
+                  "type": "string",
+                  "description": "The price of the tax line."
+                },
+                "title": {
+                  "type": "string",
+                  "description": "The title of the tax line."
+                },
+                "price_set": {
+                  "type": "object",
+                  "description": "Set of prices for tax lines",
+                  "properties": {
+                    "shop_money": {
+                      "type": "object",
+                      "description": "The tax line price in the shop currency.",
+                      "properties": {
+                        "amount": {
+                          "type": "string"
+                        },
+                        "currency_code": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "presentment_money": {
+                      "type": "object",
+                      "description": "The tax line price in the presentment currency.",
+                      "properties": {
+                        "amount": {
+                          "type": "string"
+                        },
+                        "currency_code": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "id": {
+              "type": "string",
+              "description": "The unique identifier of the duty."
+            },
+            "country_code_of_origin": {
+              "type": "string",
+              "description": "The country code of origin for duty calculation."
+            },
+            "harmonized_system_code": {
+              "type": "string",
+              "description": "The harmonized system code for duty calculation."
+            }
+          }
+        }
+      }
+    },
+    "tracking_company": {
+      "type": "string",
+      "description": "The company responsible for tracking the shipment."
+    },
+    "variant_inventory_management": {
+      "type": "string",
+      "description": "The inventory management method for the variant."
+    },
+    "tracking_urls": {
+      "type": "array",
+      "description": "Tracking URLs for tracking the fulfillment",
+      "items": {
+        "type": "string",
+        "description": "List of tracking URLs associated with the shipment."
+      }
+    },
+    "location_id": {
+      "type": "integer",
+      "description": "The location identifier where the fulfillment takes place."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the fulfillment was last updated.",
+      "format": "date-time"
+    },
+    "service": {
+      "type": "string",
+      "description": "The service used for the fulfillment."
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop associated with the fulfillment."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier of the resource in the Admin GraphQL API."
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the fulfillment."
+    },
+    "tracking_number": {
+      "type": "string",
+      "description": "The tracking number of the shipment."
+    },
+    "receipt": {
+      "type": "object",
+      "description": "Receipt details for the fulfillment",
+      "properties": {
+        "authorization": {
+          "type": "string",
+          "description": "The authorization information associated with the fulfillment."
+        },
+        "testcase": {
+          "type": "boolean",
+          "description": "Indicates if the fulfillment is a test case."
+        }
+      }
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the fulfillment."
+    },
+    "tracking_numbers": {
+      "type": "array",
+      "description": "Tracking numbers associated with the fulfillment",
+      "items": {
+        "type": "string",
+        "description": "List of tracking numbers associated with the shipment."
+      }
+    },
+    "order_id": {
+      "type": "integer",
+      "description": "The unique identifier of the order associated with the fulfillment."
+    },
+    "tracking_url": {
+      "type": "string",
+      "description": "The tracking URL of the shipment."
+    },
+    "notify_customer": {
+      "type": "boolean",
+      "description": "Indicates if the customer should be notified about the fulfillment."
+    },
+    "duties": {
+      "type": "array",
+      "description": "Information about duties associated with the fulfillment",
+      "items": {
+        "shop_money": {
+          "type": "object",
+          "description": "Duties amount in shop's currency",
+          "properties": {
+            "amount": {
+              "type": "string",
+              "description": "The amount of duty in the shop currency."
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "The currency code of the duty amount."
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "description": "Duties amount in presentment currency",
+          "properties": {
+            "amount": {
+              "type": "string",
+              "description": "The amount of duty in the presentment currency."
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "The currency code of the duty amount."
+            }
+          }
+        },
+        "tax_lines": {
+          "type": "array",
+          "description": "Tax lines related to duties",
+          "items": {
+            "channel_liable": {
+              "type": "boolean",
+              "description": "Indicates if the channel is liable for the tax."
+            },
+            "rate": {
+              "type": "number",
+              "description": "The tax rate."
+            },
+            "price": {
+              "type": "string",
+              "description": "The price of the tax line."
+            },
+            "title": {
+              "type": "string",
+              "description": "The title of the tax line."
+            },
+            "price_set": {
+              "type": "object",
+              "description": "Set of prices for tax lines",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "The tax line price in the shop currency.",
+                  "properties": {
+                    "amount": {
+                      "type": "string"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "description": "The tax line price in the presentment currency.",
+                  "properties": {
+                    "amount": {
+                      "type": "string"
+                    },
+                    "currency_code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the duty."
+        },
+        "country_code_of_origin": {
+          "type": "string",
+          "description": "The country code of origin for duty calculation."
+        },
+        "harmonized_system_code": {
+          "type": "string",
+          "description": "The harmonized system code for duty calculation."
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "description": "The status of the fulfillment."
+    },
+    "shipment_status": {
+      "type": "string",
+      "description": "The status of the shipment."
+    }
+  }
+}

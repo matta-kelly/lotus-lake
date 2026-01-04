@@ -1,0 +1,308 @@
+{
+  "stream": "transactions",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "created_at"
+    ]
+  },
+  "fields": {
+    "fees": {
+      "type": "array",
+      "description": "The transaction fees charged on the order transaction. Only present for Shopify Payments transactions.",
+      "items": {
+        "tax_amount": {
+          "type": "object",
+          "description": "Amount in the shop currency",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "Amount in the shop currency"
+            },
+            "currency": {
+              "type": "string",
+              "description": "Currency of the shop amount"
+            }
+          }
+        },
+        "amount": {
+          "type": "object",
+          "description": "Amount in the shop currency",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "Amount in the shop currency"
+            },
+            "currency": {
+              "type": "string",
+              "description": "Currency of the shop amount"
+            }
+          }
+        },
+        "rate": {
+          "type": "number",
+          "description": "Percentage charge."
+        },
+        "flat_fee_name": {
+          "type": "string",
+          "description": "Name of the credit card flat fee."
+        },
+        "admin_graphql_api_id": {
+          "type": "string",
+          "description": "Unique identifier for the resource in the GraphQL Admin API"
+        },
+        "id": {
+          "type": "string",
+          "description": "A globally-unique ID."
+        },
+        "type": {
+          "type": "string",
+          "description": "Name of the type of fee."
+        },
+        "flat_fee": {
+          "type": "object",
+          "description": "Amount in the shop currency",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "Amount in the shop currency"
+            },
+            "currency": {
+              "type": "string",
+              "description": "Currency of the shop amount"
+            }
+          }
+        },
+        "rate_name": {
+          "type": "string",
+          "description": "Percentage charge."
+        }
+      }
+    },
+    "payment_details": {
+      "type": "object",
+      "description": "Details of the payment transaction",
+      "properties": {
+        "credit_card_wallet": {
+          "type": "string",
+          "description": "Information about the digital wallet used for payment"
+        },
+        "credit_card_number": {
+          "type": "string",
+          "description": "Full credit card number"
+        },
+        "avs_result_code": {
+          "type": "string",
+          "description": "Code indicating the AVS (Address Verification Service) result"
+        },
+        "buyer_action_info": {
+          "type": "string",
+          "description": "Information about any buyer actions associated with the payment"
+        },
+        "credit_card_expiration_year": {
+          "type": "integer",
+          "description": "Expiration year of the credit card"
+        },
+        "credit_card_expiration_month": {
+          "type": "integer",
+          "description": "Expiration month of the credit card"
+        },
+        "cvv_result_code": {
+          "type": "string",
+          "description": "Code indicating the CVV (Card Verification Value) result"
+        },
+        "credit_card_bin": {
+          "type": "string",
+          "description": "First few digits of the credit card number"
+        },
+        "credit_card_name": {
+          "type": "string",
+          "description": "Name on the credit card"
+        },
+        "credit_card_company": {
+          "type": "string",
+          "description": "Name of the credit card company"
+        }
+      }
+    },
+    "formattedGateway": {
+      "type": "string",
+      "description": "The human-readable payment gateway name used to process the transaction."
+    },
+    "created_at": {
+      "type": "string",
+      "description": "Date and time when the transaction was created",
+      "format": "date-time"
+    },
+    "location_id": {
+      "type": "integer",
+      "description": "ID of the location where the transaction took place"
+    },
+    "authorization": {
+      "type": "string",
+      "description": "Authorization code for the transaction"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "URL of the shop where the transaction occurred"
+    },
+    "payment_id": {
+      "type": "string",
+      "description": "ID of the payment associated with the transaction"
+    },
+    "processed_at": {
+      "type": "string",
+      "description": "Date and time when the transaction was processed",
+      "format": "date-time"
+    },
+    "total_unsettled_set": {
+      "type": "object",
+      "description": "Total unsettled amount of the transaction",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "description": "Amount in the shop currency",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "Amount in the shop currency"
+            },
+            "currency": {
+              "type": "string",
+              "description": "Currency of the shop amount"
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "Currency code of the shop amount"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "description": "Amount in the presentment currency",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "Amount in the currency for presentation purposes"
+            },
+            "currency": {
+              "type": "string",
+              "description": "Currency of the presentment amount"
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "Currency code of the presentment amount"
+            }
+          }
+        }
+      }
+    },
+    "currency": {
+      "type": "string",
+      "description": "Currency of the transaction"
+    },
+    "id": {
+      "type": "integer",
+      "description": "Unique identifier of the transaction"
+    },
+    "source_name": {
+      "type": "string",
+      "description": "Name of the source that initiated the transaction"
+    },
+    "amount": {
+      "type": "number",
+      "description": "The amount of the transaction"
+    },
+    "test": {
+      "type": "boolean",
+      "description": "Flag to indicate if the transaction is a test transaction"
+    },
+    "device_id": {
+      "type": "integer",
+      "description": "ID of the device used to process the transaction"
+    },
+    "kind": {
+      "type": "string",
+      "description": "Type of transaction"
+    },
+    "message": {
+      "type": "string",
+      "description": "Additional message or notes regarding the transaction"
+    },
+    "amount_set": {
+      "type": "object",
+      "description": "The amount and currency of the transaction in shop",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "description": "Amount in the shop currency",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "Amount in the shop currency"
+            },
+            "currency": {
+              "type": "string",
+              "description": "Currency of the shop amount"
+            }
+          }
+        }
+      }
+    },
+    "accountNumber": {
+      "type": "integer",
+      "description": "The masked account number associated with the payment method."
+    },
+    "manuallyCapturable": {
+      "type": "boolean",
+      "description": "Whether the transaction can be manually captured."
+    },
+    "user_id": {
+      "type": "integer",
+      "description": "ID of the user associated with the transaction"
+    },
+    "parent_id": {
+      "type": "integer",
+      "description": "ID of the parent transaction if applicable"
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "Unique identifier for the resource in the GraphQL Admin API"
+    },
+    "receipt": {
+      "type": "unknown",
+      "description": "Receipt information related to the transaction"
+    },
+    "error_code": {
+      "type": "string",
+      "description": "Error code associated with the transaction"
+    },
+    "order_id": {
+      "type": "integer",
+      "description": "ID of the order associated with the transaction"
+    },
+    "gateway": {
+      "type": "string",
+      "description": "Payment gateway used for the transaction"
+    },
+    "status": {
+      "type": "string",
+      "description": "Status of the transaction"
+    }
+  }
+}

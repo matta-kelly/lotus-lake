@@ -16,7 +16,7 @@ releases:
     createNamespace: true
     chart: minio/minio
     values:
-      - minio/values.yaml
+      - infrastructure/minio/values.yaml
       - rootUser: {{ requiredEnv "TF_VAR_minio_user" }}
         rootPassword: {{ requiredEnv "TF_VAR_minio_password" }}
 
@@ -26,21 +26,21 @@ releases:
     chart: trino/trino
     version: "1.41.0"
     values:
-      - trino/values.yaml.gotmpl
+      - infrastructure/trino/values.yaml.gotmpl
 
   - name: airbyte
     namespace: airbyte
     createNamespace: true
     chart: airbyte-v2/airbyte
     values:
-      - airbyte/values.yaml
+      - orchestration/resources/airbyte/values.yaml
 
   - name: nessie-postgres
     namespace: nessie
     createNamespace: true
     chart: bitnami/postgresql
     values:
-      - nessie/postgres-values.yaml.gotmpl
+      - infrastructure/nessie/postgres-values.yaml.gotmpl
 
   - name: nessie
     namespace: nessie
@@ -60,4 +60,4 @@ releases:
               --from-literal=postgres_password={{ requiredEnv "TF_VAR_nessie_db_password" }} \
               --dry-run=client -o yaml | kubectl apply -f -
     values:
-      - nessie/values.yaml
+      - infrastructure/nessie/values.yaml

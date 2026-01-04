@@ -1,0 +1,12 @@
+lotus_lake:
+  target: dev
+  outputs:
+    dev:
+      type: trino
+      method: none
+      host: localhost
+      port: 8081
+      user: trino
+      catalog: iceberg
+      schema: dev
+      threads: 4

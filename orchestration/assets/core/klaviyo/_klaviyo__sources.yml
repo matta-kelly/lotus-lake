@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: klaviyo
+    database: iceberg
+    schema: klaviyo
+    tables:
+      - name: profiles
+      - name: events
+      - name: campaigns
+      - name: flows
+      - name: metrics
+      - name: lists

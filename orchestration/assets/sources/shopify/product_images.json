@@ -1,0 +1,79 @@
+{
+  "stream": "product_images",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "updated_at": {
+      "type": "string",
+      "description": "Date and time when the image was last updated",
+      "format": "date-time"
+    },
+    "src": {
+      "type": "string",
+      "description": "URL of the image"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "URL of the shop where the image is hosted"
+    },
+    "product_id": {
+      "type": "integer",
+      "description": "Unique identifier of the product associated with the image"
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "Unique identifier for the image in the Admin GraphQL API"
+    },
+    "alt": {
+      "type": "string",
+      "description": "Alternative text description of the image for accessibility"
+    },
+    "width": {
+      "type": "integer",
+      "description": "Width of the image in pixels"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "Date and time when the image was created",
+      "format": "date-time"
+    },
+    "variant_ids": {
+      "type": "array",
+      "description": "Array of unique identifiers for the product variants associated with the image",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "id": {
+      "type": "integer",
+      "description": "Unique identifier for the image"
+    },
+    "position": {
+      "type": "integer",
+      "description": "Position order of the image relative to other images of the same product"
+    },
+    "height": {
+      "type": "integer",
+      "description": "Height of the image in pixels"
+    }
+  }
+}

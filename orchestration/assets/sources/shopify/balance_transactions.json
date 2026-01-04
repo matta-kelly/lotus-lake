@@ -1,0 +1,87 @@
+{
+  "stream": "balance_transactions",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "id"
+    ]
+  },
+  "fields": {
+    "amount": {
+      "type": "number",
+      "description": "The amount of the transaction in the specified currency."
+    },
+    "test": {
+      "type": "boolean",
+      "description": "Flag indicating if the transaction is a test transaction."
+    },
+    "fee": {
+      "type": "number",
+      "description": "The fee associated with the transaction."
+    },
+    "source_type": {
+      "type": "string",
+      "description": "The type of source for the transaction."
+    },
+    "source_order_id": {
+      "type": "integer",
+      "description": "The identifier of the order related to the transaction."
+    },
+    "payoucurrencyt_status": {
+      "type": "string",
+      "description": "Indicates the status of the payout for the currency in which the transaction occurred."
+    },
+    "type": {
+      "type": "string",
+      "description": "The type of transaction."
+    },
+    "payout_id": {
+      "type": "integer",
+      "description": "The identifier of the associated payout."
+    },
+    "payout_status": {
+      "type": "string",
+      "description": "The status of the payout associated with this transaction."
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop related to the transaction."
+    },
+    "processed_at": {
+      "type": "string",
+      "description": "The date and time when the transaction was processed.",
+      "format": "date-time"
+    },
+    "source_order_transaction_id": {
+      "type": "integer",
+      "description": "The transaction identifier within the order."
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the balance transaction."
+    },
+    "source_id": {
+      "type": "integer",
+      "description": "The identifier of the source related to the transaction."
+    },
+    "net": {
+      "type": "number",
+      "description": "The final amount received after deducting fees."
+    }
+  }
+}

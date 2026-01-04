@@ -1,0 +1,80 @@
+{
+  "stream": "metafield_articles",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "value_type": {
+      "type": "string",
+      "description": "The type of value stored in the metafield (e.g., single, array)"
+    },
+    "owner_id": {
+      "type": "integer",
+      "description": "The unique identifier of the resource that owns the metafield"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the metafield was created",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "The description or details of the metafield"
+    },
+    "type": {
+      "type": "string",
+      "description": "The data type of the metafield's value (e.g., string, integer)"
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the metafield was last updated",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop linked to the metafield"
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier of the metafield in the GraphQL Admin API"
+    },
+    "namespace": {
+      "type": "string",
+      "description": "The namespace under which the metafield is defined"
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the metafield"
+    },
+    "value": {
+      "type": "string",
+      "description": "The actual value stored in the metafield"
+    },
+    "owner_resource": {
+      "type": "string",
+      "description": "The type or resource that owns the metafield (e.g., Article, Product)"
+    },
+    "key": {
+      "type": "string",
+      "description": "The key or identifier used to access the metafield"
+    }
+  }
+}

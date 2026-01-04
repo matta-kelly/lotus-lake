@@ -1,0 +1,104 @@
+{
+  "stream": "inventory_levels",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "deactivation_alert": {
+      "type": "string",
+      "description": "Describes either the impact of deactivating the inventory level, or why the inventory level can't be deactivated."
+    },
+    "available": {
+      "type": "integer",
+      "description": "The quantity of items available for sale in the inventory."
+    },
+    "quantities": {
+      "type": "array",
+      "description": "The quantities of items available for sale in the inventory.",
+      "items": {
+        "quantity": {
+          "type": "integer"
+        },
+        "admin_graphql_api_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the inventory level was created.",
+      "format": "date-time"
+    },
+    "location_id": {
+      "type": "integer",
+      "description": "The unique identifier for the location related to the inventory level."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the inventory level was last updated.",
+      "format": "date-time"
+    },
+    "inventory_history_url": {
+      "type": "string",
+      "description": "The URL that points to the inventory history for the item."
+    },
+    "inventory_item_id": {
+      "type": "integer",
+      "description": "The unique identifier for the associated inventory item."
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop where the inventory belongs."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier for the inventory levels in GraphQL format."
+    },
+    "can_deactivate": {
+      "type": "boolean",
+      "description": "Whether the inventory items associated with the inventory level can be deactivated."
+    },
+    "locations_count": {
+      "type": "object",
+      "description": "The number of locations where this inventory item is stocked.",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "description": "The count of elements."
+        }
+      }
+    },
+    "id": {
+      "type": "string",
+      "description": "The unique identifier for the inventory level."
+    }
+  }
+}

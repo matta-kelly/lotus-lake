@@ -1,0 +1,78 @@
+{
+  "stream": "disputes",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "id"
+    ]
+  },
+  "fields": {
+    "reason": {
+      "type": "string",
+      "description": "The reason provided for the dispute"
+    },
+    "amount": {
+      "type": "string",
+      "description": "The disputed amount in the currency specified"
+    },
+    "evidence_due_by": {
+      "type": "string",
+      "description": "The date by which evidence needs to be submitted for the dispute",
+      "format": "date-time"
+    },
+    "finalized_on": {
+      "type": "string",
+      "description": "The date when the dispute was finalized",
+      "format": "date-time"
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency in which the dispute amount is represented"
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the dispute"
+    },
+    "type": {
+      "type": "string",
+      "description": "The type of dispute (e.g., chargeback, refund request)"
+    },
+    "initiated_at": {
+      "type": "string",
+      "description": "The date and time when the dispute was initiated",
+      "format": "date-time"
+    },
+    "order_id": {
+      "type": "integer",
+      "description": "The identifier of the order associated with the dispute"
+    },
+    "network_reason_code": {
+      "type": "string",
+      "description": "The reason code provided by the network for the dispute"
+    },
+    "status": {
+      "type": "string",
+      "description": "The current status of the dispute"
+    },
+    "evidence_sent_on": {
+      "type": "string",
+      "description": "The date when evidence was sent for the dispute",
+      "format": "date-time"
+    }
+  }
+}

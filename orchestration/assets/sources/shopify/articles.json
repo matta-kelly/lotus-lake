@@ -1,0 +1,102 @@
+{
+  "stream": "articles",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "id"
+    ]
+  },
+  "fields": {
+    "blog_id": {
+      "type": "integer",
+      "description": "The unique identifier of the blog to which the article belongs"
+    },
+    "body_html": {
+      "type": "string",
+      "description": "The HTML content of the article body"
+    },
+    "deleted_message": {
+      "type": "string",
+      "description": "Message related to the deletion of the article"
+    },
+    "author": {
+      "type": "string",
+      "description": "The name of the author of the article"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the article was created",
+      "format": "date-time"
+    },
+    "handle": {
+      "type": "string",
+      "description": "The unique URL path segment for the article"
+    },
+    "title": {
+      "type": "string",
+      "description": "The title of the article"
+    },
+    "deleted_at": {
+      "type": "string",
+      "description": "The date and time when the article was deleted",
+      "format": "date-time"
+    },
+    "tags": {
+      "type": "string",
+      "description": "Tags associated with the article"
+    },
+    "template_suffix": {
+      "type": "string",
+      "description": "The suffix of the template used for the article"
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the article was last updated",
+      "format": "date-time"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "The unique identifier of the user who created the article"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop where the article is published"
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier of the article in the GraphQL Admin API"
+    },
+    "deleted_description": {
+      "type": "string",
+      "description": "Description of the reason for article deletion"
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the article"
+    },
+    "published_at": {
+      "type": "string",
+      "description": "The date and time when the article was published",
+      "format": "date-time"
+    },
+    "summary_html": {
+      "type": "string",
+      "description": "A summary or excerpt of the article content in HTML format"
+    }
+  }
+}

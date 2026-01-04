@@ -1,0 +1,230 @@
+{
+  "stream": "campaigns",
+  "sync_mode": "incremental",
+  "destination_sync_mode": "append_dedup",
+  "backfill": false,
+  "primary_key": [
+    [
+      "id"
+    ]
+  ],
+  "cursor_field": [
+    "updated_at"
+  ],
+  "selected": true,
+  "fields": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "type": "string"
+        }
+      }
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "archived": {
+          "type": "boolean"
+        },
+        "audiences": {
+          "type": "object",
+          "properties": {
+            "excluded": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "included": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "send_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "scheduled_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "send_options": {
+          "type": "object",
+          "properties": {
+            "use_smart_sending": {
+              "type": "boolean"
+            },
+            "ignore_unsubscribes": {
+              "type": "boolean"
+            }
+          }
+        },
+        "send_strategy": {
+          "type": "object",
+          "properties": {
+            "method": {
+              "type": "string"
+            },
+            "options_sto": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                }
+              }
+            },
+            "options_static": {
+              "type": "object",
+              "properties": {
+                "datetime": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "is_local": {
+                  "type": "boolean"
+                },
+                "send_past_recipients_immediately": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "options_throttled": {
+              "type": "object",
+              "properties": {
+                "datetime": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "throttle_percentage": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tracking_options": {
+          "type": "object",
+          "properties": {
+            "is_add_utm": {
+              "type": "boolean"
+            },
+            "utm_params": {
+              "type": "array",
+              "items": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            },
+            "is_tracking_opens": {
+              "type": "boolean"
+            },
+            "is_tracking_clicks": {
+              "type": "boolean"
+            },
+            "add_tracking_params": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "links": {
+              "type": "object",
+              "properties": {
+                "self": {
+                  "type": "string"
+                },
+                "related": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "campaign-messages": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "links": {
+              "type": "object",
+              "properties": {
+                "self": {
+                  "type": "string"
+                },
+                "related": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

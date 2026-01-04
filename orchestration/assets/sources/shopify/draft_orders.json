@@ -1,0 +1,707 @@
+{
+  "stream": "draft_orders",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "note": {
+      "type": "string",
+      "description": "Additional notes or comments related to the draft order"
+    },
+    "applied_discount": {
+      "type": "object",
+      "description": "Details of any discount applied to the draft order",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "The amount of the discount applied"
+        },
+        "value_type": {
+          "type": "string",
+          "description": "Type of the value in the discount"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the discount applied"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the discount"
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the discount"
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "description": "Timestamp when the draft order was created",
+      "format": "date-time"
+    },
+    "billing_address": {
+      "type": "object",
+      "description": "The billing address associated with the draft order",
+      "properties": {
+        "zip": {
+          "type": "string",
+          "description": "ZIP or postal code of the billing address"
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of the billing address"
+        },
+        "city": {
+          "type": "string",
+          "description": "City of the billing address"
+        },
+        "address2": {
+          "type": "string",
+          "description": "Second line of the billing address"
+        },
+        "address1": {
+          "type": "string",
+          "description": "First line of the billing address"
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude coordinate of the billing address"
+        },
+        "last_name": {
+          "type": "string",
+          "description": "Last name in the billing address"
+        },
+        "province_code": {
+          "type": "string",
+          "description": "Province code of the billing address"
+        },
+        "country_code": {
+          "type": "string",
+          "description": "Country code of the billing address"
+        },
+        "province": {
+          "type": "string",
+          "description": "Province of the billing address"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number associated with the billing address"
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name in the billing address"
+        },
+        "company": {
+          "type": "string",
+          "description": "Company name in the billing address"
+        },
+        "first_name": {
+          "type": "string",
+          "description": "First name in the billing address"
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude coordinate of the billing address"
+        }
+      }
+    },
+    "line_items": {
+      "type": "array",
+      "description": "Items included in the draft order",
+      "items": {
+        "variant_title": {
+          "type": "string",
+          "description": "Title of the variant associated with the line item"
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "Quantity of the line item"
+        },
+        "taxable": {
+          "type": "boolean",
+          "description": "Indicates if the line item is taxable"
+        },
+        "gift_card": {
+          "type": "boolean",
+          "description": "Indicates if the line item is a gift card"
+        },
+        "applied_discount": {
+          "type": "object",
+          "description": "Details of any discount applied to the line item",
+          "properties": {
+            "amount": {
+              "type": "string",
+              "description": "The amount of the discount applied to the line item"
+            },
+            "value_type": {
+              "type": "string",
+              "description": "Type of the value in the discount applied to the line item"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the discount applied to the line item"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the discount applied to the line item"
+            },
+            "value": {
+              "type": "string",
+              "description": "The value of the discount applied to the line item"
+            }
+          }
+        },
+        "fulfillment_service": {
+          "type": "string",
+          "description": "Service used for fulfillment of the line item"
+        },
+        "requires_shipping": {
+          "type": "boolean",
+          "description": "Indicates if the line item requires shipping"
+        },
+        "custom": {
+          "type": "boolean",
+          "description": "Custom information related to the line item"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the line item"
+        },
+        "variant_id": {
+          "type": "integer",
+          "description": "Unique identifier of the variant associated with the line item"
+        },
+        "tax_lines": {
+          "type": "array",
+          "description": "Tax information related to the line item",
+          "items": {
+            "rate": {
+              "type": "number",
+              "description": "Tax rate applied"
+            },
+            "price": {
+              "type": "number",
+              "description": "Amount of tax for the line item"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the tax"
+            },
+            "price_set": {
+              "type": "object",
+              "description": "Information about the price set for tax",
+              "properties": {
+                "shop_money": {
+                  "type": "object",
+                  "description": "Money information in the shop's currency",
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "description": "Amount of money"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code"
+                    }
+                  }
+                },
+                "presentment_money": {
+                  "type": "object",
+                  "description": "Money information in the presentment currency",
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "description": "Amount of money"
+                    },
+                    "currency_code": {
+                      "type": "string",
+                      "description": "Currency code"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the line item"
+        },
+        "vendor": {
+          "type": "string",
+          "description": "Vendor of the product associated with the line item"
+        },
+        "product_id": {
+          "type": "integer",
+          "description": "Unique identifier of the product associated with the line item"
+        },
+        "admin_graphql_api_id": {
+          "type": "string",
+          "description": "The unique identifier of the line item in the Shopify Admin GraphQL API"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the line item"
+        },
+        "id": {
+          "type": "integer",
+          "description": "Unique identifier of the line item"
+        },
+        "sku": {
+          "type": "string",
+          "description": "Stock Keeping Unit (SKU) of the line item"
+        },
+        "grams": {
+          "type": "number",
+          "description": "Weight in grams of the line item"
+        },
+        "properties": {
+          "type": "array",
+          "description": "Additional properties associated with the line item",
+          "items": {
+            "name": {
+              "type": "string",
+              "description": "Name of the property"
+            },
+            "value": {
+              "type": "string",
+              "description": "Value of the property"
+            }
+          }
+        }
+      }
+    },
+    "taxes_included": {
+      "type": "boolean",
+      "description": "Indicates if taxes are included in the prices"
+    },
+    "payment_terms": {
+      "type": "string",
+      "description": "Terms of payment for the draft order"
+    },
+    "po_number": {
+      "type": "string",
+      "description": "Purchase order number associated with the draft order"
+    },
+    "tax_lines": {
+      "type": "array",
+      "description": "Tax information related to the draft order",
+      "items": {
+        "rate": {
+          "type": "number",
+          "description": "Tax rate applied"
+        },
+        "price": {
+          "type": "number",
+          "description": "Amount of tax for the draft order"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the tax"
+        },
+        "price_set": {
+          "type": "object",
+          "description": "Information about the price set for tax",
+          "properties": {
+            "shop_money": {
+              "type": "object",
+              "description": "Money information in the shop's currency",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "description": "Amount of money"
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "Currency code"
+                }
+              }
+            },
+            "presentment_money": {
+              "type": "object",
+              "description": "Money information in the presentment currency",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "description": "Amount of money"
+                },
+                "currency_code": {
+                  "type": "string",
+                  "description": "Currency code"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "Timestamp when the draft order was last updated",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "URL of the shop related to the draft order"
+    },
+    "currency": {
+      "type": "string",
+      "description": "Currency used for the draft order"
+    },
+    "id": {
+      "type": "integer",
+      "description": "Unique identifier of the draft order"
+    },
+    "shipping_address": {
+      "type": "object",
+      "description": "The shipping address associated with the draft order",
+      "properties": {
+        "zip": {
+          "type": "string",
+          "description": "ZIP or postal code of the shipping address"
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of the shipping address"
+        },
+        "city": {
+          "type": "string",
+          "description": "City of the shipping address"
+        },
+        "address2": {
+          "type": "string",
+          "description": "Second line of the shipping address"
+        },
+        "address1": {
+          "type": "string",
+          "description": "First line of the shipping address"
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude coordinate of the shipping address"
+        },
+        "last_name": {
+          "type": "string",
+          "description": "Last name in the shipping address"
+        },
+        "province_code": {
+          "type": "string",
+          "description": "Province code of the shipping address"
+        },
+        "country_code": {
+          "type": "string",
+          "description": "Country code of the shipping address"
+        },
+        "province": {
+          "type": "string",
+          "description": "Province of the shipping address"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number associated with the shipping address"
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name in the shipping address"
+        },
+        "company": {
+          "type": "string",
+          "description": "Company name in the shipping address"
+        },
+        "first_name": {
+          "type": "string",
+          "description": "First name in the shipping address"
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude coordinate of the shipping address"
+        }
+      }
+    },
+    "email": {
+      "type": "string",
+      "description": "Email address associated with the draft order"
+    },
+    "subtotal_price": {
+      "type": "string",
+      "description": "Subtotal price of the draft order"
+    },
+    "total_price": {
+      "type": "string",
+      "description": "Total price of the draft order"
+    },
+    "tax_exempt": {
+      "type": "boolean",
+      "description": "Indicates if the draft order is tax exempt"
+    },
+    "total_tax": {
+      "type": "string",
+      "description": "Total tax amount for the draft order"
+    },
+    "invoice_sent_at": {
+      "type": "string",
+      "description": "Timestamp when the invoice was sent",
+      "format": "date-time"
+    },
+    "tags": {
+      "type": "string",
+      "description": "Tags associated with the draft order"
+    },
+    "completed_at": {
+      "type": "string",
+      "description": "Timestamp when the draft order was completed",
+      "format": "date-time"
+    },
+    "note_attributes": {
+      "type": "array",
+      "description": "Additional attributes or notes associated with the draft order",
+      "items": {
+        "name": {
+          "type": "string",
+          "description": "Name of the attribute or note"
+        },
+        "value": {
+          "type": "string",
+          "description": "Value of the attribute or note"
+        }
+      }
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier of the draft order in the Shopify Admin GraphQL API"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the draft order"
+    },
+    "shipping_line": {
+      "type": "object",
+      "description": "Details of the shipping service and cost associated with the draft order",
+      "properties": {
+        "price": {
+          "type": "number",
+          "description": "Price of the shipping service"
+        },
+        "custom": {
+          "type": "boolean",
+          "description": "Custom information related to the shipping line"
+        },
+        "handle": {
+          "type": "string",
+          "description": "Identifier for the shipping line"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the shipping service"
+        }
+      }
+    },
+    "order_id": {
+      "type": "integer",
+      "description": "Unique identifier of the order associated with the draft order"
+    },
+    "invoice_url": {
+      "type": "string",
+      "description": "URL for the invoice related to the draft order"
+    },
+    "status": {
+      "type": "string",
+      "description": "Status of the draft order"
+    },
+    "customer": {
+      "type": "object",
+      "description": "Details of the customer associated with the draft order",
+      "properties": {
+        "total_spent": {
+          "type": "number",
+          "description": "Total amount spent by the customer"
+        },
+        "note": {
+          "type": "string",
+          "description": "Notes or comments about the customer"
+        },
+        "last_order_name": {
+          "type": "string",
+          "description": "Name of the last order made by the customer"
+        },
+        "last_order_id": {
+          "type": "integer",
+          "description": "Unique identifier of the last order made by the customer"
+        },
+        "tax_exempt": {
+          "type": "boolean",
+          "description": "Indicates if the customer is tax exempt"
+        },
+        "last_name": {
+          "type": "string",
+          "description": "Last name of the customer"
+        },
+        "created_at": {
+          "type": "string",
+          "description": "Timestamp when the customer was created",
+          "format": "date-time"
+        },
+        "multipass_identifier": {
+          "type": "string",
+          "description": "Multipass identifier associated with the customer"
+        },
+        "verified_email": {
+          "type": "boolean",
+          "description": "Indicates if the email address of the customer is verified"
+        },
+        "tags": {
+          "type": "string",
+          "description": "Tags associated with the customer"
+        },
+        "accepts_marketing_updated_at": {
+          "type": "string",
+          "description": "Timestamp when marketing acceptance was last updated"
+        },
+        "orders_count": {
+          "type": "integer",
+          "description": "Total number of orders made by the customer"
+        },
+        "default_address": {
+          "type": "object",
+          "description": "Default address of the customer",
+          "properties": {
+            "zip": {
+              "type": "string",
+              "description": "ZIP or postal code of the default address"
+            },
+            "country": {
+              "type": "string",
+              "description": "Country of the default address"
+            },
+            "city": {
+              "type": "string",
+              "description": "City of the default address"
+            },
+            "address2": {
+              "type": "string",
+              "description": "Second line of the default address"
+            },
+            "address1": {
+              "type": "string",
+              "description": "First line of the default address"
+            },
+            "last_name": {
+              "type": "string",
+              "description": "Last name in the default address"
+            },
+            "province_code": {
+              "type": "string",
+              "description": "Province code of the default address"
+            },
+            "country_code": {
+              "type": "string",
+              "description": "Country code of the default address"
+            },
+            "default": {
+              "type": "boolean",
+              "description": "Indicates if this is the default address for the customer"
+            },
+            "province": {
+              "type": "string",
+              "description": "Province of the default address"
+            },
+            "phone": {
+              "type": "string",
+              "description": "Phone number associated with the default address"
+            },
+            "name": {
+              "type": "string",
+              "description": "Full name in the default address"
+            },
+            "country_name": {
+              "type": "string",
+              "description": "Name of the country in the default address"
+            },
+            "company": {
+              "type": "string",
+              "description": "Company name in the default address"
+            },
+            "id": {
+              "type": "integer",
+              "description": "Unique identifier of the default address"
+            },
+            "customer_id": {
+              "type": "integer",
+              "description": "The unique identifier of the customer associated with the address"
+            },
+            "first_name": {
+              "type": "string",
+              "description": "First name in the default address"
+            }
+          }
+        },
+        "updated_at": {
+          "type": "string",
+          "description": "Timestamp when the customer record was last updated",
+          "format": "date-time"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number associated with the customer"
+        },
+        "accepts_marketing": {
+          "type": "boolean",
+          "description": "Indicates if the customer accepts marketing"
+        },
+        "admin_graphql_api_id": {
+          "type": "string",
+          "description": "The unique identifier of the customer in the Shopify Admin GraphQL API"
+        },
+        "tax_exemptions": {
+          "type": "array",
+          "description": "List of tax exemptions for the customer",
+          "items": {
+            "type": "string"
+          }
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency used for the customer"
+        },
+        "id": {
+          "type": "integer",
+          "description": "Unique identifier of the customer"
+        },
+        "state": {
+          "type": "string",
+          "description": "State of the customer"
+        },
+        "marketing_opt_in_level": {
+          "type": "string",
+          "description": "Level of marketing opt-in for the customer"
+        },
+        "first_name": {
+          "type": "string",
+          "description": "First name of the customer"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the customer"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "stream": "metafield_shops",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "value_type": {
+      "type": "string",
+      "description": "The data type of the value stored in the metafield."
+    },
+    "owner_id": {
+      "type": "integer",
+      "description": "The unique identifier of the owner resource linked to this metafield."
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the metafield was created.",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "The additional information about the metafield."
+    },
+    "type": {
+      "type": "string",
+      "description": "The type of data stored in the metafield."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the metafield was last updated.",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop to which the metafield is associated."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier for the admin GraphQL API of the shop."
+    },
+    "namespace": {
+      "type": "string",
+      "description": "The namespace to which the metafield belongs."
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier for the metafield."
+    },
+    "value": {
+      "type": "string",
+      "description": "The actual value stored in the metafield."
+    },
+    "owner_resource": {
+      "type": "string",
+      "description": "The type of resource that owns the metafield."
+    },
+    "key": {
+      "type": "string",
+      "description": "The key that identifies the metafield."
+    }
+  }
+}

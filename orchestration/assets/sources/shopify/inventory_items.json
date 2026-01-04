@@ -1,0 +1,91 @@
+{
+  "stream": "inventory_items",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "cost": {
+      "type": "number",
+      "description": "The cost of the inventory item"
+    },
+    "requires_shipping": {
+      "type": "boolean",
+      "description": "Flag indicating if the inventory item requires shipping"
+    },
+    "duplicate_sku_count": {
+      "type": "integer",
+      "description": "The number of inventory items that share the same SKU with this item"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the inventory item was created",
+      "format": "date-time"
+    },
+    "tracked": {
+      "type": "boolean",
+      "description": "Flag indicating if the inventory item is tracked"
+    },
+    "currency_code": {
+      "type": "string",
+      "description": "Currency of the money"
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the inventory item was last updated",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop where the inventory item belongs"
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier for the inventory item in the admin GraphQL API"
+    },
+    "province_code_of_origin": {
+      "type": "string",
+      "description": "The province code indicating the origin of the inventory item"
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the inventory item"
+    },
+    "country_code_of_origin": {
+      "type": "string",
+      "description": "The country code indicating the origin of the inventory item"
+    },
+    "sku": {
+      "type": "string",
+      "description": "The stock keeping unit (SKU) of the inventory item"
+    },
+    "harmonized_system_code": {
+      "type": "string",
+      "description": "The harmonized system code for the inventory item"
+    },
+    "country_harmonized_system_codes": {
+      "type": "array",
+      "description": "The harmonized system codes associated with the inventory item",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

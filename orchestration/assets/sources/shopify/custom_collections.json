@@ -1,0 +1,112 @@
+{
+  "stream": "custom_collections",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "image": {
+      "type": "object",
+      "description": "Represents the image associated with the custom collection if available.",
+      "properties": {
+        "src": {
+          "type": "string",
+          "description": "The URL of the image."
+        },
+        "alt": {
+          "type": "string",
+          "description": "The alternative text description of the image."
+        },
+        "width": {
+          "type": "integer",
+          "description": "The width of the image in pixels."
+        },
+        "created_at": {
+          "type": "string",
+          "description": "The date and time when the image was created.",
+          "format": "date-time"
+        },
+        "height": {
+          "type": "integer",
+          "description": "The height of the image in pixels."
+        }
+      }
+    },
+    "body_html": {
+      "type": "string",
+      "description": "The full description of the custom collection for display purposes."
+    },
+    "deleted_message": {
+      "type": "string",
+      "description": "Any additional message related to the deletion of the custom collection."
+    },
+    "handle": {
+      "type": "string",
+      "description": "The unique URL-friendly string that identifies the custom collection."
+    },
+    "title": {
+      "type": "string",
+      "description": "The title of the custom collection."
+    },
+    "deleted_at": {
+      "type": "string",
+      "description": "The date and time when the custom collection was deleted.",
+      "format": "date-time"
+    },
+    "published_scope": {
+      "type": "string",
+      "description": "The scope where the custom collection is published (global or web)."
+    },
+    "template_suffix": {
+      "type": "string",
+      "description": "The template suffix for the custom collection's URL."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the custom collection was last updated.",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop where the custom collection belongs."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier of the custom collection accessible via GraphQL Admin API."
+    },
+    "deleted_description": {
+      "type": "string",
+      "description": "The description of why the custom collection was deleted."
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the custom collection."
+    },
+    "published_at": {
+      "type": "string",
+      "description": "The date and time when the custom collection was published.",
+      "format": "date-time"
+    },
+    "sort_order": {
+      "type": "string",
+      "description": "The order in which the custom collection should be displayed."
+    }
+  }
+}

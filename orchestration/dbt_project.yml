@@ -1,0 +1,18 @@
+name: 'lotus_lake'
+version: '1.0.0'
+
+profile: 'lotus_lake'
+
+model-paths: ["assets/core/shopify", "assets/core/klaviyo", "assets/marts/sales"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Models use inline config() for tags
+# Schema/materialization set via profiles.yml target

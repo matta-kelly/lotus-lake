@@ -1,0 +1,83 @@
+{
+  "stream": "smart_collections",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "body_html": {
+      "type": "string",
+      "description": "The description or details of the smart collection"
+    },
+    "rules": {
+      "type": "array",
+      "description": "The filtering rules that determine which products are included in the collection",
+      "items": {
+        "type": "string"
+      }
+    },
+    "handle": {
+      "type": "string",
+      "description": "The human-friendly URL for the collection"
+    },
+    "title": {
+      "type": "string",
+      "description": "The title or name of the smart collection"
+    },
+    "published_scope": {
+      "type": "string",
+      "description": "The visibility of the collection to different sales channels"
+    },
+    "template_suffix": {
+      "type": "string",
+      "description": "The suffix added to the collection template filename"
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the collection was last updated",
+      "format": "date-time"
+    },
+    "disjunctive": {
+      "type": "boolean",
+      "description": "Indicates whether the collection uses disjunctive filtering"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop where the smart collection belongs"
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier for the collection in the GraphQL Admin API"
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier for the smart collection"
+    },
+    "published_at": {
+      "type": "string",
+      "description": "The date and time when the collection was published",
+      "format": "date-time"
+    },
+    "sort_order": {
+      "type": "string",
+      "description": "The order in which the collection is displayed"
+    }
+  }
+}

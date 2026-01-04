@@ -1,0 +1,235 @@
+{
+  "stream": "price_rules",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "starts_at": {
+      "type": "string",
+      "description": "The date and time when the discount starts",
+      "format": "date-time"
+    },
+    "value_type": {
+      "type": "string",
+      "description": "The type of value for the discount"
+    },
+    "usage_limit": {
+      "type": "integer",
+      "description": "The limit on the total number of times the discount can be used"
+    },
+    "deleted_message": {
+      "type": "string",
+      "description": "Message displayed when the price rule is deleted"
+    },
+    "once_per_customer": {
+      "type": "boolean",
+      "description": "Whether the discount can only be applied once per customer"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the price rule was created",
+      "format": "date-time"
+    },
+    "title": {
+      "type": "string",
+      "description": "The title of the price rule"
+    },
+    "prerequisite_customer_ids": {
+      "type": "array",
+      "description": "An array of customer IDs required as prerequisites for the discount",
+      "items": {
+        "type": "number"
+      }
+    },
+    "entitled_collection_ids": {
+      "type": "array",
+      "description": "An array of collection IDs entitled to the discount",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the price rule was last updated",
+      "format": "date-time"
+    },
+    "prerequisite_product_ids": {
+      "type": "array",
+      "description": "An array of product IDs required as prerequisites for the discount",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop where the price rule is applied"
+    },
+    "prerequisite_shipping_price_range": {
+      "type": "object",
+      "description": "The maximum shipping price required for the discount",
+      "properties": {
+        "less_than_or_equal_to": {
+          "type": "number",
+          "description": "The maximum shipping price allowed for the discount"
+        }
+      }
+    },
+    "entitled_country_ids": {
+      "type": "array",
+      "description": "An array of country IDs entitled to the discount",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "deleted_description": {
+      "type": "string",
+      "description": "Description of why the price rule was deleted"
+    },
+    "entitled_variant_ids": {
+      "type": "array",
+      "description": "An array of variant IDs entitled to the discount",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier for the price rule"
+    },
+    "ends_at": {
+      "type": "string",
+      "description": "The date and time when the discount ends",
+      "format": "date-time"
+    },
+    "value": {
+      "type": "string",
+      "description": "The value of the discount"
+    },
+    "prerequisite_subtotal_range": {
+      "type": "object",
+      "description": "The required subtotal range for the discount",
+      "properties": {
+        "greater_than_or_equal_to": {
+          "type": "string",
+          "description": "The minimum subtotal required for the discount"
+        }
+      }
+    },
+    "allocation_method": {
+      "type": "string",
+      "description": "The method used to allocate the discount"
+    },
+    "prerequisite_to_entitlement_quantity_ratio": {
+      "type": "object",
+      "description": "The quantity ratio required for entitlement to the discount",
+      "properties": {
+        "prerequisite_quantity": {
+          "type": "integer",
+          "description": "The quantity required as prerequisites for the discount"
+        },
+        "entitled_quantity": {
+          "type": "integer",
+          "description": "The quantity entitled to the discount"
+        }
+      }
+    },
+    "prerequisite_quantity_range": {
+      "type": "object",
+      "description": "The required quantity range for the discount",
+      "properties": {
+        "greater_than_or_equal_to": {
+          "type": "integer",
+          "description": "The minimum quantity required for the discount"
+        }
+      }
+    },
+    "allocation_limit": {
+      "type": "integer",
+      "description": "The maximum number of times the discount can be applied"
+    },
+    "target_type": {
+      "type": "string",
+      "description": "The type of target for the discount"
+    },
+    "entitled_product_ids": {
+      "type": "array",
+      "description": "An array of product IDs entitled to the discount",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "deleted_at": {
+      "type": "string",
+      "description": "The date and time when the price rule was deleted",
+      "format": "date-time"
+    },
+    "customer_segment_prerequisite_ids": {
+      "type": "array",
+      "description": "An array of customer segment IDs as prerequisites for the discount",
+      "items": {
+        "type": "string"
+      }
+    },
+    "customer_selection": {
+      "type": "string",
+      "description": "The customer selection criteria for the discount"
+    },
+    "prerequisite_saved_search_ids": {
+      "type": "array",
+      "description": "An array of saved search IDs that act as prerequisites for the discount",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier for the price rule in the GraphQL Admin API"
+    },
+    "prerequisite_variant_ids": {
+      "type": "array",
+      "description": "An array of variant IDs required as prerequisites for the discount",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "target_selection": {
+      "type": "string",
+      "description": "The target selection criteria for the discount"
+    },
+    "prerequisite_to_entitlement_purchase": {
+      "type": "object",
+      "description": "The amount required for a purchase to be entitled to the discount",
+      "properties": {
+        "prerequisite_amount": {
+          "type": "number",
+          "description": "The required amount for entitlement to the discount"
+        }
+      }
+    },
+    "prerequisite_collection_ids": {
+      "type": "array",
+      "description": "An array of collection IDs required as prerequisites for the discount",
+      "items": {
+        "type": "integer"
+      }
+    }
+  }
+}

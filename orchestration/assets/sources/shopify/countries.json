@@ -1,0 +1,73 @@
+{
+  "stream": "countries",
+  "options": {
+    "sync_modes": [
+      "full_refresh"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": []
+  },
+  "fields": {
+    "provinces": {
+      "type": "array",
+      "description": "Array of provinces or states within the country.",
+      "items": {
+        "code": {
+          "type": "string",
+          "description": "Province or state code."
+        },
+        "translated_name": {
+          "type": "string",
+          "description": "Translated name of the province."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the province."
+        },
+        "id": {
+          "type": "integer",
+          "description": "Unique identifier for the province."
+        },
+        "country_id": {
+          "type": "integer",
+          "description": "Unique identifier of the country the province belongs to."
+        }
+      }
+    },
+    "code": {
+      "type": "string",
+      "description": "ISO country code."
+    },
+    "translated_name": {
+      "type": "string",
+      "description": "Translated name of the country"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "URL for the shop related to this country."
+    },
+    "rest_of_world": {
+      "type": "boolean",
+      "description": "Whether the country in a catch-all group of countries that are not individually listed or assigned to any specific zone or market."
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the country."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Unique identifier for the country."
+    }
+  }
+}

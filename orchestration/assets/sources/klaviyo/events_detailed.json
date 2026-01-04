@@ -1,0 +1,279 @@
+{
+  "stream": "events_detailed",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "datetime"
+    ]
+  },
+  "fields": {
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "metric": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "links": {
+              "type": "object",
+              "properties": {
+                "related": {
+                  "type": "string"
+                },
+                "self": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "profile": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "links": {
+              "type": "object",
+              "properties": {
+                "related": {
+                  "type": "string"
+                },
+                "self": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "attributions": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "relationships": {
+                  "type": "object",
+                  "properties": {
+                    "flow-message": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "campaign-message": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "flow-message-variation": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "campaign": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "attributed-event": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "event": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "flow": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "links": {
+                  "type": "object",
+                  "properties": {
+                    "self": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "timestamp": {
+                  "type": "integer"
+                }
+              }
+            },
+            "links": {
+              "type": "object",
+              "properties": {
+                "related": {
+                  "type": "string"
+                },
+                "self": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "datetime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "type": "string"
+        }
+      }
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "datetime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer"
+        },
+        "event_properties": {
+          "type": "object"
+        }
+      }
+    },
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    }
+  }
+}

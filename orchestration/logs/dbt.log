@@ -1,0 +1,76 @@
+[0m21:35:40.446081 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7c8094a7b0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7c8008cb90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7c82304b90>]}
+
+
+============================== 21:35:40.452204 | 3b34d6a9-b140-44a0-82e9-5fd0e440141c ==============================
+[0m21:35:40.452204 [info ] [MainThread]: Running with dbt=1.10.17
+[0m21:35:40.452525 [debug] [MainThread]: running dbt with arguments {'log_cache_events': 'False', 'introspect': 'True', 'cache_selected_only': 'False', 'use_colors': 'True', 'target_path': 'None', 'printer_width': '80', 'profiles_dir': '/home/mkultra/bode/lotusandluna/landl/lotus-lake/orchestration', 'log_path': '/home/mkultra/bode/lotusandluna/landl/lotus-lake/orchestration/logs', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'static_parser': 'True', 'quiet': 'False', 'indirect_selection': 'eager', 'write_json': 'True', 'fail_fast': 'False', 'send_anonymous_usage_stats': 'True', 'partial_parse': 'True', 'warn_error': 'None', 'invocation_command': 'dbt parse', 'version_check': 'True', 'no_print': 'None', 'use_experimental_parser': 'False', 'debug': 'False', 'empty': 'None', 'log_format': 'default'}
+[0m21:35:40.582546 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '3b34d6a9-b140-44a0-82e9-5fd0e440141c', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7c80664510>]}
+[0m21:35:40.636619 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '3b34d6a9-b140-44a0-82e9-5fd0e440141c', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7c7f90f8a0>]}
+[0m21:35:40.637114 [info ] [MainThread]: Registered adapter: trino=1.10.0
+[0m21:35:40.694461 [debug] [MainThread]: checksum: a50d730a31f4c1af850aa8110f398f1e1657a0325ec5753dae2929b817189a3e, vars: {}, profile: , target: , version: 1.10.17
+[0m21:35:40.694871 [info ] [MainThread]: Unable to do partial parsing because saved manifest not found. Starting full parse.
+[0m21:35:40.695075 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'partial_parser', 'label': '3b34d6a9-b140-44a0-82e9-5fd0e440141c', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7c7f4e0250>]}
+[0m21:35:41.280424 [error] [MainThread]: Encountered an error:
+Parsing Error in model assets (assets/core/assets.py)
+  dbt allows exactly one model defined per python file, found 0
+[0m21:35:41.283658 [debug] [MainThread]: Resource report: {"command_name": "parse", "command_success": false, "command_wall_clock_time": 0.88289154, "process_in_blocks": "1808", "process_kernel_time": 0.170266, "process_mem_max_rss": "116624", "process_out_blocks": "48", "process_user_time": 1.694985}
+[0m21:35:41.284048 [debug] [MainThread]: Command `dbt parse` failed at 21:35:41.283988 after 0.88 seconds
+[0m21:35:41.284306 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7c7f389220>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7c7f389130>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7c7fad3e70>]}
+[0m21:35:41.284529 [debug] [MainThread]: Flushing usage events
+[0m21:35:41.714862 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m21:36:59.284323 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fa4bc43a7b0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fa4bbb84b90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fa4bde00b90>]}
+
+
+============================== 21:36:59.287718 | 2ebe04b4-59aa-4df7-968d-f4ca42257d82 ==============================
+[0m21:36:59.287718 [info ] [MainThread]: Running with dbt=1.10.17
+[0m21:36:59.288087 [debug] [MainThread]: running dbt with arguments {'debug': 'False', 'introspect': 'True', 'write_json': 'True', 'log_format': 'default', 'empty': 'None', 'use_colors': 'True', 'use_experimental_parser': 'False', 'static_parser': 'True', 'send_anonymous_usage_stats': 'True', 'cache_selected_only': 'False', 'indirect_selection': 'eager', 'log_cache_events': 'False', 'printer_width': '80', 'quiet': 'False', 'log_path': '/home/mkultra/bode/lotusandluna/landl/lotus-lake/orchestration/logs', 'fail_fast': 'False', 'profiles_dir': '/home/mkultra/bode/lotusandluna/landl/lotus-lake/orchestration', 'target_path': 'None', 'invocation_command': 'dbt parse', 'warn_error': 'None', 'no_print': 'None', 'partial_parse': 'True', 'version_check': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])'}
+[0m21:36:59.429332 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '2ebe04b4-59aa-4df7-968d-f4ca42257d82', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fa4bc15c510>]}
+[0m21:36:59.496392 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '2ebe04b4-59aa-4df7-968d-f4ca42257d82', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fa4bb4038a0>]}
+[0m21:36:59.496904 [info ] [MainThread]: Registered adapter: trino=1.10.0
+[0m21:36:59.551790 [debug] [MainThread]: checksum: a50d730a31f4c1af850aa8110f398f1e1657a0325ec5753dae2929b817189a3e, vars: {}, profile: , target: , version: 1.10.17
+[0m21:36:59.552323 [info ] [MainThread]: Unable to do partial parsing because saved manifest not found. Starting full parse.
+[0m21:36:59.552590 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'partial_parser', 'label': '2ebe04b4-59aa-4df7-968d-f4ca42257d82', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fa4bafd8250>]}
+[0m21:37:00.314399 [warn ] [MainThread]: [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 3 unused configuration paths:
+- models.lotus_lake.sales
+- models.lotus_lake.klaviyo
+- models.lotus_lake.shopify
+[0m21:37:00.320316 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '2ebe04b4-59aa-4df7-968d-f4ca42257d82', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fa4bae7b4d0>]}
+[0m21:37:00.322821 [info ] [MainThread]: Performance info: /home/mkultra/bode/lotusandluna/landl/lotus-lake/orchestration/target/perf_info.json
+[0m21:37:00.359479 [debug] [MainThread]: Wrote artifact WritableManifest to /home/mkultra/bode/lotusandluna/landl/lotus-lake/orchestration/target/manifest.json
+[0m21:37:00.360809 [debug] [MainThread]: Wrote artifact SemanticManifest to /home/mkultra/bode/lotusandluna/landl/lotus-lake/orchestration/target/semantic_manifest.json
+[0m21:37:00.361539 [debug] [MainThread]: Resource report: {"command_name": "parse", "command_success": true, "command_wall_clock_time": 1.1234263, "process_in_blocks": "0", "process_kernel_time": 0.177121, "process_mem_max_rss": "119404", "process_out_blocks": "1928", "process_user_time": 1.905694}
+[0m21:37:00.361839 [debug] [MainThread]: Command `dbt parse` succeeded at 21:37:00.361780 after 1.12 seconds
+[0m21:37:00.362056 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fa4bb5cbe70>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fa4bb5cb930>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fa4bad23ba0>]}
+[0m21:37:00.362279 [debug] [MainThread]: Flushing usage events
+[0m21:37:00.775831 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m21:39:04.933548 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f73b14327b0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f73b0b78b90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f73b2e00b90>]}
+
+
+============================== 21:39:04.935834 | 5e48385b-8798-4918-8ee8-eb4a3e63b3de ==============================
+[0m21:39:04.935834 [info ] [MainThread]: Running with dbt=1.10.17
+[0m21:39:04.936211 [debug] [MainThread]: running dbt with arguments {'use_experimental_parser': 'False', 'log_path': '/home/mkultra/bode/lotusandluna/landl/lotus-lake/orchestration/logs', 'quiet': 'False', 'write_json': 'True', 'target_path': 'None', 'partial_parse': 'True', 'use_colors': 'True', 'printer_width': '80', 'indirect_selection': 'eager', 'warn_error': 'None', 'send_anonymous_usage_stats': 'True', 'cache_selected_only': 'False', 'invocation_command': 'dbt parse', 'debug': 'False', 'profiles_dir': '/home/mkultra/bode/lotusandluna/landl/lotus-lake/orchestration', 'fail_fast': 'False', 'no_print': 'None', 'version_check': 'True', 'static_parser': 'True', 'log_format': 'default', 'log_cache_events': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'introspect': 'True', 'empty': 'None'}
+[0m21:39:05.058077 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '5e48385b-8798-4918-8ee8-eb4a3e63b3de', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f73b1150510>]}
+[0m21:39:05.109957 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '5e48385b-8798-4918-8ee8-eb4a3e63b3de', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f73b03f38a0>]}
+[0m21:39:05.110488 [info ] [MainThread]: Registered adapter: trino=1.10.0
+[0m21:39:05.161807 [debug] [MainThread]: checksum: a50d730a31f4c1af850aa8110f398f1e1657a0325ec5753dae2929b817189a3e, vars: {}, profile: , target: , version: 1.10.17
+[0m21:39:05.212285 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 5 files changed.
+[0m21:39:05.212749 [debug] [MainThread]: Partial parsing: updated file: lotus_lake://assets/core/klaviyo/int_klaviyo__profiles.sql
+[0m21:39:05.212959 [debug] [MainThread]: Partial parsing: updated file: lotus_lake://assets/core/shopify/int_shopify__refunds.sql
+[0m21:39:05.213161 [debug] [MainThread]: Partial parsing: updated file: lotus_lake://assets/core/klaviyo/int_klaviyo__events.sql
+[0m21:39:05.213362 [debug] [MainThread]: Partial parsing: updated file: lotus_lake://assets/marts/sales/fct_sales.sql
+[0m21:39:05.213550 [debug] [MainThread]: Partial parsing: updated file: lotus_lake://assets/core/shopify/int_shopify__orders.sql
+[0m21:39:05.401133 [warn ] [MainThread]: [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 3 unused configuration paths:
+- models.lotus_lake.sales
+- models.lotus_lake.klaviyo
+- models.lotus_lake.shopify
+[0m21:39:05.409467 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '5e48385b-8798-4918-8ee8-eb4a3e63b3de', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f73b0033150>]}
+[0m21:39:05.411571 [info ] [MainThread]: Performance info: /home/mkultra/bode/lotusandluna/landl/lotus-lake/orchestration/target/perf_info.json
+[0m21:39:05.514248 [debug] [MainThread]: Wrote artifact WritableManifest to /home/mkultra/bode/lotusandluna/landl/lotus-lake/orchestration/target/manifest.json
+[0m21:39:05.515926 [debug] [MainThread]: Wrote artifact SemanticManifest to /home/mkultra/bode/lotusandluna/landl/lotus-lake/orchestration/target/semantic_manifest.json
+[0m21:39:05.516667 [debug] [MainThread]: Resource report: {"command_name": "parse", "command_success": true, "command_wall_clock_time": 0.6246732, "process_in_blocks": "0", "process_kernel_time": 0.144064, "process_mem_max_rss": "117620", "process_out_blocks": "1896", "process_user_time": 1.409534}
+[0m21:39:05.516969 [debug] [MainThread]: Command `dbt parse` succeeded at 21:39:05.516911 after 0.63 seconds
+[0m21:39:05.517256 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f73b038cd70>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f73b038c500>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f73b0085550>]}
+[0m21:39:05.517555 [debug] [MainThread]: Flushing usage events
+[0m21:39:05.923368 [debug] [MainThread]: An error was encountered while trying to flush usage events

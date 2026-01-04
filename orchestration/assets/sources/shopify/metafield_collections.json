@@ -1,0 +1,80 @@
+{
+  "stream": "metafield_collections",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "value_type": {
+      "type": "string",
+      "description": "The type of the value in the metafield collection"
+    },
+    "owner_id": {
+      "type": "integer",
+      "description": "The ID of the owner associated with the metafield collection"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the metafield collection was created",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "The description of the metafield collection"
+    },
+    "type": {
+      "type": "string",
+      "description": "The type of the metafield collection"
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the metafield collection was last updated",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop related to the metafield collection"
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier for the metafield collection in the Admin GraphQL API"
+    },
+    "namespace": {
+      "type": "string",
+      "description": "The namespace for the metafield collection"
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier for the metafield collection"
+    },
+    "value": {
+      "type": "string",
+      "description": "The value of the metafield collection"
+    },
+    "owner_resource": {
+      "type": "string",
+      "description": "The resource type of the owner associated with the metafield collection"
+    },
+    "key": {
+      "type": "string",
+      "description": "The key associated with the metafield collection"
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "stream": "customer_address",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "id"
+    ]
+  },
+  "fields": {
+    "zip": {
+      "type": "string",
+      "description": "The postal code or ZIP code of the address."
+    },
+    "country": {
+      "type": "string",
+      "description": "The full name of the country associated with the address."
+    },
+    "city": {
+      "type": "string",
+      "description": "The city where the customer resides."
+    },
+    "address2": {
+      "type": "string",
+      "description": "The second line of the customer's street address."
+    },
+    "address1": {
+      "type": "string",
+      "description": "The first line of the customer's street address."
+    },
+    "last_name": {
+      "type": "string",
+      "description": "The last name of the customer."
+    },
+    "province_code": {
+      "type": "string",
+      "description": "The code or abbreviation of the region or state."
+    },
+    "country_code": {
+      "type": "string",
+      "description": "The ISO 3166-1 alpha-2 country code of the address country."
+    },
+    "default": {
+      "type": "boolean",
+      "description": "Indicates whether this is the default address for the customer."
+    },
+    "province": {
+      "type": "string",
+      "description": "The region or state where the customer resides."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the address was last updated.",
+      "format": "date-time"
+    },
+    "phone": {
+      "type": "string",
+      "description": "The phone number associated with the address."
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop associated with the customer's address."
+    },
+    "name": {
+      "type": "string",
+      "description": "The full name of the customer associated with the address."
+    },
+    "country_name": {
+      "type": "string",
+      "description": "The name of the country associated with the address."
+    },
+    "company": {
+      "type": "string",
+      "description": "The company name associated with the customer's address."
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the address."
+    },
+    "customer_id": {
+      "type": "integer",
+      "description": "The unique identifier of the customer to whom the address belongs."
+    },
+    "first_name": {
+      "type": "string",
+      "description": "The first name of the customer."
+    }
+  }
+}

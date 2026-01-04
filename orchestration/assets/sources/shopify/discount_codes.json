@@ -1,0 +1,136 @@
+{
+  "stream": "discount_codes",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "summary": {
+      "type": "string",
+      "description": "A brief summary or description of the discount code"
+    },
+    "starts_at": {
+      "type": "string",
+      "description": "The date and time when the discount code is activated.",
+      "format": "date-time"
+    },
+    "usage_limit": {
+      "type": "integer",
+      "description": "The maximum number of times that the discount can be used."
+    },
+    "code": {
+      "type": "string",
+      "description": "The discount code that customers can use during checkout to apply the discount"
+    },
+    "price_rule_id": {
+      "type": "integer",
+      "description": "The identifier of the price rule associated with the discount code"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the discount code was created",
+      "format": "date-time"
+    },
+    "title": {
+      "type": "string",
+      "description": "The title of the discount."
+    },
+    "discount_type": {
+      "type": "string",
+      "description": "The type of discount applied by the discount code, such as a percentage or fixed amount off"
+    },
+    "async_usage_count": {
+      "type": "integer",
+      "description": "The number of times that the discount has been used."
+    },
+    "usage_count": {
+      "type": "integer",
+      "description": "The number of times the discount code has been used by customers"
+    },
+    "applies_once_per_customer": {
+      "type": "boolean",
+      "description": "Whether the discount can be applied only once per customer."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the discount code was last updated",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "object",
+      "description": "The application that created the discount reedem code.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      }
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop where the discount code is applicable"
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier for the discount code in the Shopify Admin GraphQL API"
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier for the discount code"
+    },
+    "ends_at": {
+      "type": "string",
+      "description": "The date and time when the discount code is deactivated.",
+      "format": "date-time"
+    },
+    "total_sales": {
+      "type": "object",
+      "description": "The total sales from orders where the discount was used.",
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "currency_code": {
+          "type": "string"
+        }
+      }
+    },
+    "codes_count": {
+      "type": "object",
+      "description": "The number of redeem codes for the discount.",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "description": "The count of elements."
+        }
+      }
+    },
+    "typename": {
+      "type": "string",
+      "description": "The typename of the discount"
+    },
+    "status": {
+      "type": "string",
+      "description": "The status of the Discount"
+    }
+  }
+}

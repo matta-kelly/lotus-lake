@@ -1,0 +1,95 @@
+{
+  "stream": "orders",
+  "sync_mode": "incremental",
+  "destination_sync_mode": "append_dedup",
+  "backfill": false,
+  "primary_key": [
+    [
+      "id"
+    ]
+  ],
+  "cursor_field": [
+    "updated_at"
+  ],
+  "fields": {
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the order"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the order was created",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the order was last updated",
+      "format": "date-time"
+    },
+    "test": {
+      "type": "boolean",
+      "description": "Indicates if the order is a test order"
+    },
+    "total_line_items_price": {
+      "type": "number",
+      "description": "The total price of all line items in the order"
+    },
+    "total_discounts": {
+      "type": "number",
+      "description": "The total amount of discounts applied to the order"
+    },
+    "total_shipping_price_set": {
+      "type": "object",
+      "description": "The details of the total shipping price for the order.",
+      "properties": {
+        "shop_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "The total shipping amount in shop currency"
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "The currency code for the total shipping price in shop currency"
+            }
+          }
+        },
+        "presentment_money": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "The total shipping amount in presentment currency"
+            },
+            "currency_code": {
+              "type": "string",
+              "description": "The currency code for the total shipping price"
+            }
+          }
+        }
+      }
+    },
+    "total_tax": {
+      "type": "number",
+      "description": "The total tax amount for the order"
+    },
+    "financial_status": {
+      "type": "string",
+      "description": "The financial status of the order"
+    },
+    "fulfillment_status": {
+      "type": "string",
+      "description": "The fulfillment status of the order"
+    },
+    "cancelled_at": {
+      "type": "string",
+      "description": "The date and time when the order was canceled",
+      "format": "date-time"
+    },
+    "cancel_reason": {
+      "type": "string",
+      "description": "The reason provided if the order was canceled"
+    }
+  }
+}

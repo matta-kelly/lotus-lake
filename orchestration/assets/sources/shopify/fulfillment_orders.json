@@ -1,0 +1,304 @@
+{
+  "stream": "fulfillment_orders",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "fulfilled_at": {
+      "type": "string",
+      "description": "The date and time when the fulfillment was completed",
+      "format": "date-time"
+    },
+    "request_status": {
+      "type": "string",
+      "description": "The status of any requests associated with the fulfillment order"
+    },
+    "fulfill_by": {
+      "type": "string",
+      "description": "The deadline by which the fulfillment must be completed"
+    },
+    "fulfillment_holds": {
+      "type": "array",
+      "description": "Details of any holds on the fulfillment",
+      "items": {
+        "reason_notes": {
+          "type": "string",
+          "description": "Additional notes regarding the hold on the fulfillment"
+        },
+        "reason": {
+          "type": "string",
+          "description": "The reason for the hold on the fulfillment"
+        }
+      }
+    },
+    "fulfill_at": {
+      "type": "string",
+      "description": "The date and time when the fulfillment is scheduled to occur",
+      "format": "date-time"
+    },
+    "destination": {
+      "type": "object",
+      "description": "Details of the destination where the order is to be fulfilled",
+      "properties": {
+        "zip": {
+          "type": "string",
+          "description": "The postal code of the destination"
+        },
+        "country": {
+          "type": "string",
+          "description": "The country of the destination"
+        },
+        "province": {
+          "type": "string",
+          "description": "The province of the destination"
+        },
+        "city": {
+          "type": "string",
+          "description": "The city of the destination"
+        },
+        "phone": {
+          "type": "string",
+          "description": "The phone number of the recipient at the destination"
+        },
+        "address2": {
+          "type": "string",
+          "description": "The secondary address of the destination"
+        },
+        "address1": {
+          "type": "string",
+          "description": "The primary address of the destination"
+        },
+        "last_name": {
+          "type": "string",
+          "description": "The last name of the recipient at the destination"
+        },
+        "company": {
+          "type": "string",
+          "description": "The name of the company at the destination"
+        },
+        "id": {
+          "type": "integer",
+          "description": "The unique identifier of the destination"
+        },
+        "first_name": {
+          "type": "string",
+          "description": "The first name of the recipient at the destination"
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the recipient at the destination"
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the fulfillment order was created",
+      "format": "date-time"
+    },
+    "line_items": {
+      "type": "array",
+      "description": "Details of the line items in the fulfillment order",
+      "items": {
+        "fulfillment_order_id": {
+          "type": "integer",
+          "description": "The identifier of the fulfillment order"
+        },
+        "shop_id": {
+          "type": "integer",
+          "description": "The identifier of the shop where the line item belongs"
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "The quantity of the line item"
+        },
+        "variant_id": {
+          "type": "integer",
+          "description": "The identifier of the product variant"
+        },
+        "line_item_id": {
+          "type": "integer",
+          "description": "The identifier of the line item in the order"
+        },
+        "fulfillable_quantity": {
+          "type": "integer",
+          "description": "The quantity that can be fulfilled"
+        },
+        "inventory_item_id": {
+          "type": "integer",
+          "description": "The identifier of the inventory item associated with the line item"
+        },
+        "id": {
+          "type": "integer",
+          "description": "The unique identifier of the line item"
+        }
+      }
+    },
+    "shop_id": {
+      "type": "integer",
+      "description": "The identifier of the shop that created the fulfillment order"
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the fulfillment order was last updated",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop associated with the fulfillment order"
+    },
+    "delivery_method": {
+      "type": "object",
+      "description": "Details of the delivery method for the fulfillment order",
+      "properties": {
+        "min_delivery_date_time": {
+          "type": "string",
+          "description": "The minimum expected delivery date and time",
+          "format": "date-time"
+        },
+        "method_type": {
+          "type": "string",
+          "description": "The type of delivery method"
+        },
+        "id": {
+          "type": "integer",
+          "description": "The unique identifier of the delivery method"
+        },
+        "max_delivery_date_time": {
+          "type": "string",
+          "description": "The maximum expected delivery date and time",
+          "format": "date-time"
+        }
+      }
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier of the fulfillment order in the Admin GraphQL API"
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the fulfillment order"
+    },
+    "assigned_location_id": {
+      "type": "integer",
+      "description": "The unique identifier of the assigned location"
+    },
+    "order_id": {
+      "type": "integer",
+      "description": "The identifier of the order associated with the fulfillment"
+    },
+    "channel_id": {
+      "type": "string",
+      "description": "The ID of the channel that created an order"
+    },
+    "supported_actions": {
+      "type": "array",
+      "description": "Actions supported for the fulfillment order",
+      "items": {
+        "external_url": {
+          "type": "string",
+          "description": "The external URL associated with the action"
+        },
+        "action": {
+          "type": "string",
+          "description": "The type of action supported"
+        }
+      }
+    },
+    "international_duties": {
+      "type": "string",
+      "description": "Details of any international duties associated with the fulfillment order"
+    },
+    "assigned_location": {
+      "type": "object",
+      "description": "The location to which the fulfillment order is assigned",
+      "properties": {
+        "zip": {
+          "type": "string",
+          "description": "The postal code of the assigned location"
+        },
+        "country_code": {
+          "type": "string",
+          "description": "The country code of the assigned location"
+        },
+        "province": {
+          "type": "string",
+          "description": "The province of the assigned location"
+        },
+        "city": {
+          "type": "string",
+          "description": "The city of the assigned location"
+        },
+        "phone": {
+          "type": "string",
+          "description": "The phone number of the assigned location"
+        },
+        "address2": {
+          "type": "string",
+          "description": "The secondary address of the assigned location"
+        },
+        "address1": {
+          "type": "string",
+          "description": "The primary address of the assigned location"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the assigned location"
+        },
+        "location_id": {
+          "type": "integer",
+          "description": "The unique identifier of the assigned location"
+        }
+      }
+    },
+    "merchant_requests": {
+      "type": "array",
+      "description": "Details of any requests made by the merchant regarding the fulfillment order",
+      "items": {
+        "request_options": {
+          "type": "object",
+          "description": "Additional options provided with the merchant request",
+          "properties": {
+            "notify_customer": {
+              "type": "boolean",
+              "description": "Whether to notify the customer regarding the request"
+            }
+          }
+        },
+        "kind": {
+          "type": "string",
+          "description": "The type of request made by the merchant"
+        },
+        "id": {
+          "type": "integer",
+          "description": "The unique identifier of the merchant request"
+        },
+        "message": {
+          "type": "string",
+          "description": "The message included with the merchant request"
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "description": "The current status of the fulfillment order"
+    }
+  }
+}

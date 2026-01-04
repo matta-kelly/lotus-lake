@@ -1,0 +1,105 @@
+{
+  "stream": "locations",
+  "options": {
+    "sync_modes": [
+      "full_refresh"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": []
+  },
+  "fields": {
+    "zip": {
+      "type": "string",
+      "description": "The postal or ZIP code of the location."
+    },
+    "country": {
+      "type": "string",
+      "description": "The full name of the country where the location is located."
+    },
+    "legacy": {
+      "type": "boolean",
+      "description": "Indicates if the location is a legacy location or not."
+    },
+    "localized_country_name": {
+      "type": "string",
+      "description": "The localized name of the country where the location is located."
+    },
+    "city": {
+      "type": "string",
+      "description": "The city where the location is based."
+    },
+    "address2": {
+      "type": "string",
+      "description": "The second line of the location's address."
+    },
+    "address1": {
+      "type": "string",
+      "description": "The first line of the location's address."
+    },
+    "localized_province_name": {
+      "type": "string",
+      "description": "The localized name of the province or state of the location."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Indicates if the location is currently active or not."
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the location was created.",
+      "format": "date-time"
+    },
+    "province_code": {
+      "type": "string",
+      "description": "The ISO code of the province or state where the location is located."
+    },
+    "country_code": {
+      "type": "string",
+      "description": "The ISO country code of the location."
+    },
+    "province": {
+      "type": "string",
+      "description": "The full name of the province or state where the location is located."
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the location was last updated.",
+      "format": "date-time"
+    },
+    "phone": {
+      "type": "string",
+      "description": "The phone number associated with the location."
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop associated with the location."
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The Admin GraphQL API ID of the location."
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the location."
+    },
+    "country_name": {
+      "type": "string",
+      "description": "The name of the country where the location is located."
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier of the location."
+    }
+  }
+}

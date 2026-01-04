@@ -1,0 +1,80 @@
+{
+  "stream": "metafield_blogs",
+  "options": {
+    "sync_modes": [
+      "full_refresh",
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "overwrite",
+      "append",
+      "append_dedup"
+    ]
+  },
+  "defaults": {
+    "primary_key": [
+      [
+        "id"
+      ]
+    ],
+    "cursor_field": [
+      "updated_at"
+    ]
+  },
+  "fields": {
+    "value_type": {
+      "type": "string",
+      "description": "The data type of the value stored in the metafield"
+    },
+    "owner_id": {
+      "type": "integer",
+      "description": "The unique identifier of the owner associated with the metafield data"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time when the metafield data was created",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "The description of the metafield data"
+    },
+    "type": {
+      "type": "string",
+      "description": "The type of data stored in the metafield"
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time when the metafield data was last updated",
+      "format": "date-time"
+    },
+    "shop_url": {
+      "type": "string",
+      "description": "The URL of the shop where the metafield data belongs"
+    },
+    "admin_graphql_api_id": {
+      "type": "string",
+      "description": "The unique identifier for the metafield data in the Admin GraphQL API"
+    },
+    "namespace": {
+      "type": "string",
+      "description": "The namespace of the metafield data"
+    },
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier for the metafield data"
+    },
+    "value": {
+      "type": "string",
+      "description": "The value of the metafield data"
+    },
+    "owner_resource": {
+      "type": "string",
+      "description": "The resource type of the owner associated with the metafield data"
+    },
+    "key": {
+      "type": "string",
+      "description": "The key associated with the metafield data"
+    }
+  }
+}

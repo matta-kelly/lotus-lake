@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: shopify
+    database: iceberg
+    schema: shopify
+    tables:
+      - name: orders
+      - name: order_refunds
