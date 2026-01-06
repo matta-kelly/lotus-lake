@@ -18,7 +18,7 @@ resource "airbyte_connection" "shopify_to_lake" {
     }
   }
 
-  sync_catalog = jsondecode(file("${path.module}/../../../assets/streams/shopify/_catalog.json"))
+  sync_catalog = jsondecode(file("${path.module}/../../assets/streams/shopify/_catalog.json"))
 }
 
 resource "airbyte_connection" "klaviyo_to_lake" {
@@ -41,5 +41,5 @@ resource "airbyte_connection" "klaviyo_to_lake" {
     }
   }
 
-  sync_catalog = jsondecode(file("${path.module}/../../../assets/streams/klaviyo/_catalog.json"))
+  sync_catalog = jsondecode(file("${path.module}/../../assets/streams/klaviyo/_catalog.json"))
 }
