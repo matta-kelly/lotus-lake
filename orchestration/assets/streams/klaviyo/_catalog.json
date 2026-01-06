@@ -23,52 +23,55 @@
         ]
       },
       "config": {
-        "selected": true,
-        "suggested": false,
-        "sync_mode": "incremental",
-        "destination_sync_mode": "append_dedup",
-        "cursor_field": [
+        "syncMode": "incremental",
+        "cursorField": [
           "updated_at"
         ],
-        "primary_key": [
+        "destinationSyncMode": "append_dedup",
+        "primaryKey": [
           [
             "id"
           ]
         ],
-        "alias_name": "campaigns",
-        "field_selection_enabled": true,
-        "selected_fields": [
+        "aliasName": "campaigns",
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "fieldSelectionEnabled": true,
+        "selectedFields": [
           {
-            "field_path": [
+            "fieldPath": [
               "id"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "type"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "links"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "attributes"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "updated_at"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "relationships"
             ]
           }
-        ]
+        ],
+        "hashedFields": [],
+        "mappers": []
       }
     },
     {
@@ -94,52 +97,55 @@
         ]
       },
       "config": {
-        "selected": true,
-        "suggested": false,
-        "sync_mode": "incremental",
-        "destination_sync_mode": "append_dedup",
-        "cursor_field": [
+        "syncMode": "incremental",
+        "cursorField": [
           "datetime"
         ],
-        "primary_key": [
+        "destinationSyncMode": "append_dedup",
+        "primaryKey": [
           [
             "id"
           ]
         ],
-        "alias_name": "events",
-        "field_selection_enabled": true,
-        "selected_fields": [
+        "aliasName": "events",
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "fieldSelectionEnabled": true,
+        "selectedFields": [
           {
-            "field_path": [
+            "fieldPath": [
               "id"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "type"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "links"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "datetime"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "attributes"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "relationships"
             ]
           }
-        ]
+        ],
+        "hashedFields": [],
+        "mappers": []
       }
     },
     {
@@ -165,52 +171,55 @@
         ]
       },
       "config": {
-        "selected": true,
-        "suggested": false,
-        "sync_mode": "incremental",
-        "destination_sync_mode": "append_dedup",
-        "cursor_field": [
+        "syncMode": "incremental",
+        "cursorField": [
           "updated"
         ],
-        "primary_key": [
+        "destinationSyncMode": "append_dedup",
+        "primaryKey": [
           [
             "id"
           ]
         ],
-        "alias_name": "flows",
-        "field_selection_enabled": true,
-        "selected_fields": [
+        "aliasName": "flows",
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "fieldSelectionEnabled": true,
+        "selectedFields": [
           {
-            "field_path": [
+            "fieldPath": [
               "id"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "type"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "links"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "updated"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "attributes"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "relationships"
             ]
           }
-        ]
+        ],
+        "hashedFields": [],
+        "mappers": []
       }
     },
     {
@@ -236,52 +245,55 @@
         ]
       },
       "config": {
-        "selected": true,
-        "suggested": false,
-        "sync_mode": "incremental",
-        "destination_sync_mode": "append_dedup",
-        "cursor_field": [
+        "syncMode": "incremental",
+        "cursorField": [
           "updated"
         ],
-        "primary_key": [
+        "destinationSyncMode": "append_dedup",
+        "primaryKey": [
           [
             "id"
           ]
         ],
-        "alias_name": "lists",
-        "field_selection_enabled": true,
-        "selected_fields": [
+        "aliasName": "lists",
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "fieldSelectionEnabled": true,
+        "selectedFields": [
           {
-            "field_path": [
+            "fieldPath": [
               "id"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "type"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "links"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "updated"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "attributes"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "relationships"
             ]
           }
-        ]
+        ],
+        "hashedFields": [],
+        "mappers": []
       }
     },
     {
@@ -307,52 +319,55 @@
         ]
       },
       "config": {
-        "selected": true,
-        "suggested": false,
-        "sync_mode": "incremental",
-        "destination_sync_mode": "append_dedup",
-        "cursor_field": [
+        "syncMode": "incremental",
+        "cursorField": [
           "updated"
         ],
-        "primary_key": [
+        "destinationSyncMode": "append_dedup",
+        "primaryKey": [
           [
             "id"
           ]
         ],
-        "alias_name": "metrics",
-        "field_selection_enabled": true,
-        "selected_fields": [
+        "aliasName": "metrics",
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "fieldSelectionEnabled": true,
+        "selectedFields": [
           {
-            "field_path": [
+            "fieldPath": [
               "id"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "type"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "links"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "updated"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "attributes"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "relationships"
             ]
           }
-        ]
+        ],
+        "hashedFields": [],
+        "mappers": []
       }
     },
     {
@@ -378,57 +393,60 @@
         ]
       },
       "config": {
-        "selected": true,
-        "suggested": false,
-        "sync_mode": "incremental",
-        "destination_sync_mode": "append_dedup",
-        "cursor_field": [
+        "syncMode": "incremental",
+        "cursorField": [
           "updated"
         ],
-        "primary_key": [
+        "destinationSyncMode": "append_dedup",
+        "primaryKey": [
           [
             "id"
           ]
         ],
-        "alias_name": "profiles",
-        "field_selection_enabled": true,
-        "selected_fields": [
+        "aliasName": "profiles",
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "fieldSelectionEnabled": true,
+        "selectedFields": [
           {
-            "field_path": [
+            "fieldPath": [
               "id"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "type"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "links"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "updated"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "segments"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "attributes"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "relationships"
             ]
           }
-        ]
+        ],
+        "hashedFields": [],
+        "mappers": []
       }
     }
   ]

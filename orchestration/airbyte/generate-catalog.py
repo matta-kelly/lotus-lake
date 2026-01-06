@@ -11,7 +11,7 @@ import json
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).parent.parent.parent.parent  # lotus-lake/
+REPO_ROOT = Path(__file__).parent.parent.parent  # lotus-lake/
 STREAMS_DIR = REPO_ROOT / "orchestration" / "assets" / "streams"
 SOURCES_DIR = REPO_ROOT / "orchestration" / "assets" / "sources"
 
@@ -85,8 +85,9 @@ def build_airbyte_stream(stream_config, source_schema):
         "additionalProperties": "true"
     }
 
+    # Use camelCase for selectedFields to match Airbyte's API response format
     selected_fields = [
-        {"field_path": [name]}
+        {"fieldPath": [name]}
         for name in stream_config.get("fields", {}).keys()
     ]
 
@@ -99,16 +100,21 @@ def build_airbyte_stream(stream_config, source_schema):
             "source_defined_cursor": source_defined_cursor,
             "source_defined_primary_key": source_defined_primary_key
         },
+        # Use camelCase keys to match Airbyte's API response format
+        # This prevents drift detection from seeing snake_case vs camelCase differences
         "config": {
+            "syncMode": stream_config.get("sync_mode", "full_refresh"),
+            "cursorField": stream_config.get("cursor_field", []),
+            "destinationSyncMode": stream_config.get("destination_sync_mode", "overwrite"),
+            "primaryKey": stream_config.get("primary_key", []),
+            "aliasName": stream_name,
             "selected": stream_config.get("selected", True),
             "suggested": False,
-            "sync_mode": stream_config.get("sync_mode", "full_refresh"),
-            "destination_sync_mode": stream_config.get("destination_sync_mode", "overwrite"),
-            "cursor_field": stream_config.get("cursor_field", []),
-            "primary_key": stream_config.get("primary_key", []),
-            "alias_name": stream_name,
-            "field_selection_enabled": True,
-            "selected_fields": selected_fields
+            "includeFiles": False,
+            "fieldSelectionEnabled": True,
+            "selectedFields": selected_fields,
+            "hashedFields": [],
+            "mappers": []
         }
     }
 

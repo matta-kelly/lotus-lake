@@ -23,47 +23,50 @@
         ]
       },
       "config": {
-        "selected": true,
-        "suggested": false,
-        "sync_mode": "incremental",
-        "destination_sync_mode": "append_dedup",
-        "cursor_field": [
+        "syncMode": "incremental",
+        "cursorField": [
           "created_at"
         ],
-        "primary_key": [
+        "destinationSyncMode": "append_dedup",
+        "primaryKey": [
           [
             "id"
           ]
         ],
-        "alias_name": "order_refunds",
-        "field_selection_enabled": true,
-        "selected_fields": [
+        "aliasName": "order_refunds",
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "fieldSelectionEnabled": true,
+        "selectedFields": [
           {
-            "field_path": [
+            "fieldPath": [
               "id"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "order_id"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "created_at"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "refund_line_items"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "transactions"
             ]
           }
-        ]
+        ],
+        "hashedFields": [],
+        "mappers": []
       }
     },
     {
@@ -89,82 +92,85 @@
         ]
       },
       "config": {
-        "selected": true,
-        "suggested": false,
-        "sync_mode": "incremental",
-        "destination_sync_mode": "append_dedup",
-        "cursor_field": [
+        "syncMode": "incremental",
+        "cursorField": [
           "updated_at"
         ],
-        "primary_key": [
+        "destinationSyncMode": "append_dedup",
+        "primaryKey": [
           [
             "id"
           ]
         ],
-        "alias_name": "orders",
-        "field_selection_enabled": true,
-        "selected_fields": [
+        "aliasName": "orders",
+        "selected": true,
+        "suggested": false,
+        "includeFiles": false,
+        "fieldSelectionEnabled": true,
+        "selectedFields": [
           {
-            "field_path": [
+            "fieldPath": [
               "id"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "created_at"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "updated_at"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "test"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "total_line_items_price"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "total_discounts"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "total_shipping_price_set"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "total_tax"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "financial_status"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "fulfillment_status"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "cancelled_at"
             ]
           },
           {
-            "field_path": [
+            "fieldPath": [
               "cancel_reason"
             ]
           }
-        ]
+        ],
+        "hashedFields": [],
+        "mappers": []
       }
     }
   ]
