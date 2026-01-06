@@ -4,6 +4,99 @@ Tracking issues, limitations, and potential solutions for the lotus-lake platfor
 
 ---
 
+# TODOs: Intended GitOps Functionality
+
+These are the workflows the platform should support. Use these as acceptance criteria.
+
+---
+
+## TODO-001: Add a New Source
+
+**Status:** Implemented
+**Workflow:**
+
+1. Edit `orchestration/airbyte/terraform/sources.tf`
+   - Add new `airbyte_source` resource (e.g., Facebook Ads)
+2. `git add . && git commit -m "Add Facebook Ads source" && git push`
+3. Within 5-15 minutes:
+   - Flux GitRepository detects new commit
+   - tofu-controller runs `terraform plan`
+   - Plan shows: "1 to add"
+   - Auto-approves and applies
+   - New source appears in Airbyte UI
+4. No manual intervention required
+
+---
+
+## TODO-002: Modify Connection Schema
+
+**Status:** Implemented
+**Workflow:**
+
+1. Edit stream config (e.g., `orchestration/assets/streams/shopify/orders.json`)
+   - Add new field selection or change sync_mode
+2. Regenerate catalog:
+   ```bash
+   python orchestration/airbyte/generate-catalog.py
+   ```
+3. `git add . && git commit -m "Add field to orders" && git push`
+4. tofu-controller detects catalog change
+   - Updates `airbyte_connection` resource
+   - Airbyte connection schema updates automatically
+
+---
+
+## TODO-003: Remove a Source
+
+**Status:** Implemented
+**Workflow:**
+
+1. Delete the source resource from `sources.tf`
+2. Delete associated connection from `connections.tf`
+3. `git add . && git commit -m "Remove old source" && git push`
+4. tofu-controller runs plan:
+   - Plan shows: "2 to destroy" (connection first, then source)
+   - Auto-approves and applies
+   - Resources removed from Airbyte cleanly
+5. No orphaned resources left behind (`destroyResourcesOnDeletion: true`)
+
+---
+
+## TODO-004: Trigger a Backfill
+
+**Status:** Implemented
+**Workflow:**
+
+1. Edit stream config (e.g., `orchestration/assets/streams/shopify/orders.json`)
+   - Set `"backfill": true`
+2. `git add . && git commit -m "Trigger orders backfill" && git push`
+3. tofu-controller applies:
+   - Detects backfill flag
+   - Calls Airbyte API to reset connection
+   - Backfill starts
+4. After backfill completes:
+   - Set `"backfill": false`
+   - Commit and push
+   - System returns to stable state (no perpetual drift)
+
+---
+
+## What "Stable" Looks Like
+
+```bash
+$ kubectl get terraform -n lotus-lake
+NAME                 READY   STATUS                                    AGE
+lotus-lake-airbyte   True    Applied successfully: main@sha1:abc123   5m
+
+# Events should be quiet between actual changes - no perpetual drift
+```
+
+---
+
+# Known Issues & Limitations
+
+---
+
 ## TICKET-001: Tofu-Controller Source Refresh on Retry
 
 **Status:** Open
