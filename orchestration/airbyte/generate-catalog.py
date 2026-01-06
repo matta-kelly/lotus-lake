@@ -85,12 +85,14 @@ def build_airbyte_stream(stream_config, source_schema):
         "additionalProperties": "true"
     }
 
-    # Use camelCase for selectedFields to match Airbyte's API response format
     selected_fields = [
-        {"fieldPath": [name]}
+        {"field_path": [name]}
         for name in stream_config.get("fields", {}).keys()
     ]
 
+    # NOTE: Terraform provider expects snake_case, Airbyte API returns camelCase
+    # The provider should handle conversion internally, but causes drift detection
+    # This is documented in TICKET-003
     return {
         "stream": {
             "name": stream_name,
@@ -100,21 +102,16 @@ def build_airbyte_stream(stream_config, source_schema):
             "source_defined_cursor": source_defined_cursor,
             "source_defined_primary_key": source_defined_primary_key
         },
-        # Use camelCase keys to match Airbyte's API response format
-        # This prevents drift detection from seeing snake_case vs camelCase differences
         "config": {
-            "syncMode": stream_config.get("sync_mode", "full_refresh"),
-            "cursorField": stream_config.get("cursor_field", []),
-            "destinationSyncMode": stream_config.get("destination_sync_mode", "overwrite"),
-            "primaryKey": stream_config.get("primary_key", []),
-            "aliasName": stream_name,
+            "sync_mode": stream_config.get("sync_mode", "full_refresh"),
+            "cursor_field": stream_config.get("cursor_field", []),
+            "destination_sync_mode": stream_config.get("destination_sync_mode", "overwrite"),
+            "primary_key": stream_config.get("primary_key", []),
+            "alias_name": stream_name,
             "selected": stream_config.get("selected", True),
             "suggested": False,
-            "includeFiles": False,
-            "fieldSelectionEnabled": True,
-            "selectedFields": selected_fields,
-            "hashedFields": [],
-            "mappers": []
+            "field_selection_enabled": True,
+            "selected_fields": selected_fields
         }
     }
 
