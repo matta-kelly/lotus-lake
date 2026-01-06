@@ -3,6 +3,10 @@
 *.tfstate
 *.tfstate.backup
 *.tfstate.*.backup
+*.tfvars
+.terraform.lock.hcl
 .venv/
+__pycache__/
+*.pyc
 orchestration/target/
 orchestration/logs/
