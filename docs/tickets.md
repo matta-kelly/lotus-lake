@@ -101,6 +101,73 @@ spec:
 
 ---
 
+---
+
+## TICKET-002: Orphaned Airbyte Connections from State Mismatch
+
+**Status:** Resolved (documented for future reference)
+**Priority:** Medium
+**Discovered:** 2026-01-06
+**Component:** Airbyte / Terraform State
+
+### Problem Statement
+
+Duplicate Airbyte connections appear and persist even after deletion attempts. This happens when Terraform state gets out of sync with Airbyte reality.
+
+### Root Cause
+
+Terraform state (stored in K8s secret `tfstate-default-lotus-lake-airbyte`) only knows about connections it created. If connections are created by:
+- Manual UI actions
+- A different Terraform run
+- State loss/reset
+
+...then Terraform will create NEW connections alongside existing ones, resulting in duplicates.
+
+### How to Diagnose
+
+1. **List all connections in Airbyte:**
+```bash
+kubectl exec -n airbyte deploy/airbyte-server -- curl -s \
+  "http://localhost:8001/api/v1/connections/list" \
+  -H "Content-Type: application/json" \
+  -d '{"workspaceId":"YOUR_WORKSPACE_ID"}' | jq '[.connections[] | {id: .connectionId, name: .name, status: .status, created: .created_at}]'
+```
+
+2. **List connections in Terraform state:**
+```bash
+kubectl get secret tfstate-default-lotus-lake-airbyte -n lotus-lake \
+  -o jsonpath='{.data.tfstate}' | base64 -d | gunzip | \
+  jq '[.resources[] | select(.type == "airbyte_connection") | {name: .instances[0].attributes.name, connection_id: .instances[0].attributes.connection_id}]'
+```
+
+3. **Compare:** Connections in Airbyte but NOT in Terraform state are orphans.
+
+### How to Fix
+
+Delete orphaned connections via API:
+```bash
+kubectl exec -n airbyte deploy/airbyte-server -- curl -s -X POST \
+  "http://localhost:8001/api/v1/connections/delete" \
+  -H "Content-Type: application/json" \
+  -d '{"connectionId":"ORPHAN_CONNECTION_ID"}'
+```
+
+### Prevention
+
+1. **Never create connections manually** if Terraform manages them
+2. **Import existing resources** before running Terraform on an existing workspace
+3. **Protect Terraform state** - don't delete the tfstate secret
+4. **Use `destroyResourcesOnDeletion: true`** in tofu-controller spec
+
+### Takeaway
+
+When debugging duplicate Airbyte resources:
+1. Always compare Airbyte reality vs Terraform state
+2. Terraform will recreate resources it owns if you delete them manually
+3. Orphans (not in state) must be deleted via API, not Terraform
+
+---
+
 ## Template for New Tickets
 
 ```markdown
