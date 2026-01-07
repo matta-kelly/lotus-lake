@@ -3,8 +3,8 @@
 -- Aggregate refunds per order
 select
     order_id,
-    sum(cast(json_extract_scalar(json_parse(t), '$.amount') as decimal(10,2))) as returns
+    sum(cast(t::JSON->>'$.amount' as decimal(10,2))) as returns
 
-from {{ source('shopify', 'order_refunds') }}
-cross join unnest(transactions) as t(t)
+from {{ source('shopify', 'order_refunds') }},
+unnest(transactions) as u(t)
 group by order_id

@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: klaviyo
-    database: iceberg
+    database: lakehouse
     schema: klaviyo
     tables:
       - name: profiles

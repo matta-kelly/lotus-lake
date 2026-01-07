@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: shopify
-    database: iceberg
+    database: lakehouse
     schema: shopify
     tables:
       - name: orders

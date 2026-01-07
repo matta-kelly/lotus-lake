@@ -17,14 +17,14 @@ from ...resources import DBT_MANIFEST, SHOPIFY_CONNECTION_ID, KLAVIYO_CONNECTION
 
 @asset(group_name="shopify", compute_kind="airbyte")
 def shopify_sync(airbyte: AirbyteResource) -> Output[None]:
-    """Syncs Shopify data to Iceberg via Airbyte."""
+    """Syncs Shopify data to S3 Parquet via Airbyte."""
     result = airbyte.sync_and_poll(connection_id=SHOPIFY_CONNECTION_ID)
     return Output(None, metadata={"records_synced": result.records_synced})
 
 
 @asset(group_name="klaviyo", compute_kind="airbyte")
 def klaviyo_sync(airbyte: AirbyteResource) -> Output[None]:
-    """Syncs Klaviyo data to Iceberg via Airbyte."""
+    """Syncs Klaviyo data to S3 Parquet via Airbyte."""
     result = airbyte.sync_and_poll(connection_id=KLAVIYO_CONNECTION_ID)
     return Output(None, metadata={"records_synced": result.records_synced})
 
