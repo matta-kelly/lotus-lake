@@ -95,7 +95,7 @@ def make_stream_sensor(source: str, stream: str):
     """
     Factory for stream-specific S3 sensors.
 
-    - S3 path: raw/{source}/{stream}/ (matches Airbyte destination)
+    - S3 path: raw/{source}/{stream}*.parquet (matches Airbyte destination)
     - Asset selection: tag("{source}__{stream}") + downstream (marts via ref())
 
     dbt models must be tagged with source__stream to be triggered:
@@ -104,7 +104,8 @@ def make_stream_sensor(source: str, stream: str):
     Downstream models (marts) auto-trigger via ref() dependencies.
     """
     tag = f"{source}__{stream}"
-    s3_prefix = f"{S3_RAW_PREFIX}/{source}/{stream}/"
+    # Airbyte writes files as raw/{source}/{stream}0.parquet (not in subdirectory)
+    s3_prefix = f"{S3_RAW_PREFIX}/{source}/{stream}"
 
     # Select the tagged model AND anything downstream of it (marts via ref())
     # dbt tags become dagster tags with key "dagster-dbt/tag"
