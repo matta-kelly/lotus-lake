@@ -25,6 +25,23 @@ cat docs/*.md
 
 ---
 
+## Kubectl Setup
+
+**All kubectl commands require the h-kube kubeconfig:**
+
+```bash
+export KUBECONFIG=/home/mkultra/bode/h-kube/generated/kubeconfig.yaml
+```
+
+Without this, you'll get connection refused errors. The default `~/.kube/config` is empty.
+
+**Verify connection:**
+```bash
+kubectl get nodes
+```
+
+---
+
 ## CRITICAL: Never Run Terraform Locally
 
 ```
