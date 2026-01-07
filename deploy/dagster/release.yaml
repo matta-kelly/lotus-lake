@@ -43,6 +43,8 @@ spec:
     generatePostgresqlPasswordSecret: false
 
     dagsterWebserver:
+      nodeSelector:
+        kubernetes.io/hostname: monkeybusiness
       env:
         - name: DAGSTER_PG_PASSWORD
           valueFrom:
@@ -51,6 +53,8 @@ spec:
               key: password
 
     dagsterDaemon:
+      nodeSelector:
+        kubernetes.io/hostname: monkeybusiness
       env:
         - name: DAGSTER_PG_PASSWORD
           valueFrom:
@@ -70,6 +74,10 @@ spec:
       type: K8sRunLauncher
       config:
         k8sRunLauncher:
+          runK8sConfig:
+            podSpecConfig:
+              nodeSelector:
+                kubernetes.io/hostname: monkeybusiness
           envSecrets:
             - name: dagster-db-app
             - name: lotus-lake-terraform-vars
@@ -93,6 +101,8 @@ spec:
             - "-m"
             - "orchestration.definitions"
           port: 3030
+          nodeSelector:
+            kubernetes.io/hostname: monkeybusiness
           env:
             - name: DAGSTER_PG_PASSWORD
               valueFrom:
