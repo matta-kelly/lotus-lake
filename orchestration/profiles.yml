@@ -2,11 +2,41 @@ lotus_lake:
   target: dev
   outputs:
     dev:
-      type: trino
-      method: none
-      host: localhost
-      port: 8081
-      user: trino
-      catalog: iceberg
-      schema: dev
+      type: duckdb
+      path: ":memory:"
       threads: 4
+      extensions:
+        - ducklake
+        - httpfs
+      settings:
+        # S3 credentials for SeaweedFS (local dev uses port-forward)
+        s3_access_key_id: "{{ env_var('S3_ACCESS_KEY_ID', 'minio') }}"
+        s3_secret_access_key: "{{ env_var('S3_SECRET_ACCESS_KEY', 'minio123') }}"
+        s3_endpoint: "{{ env_var('S3_ENDPOINT', 'localhost:8333') }}"
+        s3_use_ssl: false
+        s3_url_style: path
+      attach:
+        - path: "ducklake:postgres:host={{ env_var('DUCKLAKE_DB_HOST', 'localhost') }} port=5432 dbname=ducklake user=ducklake password={{ env_var('DUCKLAKE_DB_PASSWORD', '') }}"
+          alias: lakehouse
+          options:
+            DATA_PATH: "s3://landing/raw/"
+
+    # Production target (runs in-cluster via Dagster)
+    prod:
+      type: duckdb
+      path: ":memory:"
+      threads: 4
+      extensions:
+        - ducklake
+        - httpfs
+      settings:
+        s3_access_key_id: "{{ env_var('S3_ACCESS_KEY_ID') }}"
+        s3_secret_access_key: "{{ env_var('S3_SECRET_ACCESS_KEY') }}"
+        s3_endpoint: "{{ env_var('S3_ENDPOINT') }}"
+        s3_use_ssl: false
+        s3_url_style: path
+      attach:
+        - path: "ducklake:postgres:host={{ env_var('DUCKLAKE_DB_HOST') }} port=5432 dbname=ducklake user=ducklake password={{ env_var('DUCKLAKE_DB_PASSWORD') }}"
+          alias: lakehouse
+          options:
+            DATA_PATH: "s3://landing/raw/"
