@@ -86,12 +86,28 @@ spec:
                   key: password
             # Airbyte connection
             - name: AIRBYTE_HOST
-              value: "http://airbyte-webapp.airbyte.svc.cluster.local"
-            # Trino connection
-            - name: TRINO_HOST
-              value: "trino.lotus-lake.svc.cluster.local"
-            - name: TRINO_PORT
-              value: "8080"
+              value: "http://airbyte-server.airbyte.svc.cluster.local:8001"
+            # DuckLake (Postgres catalog)
+            - name: DUCKLAKE_DB_HOST
+              value: "ducklake-db-rw.lotus-lake.svc.cluster.local"
+            - name: DUCKLAKE_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ducklake-db-app
+                  key: password
+            # S3 (SeaweedFS)
+            - name: S3_ENDPOINT
+              value: "http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333"
+            - name: S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: lotus-lake-secrets
+                  key: minio_user
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: lotus-lake-secrets
+                  key: minio_password
 
     # -------------------------------------------------------------------------
     # Ingress
