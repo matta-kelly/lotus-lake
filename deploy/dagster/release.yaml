@@ -54,7 +54,12 @@ spec:
               key: password
 
     global:
-      postgresqlSecretName: ""
+      postgresqlSecretName: "dagster-db-app"
+      postgresqlSecretKey: "password"
+      postgresqlHost: "dagster-db-rw.lotus-lake.svc.cluster.local"
+      postgresqlPort: 5432
+      postgresqlUsername: "dagster"
+      postgresqlDatabase: "dagster"
 
     runLauncher:
       type: K8sRunLauncher
