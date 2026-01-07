@@ -497,6 +497,69 @@ When changing credentials in terraform vars:
 
 ---
 
+## TICKET-005: SeaweedFS S3 Gateway Doesn't Hot-Reload Credentials
+
+**Status:** Open
+**Priority:** Medium
+**Discovered:** 2026-01-07
+**Component:** SeaweedFS / S3 Gateway
+
+### Problem Statement
+
+When adding or updating S3 identities in the `seaweedfs-s3-config` secret, the SeaweedFS S3 gateway **does not automatically reload** the credentials. Connections using new credentials will fail with:
+
+```
+The access key ID you provided does not exist in our records.
+```
+
+### Observed Behavior
+
+1. Add new identity to `seaweedfs-s3-config` secret (via h-kube)
+2. Flux applies the secret to the cluster
+3. Airbyte destination uses the new credentials
+4. Connection test fails: "access key ID does not exist"
+5. SeaweedFS S3 gateway logs show: `could not find accessKey lotus-lake-s3`
+
+### Root Cause
+
+The SeaweedFS S3 gateway reads the config secret at startup and doesn't watch for changes. New identities aren't available until the pod restarts.
+
+### How to Fix
+
+Restart the S3 gateway after adding/updating credentials:
+
+```bash
+kubectl rollout restart deployment/seaweedfs-s3 -n seaweedfs
+```
+
+Wait for the new pod to be ready, then retry the connection.
+
+### Prevention
+
+When adding new S3 identities to h-kube:
+1. Update the `seaweedfs-s3-config` secret
+2. Commit and push to h-kube
+3. **Restart the S3 gateway** (or add to the h-kube workflow)
+4. Then configure Airbyte/other services to use the new credentials
+
+### Potential Solutions
+
+1. **Add annotation to trigger restart** - Use Flux/Kustomize to add a hash annotation that changes when the secret changes, triggering a rollout
+2. **Use Reloader** - Install [stakater/Reloader](https://github.com/stakater/Reloader) to auto-restart deployments when secrets change
+3. **SeaweedFS config watch** - Check if SeaweedFS supports hot-reloading (unlikely based on current behavior)
+
+### Action Items
+
+- [ ] Consider adding Reloader to h-kube infrastructure
+- [ ] Or add secret hash annotation to seaweedfs-s3 deployment
+- [x] Document manual restart procedure (this ticket)
+
+### Related
+
+- TICKET-004: Terraform doesn't detect secret changes (similar pattern)
+
+---
+
 ## Template for New Tickets
 
 ```markdown
