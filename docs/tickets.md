@@ -423,6 +423,79 @@ If you need to debug Terraform:
 
 ---
 
+## TICKET-004: Terraform Doesn't Detect Secret Value Changes
+
+**Status:** Open
+**Priority:** Medium
+**Discovered:** 2026-01-07
+**Component:** tofu-controller / Terraform
+
+### Problem Statement
+
+When you update values in the `lotus-lake-terraform-vars` secret (e.g., changing credentials), **Terraform does not detect the change** and won't update the affected resources.
+
+### Root Cause
+
+Terraform stores the **computed output** in state, not variable references:
+
+```
+# What's in state:
+connection_configuration = {"access_key_id": "old_value", ...}
+
+# What Terraform compares:
+- State: {"access_key_id": "old_value"}
+- Plan:  {"access_key_id": "new_value"}  ← Uses new secret value
+- Result: Detects change, plans update
+```
+
+**But here's the catch:** tofu-controller caches the runner pod environment. Secret changes may not propagate immediately to the next terraform run.
+
+### Observed Behavior
+
+1. Update `lotus-lake-secrets.yaml` with new credentials
+2. Commit, push, Flux applies new secret to cluster
+3. Force tofu-controller reconcile
+4. Terraform says "Applied successfully" but **doesn't update resources**
+5. Resources still have old credentials, connections fail
+
+### Workaround
+
+Update the resource directly via Airbyte API, then let terraform sync state:
+
+```bash
+# 1. Update destination via API
+kubectl exec -n airbyte deploy/airbyte-server -- curl -s -X POST \
+  "http://localhost:8001/api/v1/destinations/update" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "destinationId": "YOUR_DESTINATION_ID",
+    "name": "S3 Data Lake",
+    "connectionConfiguration": {
+      "access_key_id": "NEW_VALUE",
+      "secret_access_key": "NEW_SECRET",
+      ...rest of config...
+    }
+  }'
+
+# 2. Force terraform reconcile to sync state
+kubectl annotate terraform -n lotus-lake lotus-lake-airbyte \
+  reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite
+```
+
+### Prevention
+
+When changing credentials in terraform vars:
+1. Update the h-kube secret
+2. Update the resource via API with same values
+3. Force terraform reconcile
+4. Verify state matches reality
+
+### Related
+
+- TICKET-003: State drift (similar symptom, different cause)
+
+---
+
 ## Template for New Tickets
 
 ```markdown
