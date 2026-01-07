@@ -56,6 +56,16 @@ Create `orchestration/assets/core/{source}/int_{source}__{stream}.sql`:
     incremental_strategy='delete+insert'
 ) }}
 
+{% if is_incremental() %}
+  {% set partition_query %}
+    select max(year) as max_year, max(month) as max_month, max(day) as max_day from {{ this }}
+  {% endset %}
+  {% set results = run_query(partition_query) %}
+  {% set max_year = results.columns[0][0] %}
+  {% set max_month = results.columns[1][0] %}
+  {% set max_day = results.columns[2][0] %}
+{% endif %}
+
 select
     -- identifiers (rename for clarity)
     id as entity_id,
@@ -71,7 +81,7 @@ select
     updated_at,
     _airbyte_extracted_at,
 
-    -- partition columns (from Hive path, used for incremental filter)
+    -- partition columns (from Hive path, required for incremental)
     year,
     month,
     day
@@ -79,9 +89,7 @@ select
 from read_parquet('s3://landing/raw/{source}/{stream}/**/*', hive_partitioning=true)
 
 {% if is_incremental() %}
-where cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer) >= (
-    select max(cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer)) from {{ this }}
-)
+where year = '{{ max_year }}' and month = '{{ max_month }}' and day >= '{{ max_day }}'
 {% endif %}
 
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
@@ -91,10 +99,11 @@ qualify row_number() over (partition by id order by _airbyte_extracted_at desc) 
 - Tag must be `'{source}__{stream}'` (double underscore) to match the sensor
 - Multiple models can share the same tag (e.g., `orders` + `order_lines` both use `shopify__orders`)
 - `unique_key` enables delete+insert to find existing records
-- Partition columns `year`, `month`, `day` come from Hive path automatically
-- `is_incremental()` filter enables partition pruning (DuckDB skips old folders)
-- Use integer comparison for partitions (DuckDB doesn't support tuple comparison with aggregates)
+- Partition columns `year`, `month`, `day` come from Hive path automatically and **must be in SELECT**
+- The `run_query` block runs at **compile time**, injecting literal values into the WHERE clause
+- Literal partition filters enable DuckDB partition pruning (skips old folders entirely)
 - `qualify` dedupe still runs on both full refresh and incremental
+- **Schema changes require full refresh** - if you add/remove columns, run `dbt run --full-refresh`
 
 ### 3. Regenerate Manifest
 
@@ -131,16 +140,34 @@ Simple `append` would create duplicates. `delete+insert` maintains dedupe.
 
 ### Partition Pruning
 
-The `is_incremental()` WHERE clause:
+For DuckDB to skip old partition folders, it needs **literal values** in the WHERE clause at query planning time. Subqueries are evaluated too late.
+
+**How it works:**
+
 ```sql
-where cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer) >= (
-    select max(cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer)) from {{ this }}
-)
+{% if is_incremental() %}
+  {% set partition_query %}
+    select max(year), max(month), max(day) from {{ this }}
+  {% endset %}
+  {% set results = run_query(partition_query) %}
+  {% set max_year = results.columns[0][0] %}
+  ...
+{% endif %}
+
+where year = '{{ max_year }}' and month = '{{ max_month }}' and day >= '{{ max_day }}'
 ```
 
-DuckDB sees this filter on partition columns and **skips reading older folders entirely**. This is the memory savings - we don't load historical data.
+1. `run_query` executes at **compile time** (before the main query runs)
+2. Results are stored in Jinja variables
+3. Variables are injected as **literals** into the WHERE clause
+4. DuckDB sees `year = '2026'` (not a subquery) and pushes filter to scan
+5. Old partition folders are **never read from S3**
 
-**Note:** We use integer comparison (`year * 10000 + month * 100 + day`) because DuckDB doesn't support tuple comparison with aggregate subqueries.
+**Verified behavior:**
+- With filter: `Scanning Files: 11/12` (skips old partitions)
+- Without filter: `Total Files Read: 12` (reads everything)
+
+This is critical for performance with large datasets - incremental runs only read new data.
 
 ### When to Full Refresh
 
