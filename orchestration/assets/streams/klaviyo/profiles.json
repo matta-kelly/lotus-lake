@@ -81,14 +81,8 @@
             "address2": {
               "type": "string"
             },
-            "latitude": {
-              "type": "unknown"
-            },
             "timezone": {
               "type": "string"
-            },
-            "longitude": {
-              "type": "unknown"
             }
           }
         },
