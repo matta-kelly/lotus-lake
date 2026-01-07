@@ -12,5 +12,5 @@ select
     attributes::JSON->>'$.created' as created_at,
     attributes::JSON->>'$.updated' as updated_at
 
-from {{ source('klaviyo', 'lists') }}
+from read_parquet('s3://landing/raw/klaviyo/lists/*.parquet')
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

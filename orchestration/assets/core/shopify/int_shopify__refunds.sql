@@ -3,7 +3,7 @@
 -- Dedupe then aggregate refunds per order
 with deduped as (
     select *
-    from {{ source('shopify', 'order_refunds') }}
+    from read_parquet('s3://landing/raw/shopify/order_refunds/*.parquet')
     qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
 )
 
