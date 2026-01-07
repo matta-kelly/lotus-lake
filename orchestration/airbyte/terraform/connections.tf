@@ -1,7 +1,7 @@
 resource "airbyte_connection" "shopify_to_lake" {
   source_id                       = airbyte_source.shopify.source_id
-  destination_id                  = airbyte_destination.s3_data_lake.destination_id
-  name                            = "Shopify → S3 Data Lake"
+  destination_id                  = airbyte_destination.s3.destination_id
+  name                            = "Shopify → S3"
   status                          = "active"
   namespace_definition            = "customformat"
   namespace_format                = "shopify"
@@ -23,8 +23,8 @@ resource "airbyte_connection" "shopify_to_lake" {
 
 resource "airbyte_connection" "klaviyo_to_lake" {
   source_id                       = airbyte_source.klaviyo.source_id
-  destination_id                  = airbyte_destination.s3_data_lake.destination_id
-  name                            = "Klaviyo → S3 Data Lake"
+  destination_id                  = airbyte_destination.s3.destination_id
+  name                            = "Klaviyo → S3"
   status                          = "active"
   namespace_definition            = "customformat"
   namespace_format                = "klaviyo"
