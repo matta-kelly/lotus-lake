@@ -560,6 +560,124 @@ When adding new S3 identities to h-kube:
 
 ---
 
+## TICKET-006: Dagster Sensor/Asset Wiring Requirements
+
+**Status:** Resolved
+**Priority:** Critical
+**Discovered:** 2026-01-07
+**Component:** Dagster / dagster-dbt
+
+### Problem Statement
+
+Sensors triggering ALL dbt models instead of just the specific stream's model. A single sensor firing would run 9 models when it should run 1.
+
+### Root Causes (Multiple Issues)
+
+**Issue 1: Bundled dbt assets**
+```python
+# WRONG - all models run together
+@dbt_assets(select="tag:core")
+def core_dbt_models(...):
+```
+
+**Issue 2: Missing asset_selection on sensor decorator**
+```python
+# WRONG - no target defined
+@sensor(name="...", minimum_interval_seconds=300)
+def _sensor(context):
+    yield RunRequest(run_key="...")  # Error: no target
+```
+
+**Issue 3: Not verifying deployed code**
+Testing against stale Docker image that hadn't picked up fixes.
+
+### Solution
+
+**1. Factory pattern for assets** - one `@dbt_assets` per stream:
+```python
+def make_dbt_asset(source: str, stream: str):
+    @dbt_assets(
+        manifest=DBT_MANIFEST,
+        select=f"tag:{source}__{stream}",
+        name=f"{source}_{stream}_dbt",
+    )
+    def _asset(context, dbt):
+        yield from dbt.cli(["run"], context=context).stream()
+    return _asset
+```
+
+**2. Sensor must have asset_selection on decorator:**
+```python
+asset_key = AssetKey(["main", f"int_{source}__{stream}"])
+
+@sensor(
+    name=f"{source}_{stream}_sensor",
+    asset_selection=[asset_key],  # REQUIRED
+    ...
+)
+def _sensor(context):
+    yield RunRequest(run_key="...")
+```
+
+**3. Always verify deployed code before testing:**
+```bash
+kubectl exec -n lotus-lake deploy/dagster-dagster-user-deployments-lotus-lake \
+  -- grep -A3 "asset_selection" /app/orchestration/sensors.py
+```
+
+### Key Learnings
+
+1. **Stream config filename is source of truth** for all naming
+2. **Asset keys** in dagster-dbt are `["main", "model_name"]`
+3. **CI takes ~2 minutes** - don't test until new image is deployed
+4. **Force image pull** with: `kubectl delete pod -n lotus-lake -l component=user-deployments`
+
+### Files Changed
+
+- `orchestration/sensors.py` - sensor factory with asset_selection
+- `orchestration/assets/core/assets.py` - asset factory pattern
+- `CLAUDE.md` - documented wiring requirements
+
+---
+
+## TICKET-007: Mart Models Don't Auto-Trigger (Pending)
+
+**Status:** Open
+**Priority:** Medium
+**Discovered:** 2026-01-07
+**Component:** Dagster
+
+### Problem Statement
+
+When a core model runs (e.g., `int_shopify__orders`), downstream mart models (e.g., `fct_sales`) don't automatically trigger.
+
+### Current Behavior
+
+Sensor targets only the core model:
+```python
+asset_selection=[AssetKey(["main", "int_shopify__orders"])]
+```
+
+`fct_sales` depends on `int_shopify__orders` via `ref()`, but Dagster doesn't auto-trigger it.
+
+### Expected Behavior
+
+When `int_shopify__orders` runs, `fct_sales` should also run (since it refs the core model).
+
+### Potential Solutions
+
+1. **Add mart keys to sensor selection** - manually list downstream assets
+2. **Use AssetSelection.downstream()** - but this caused issues before (needs investigation)
+3. **Separate mart sensor** - trigger marts on schedule or after all core models complete
+
+### Action Items
+
+- [ ] Test if `AssetSelection.keys(...).downstream()` works with explicit asset keys
+- [ ] Consider a separate sensor for marts that runs on schedule
+- [ ] Document chosen approach
+
+---
+
 ## Template for New Tickets
 
 ```markdown

@@ -248,6 +248,91 @@ vim orchestration/assets/streams/SOURCE/STREAM.json
 
 ---
 
+## CRITICAL: Dagster Sensor & Asset Wiring
+
+### Stream Config is Source of Truth
+
+The stream config filename drives ALL naming:
+
+```
+streams/{source}/{stream}.json
+       ↓
+┌──────┴──────────────────────────────────────────────────┐
+│                                                          │
+▼                                                          ▼
+S3 Path                                          Code Generation
+raw/{source}/{stream}/YYYY/MM/DD/                         │
+                                          ┌───────────────┼───────────────┐
+                                          ▼               ▼               ▼
+                                       Sensor          Asset           dbt Model
+                                  {source}_{stream}  {source}_{stream}  int_{source}__{stream}
+                                     _sensor            _dbt              .sql
+```
+
+### Asset Key Format
+
+dagster-dbt creates asset keys as `["main", "model_name"]`:
+```python
+asset_key = AssetKey(["main", f"int_{source}__{stream}"])
+```
+
+### Sensor Requirements
+
+**Sensors MUST have `asset_selection` on the decorator:**
+```python
+@sensor(
+    name=f"{source}_{stream}_sensor",
+    asset_selection=[asset_key],  # REQUIRED - defines target
+    ...
+)
+def _sensor(context):
+    yield RunRequest(run_key="...")  # Uses decorator's target
+```
+
+Without `asset_selection`, you get:
+> "Sensor evaluation function returned a RunRequest for a sensor lacking a specified target"
+
+### Factory Pattern for Assets
+
+Each stream needs its OWN `@dbt_assets` decorator (not one bundled decorator):
+
+```python
+# CORRECT - one asset per stream
+def make_dbt_asset(source: str, stream: str):
+    @dbt_assets(
+        manifest=DBT_MANIFEST,
+        select=f"tag:{source}__{stream}",  # Select ONLY this model
+        name=f"{source}_{stream}_dbt",
+    )
+    def _asset(context, dbt):
+        yield from dbt.cli(["run"], context=context).stream()
+    return _asset
+
+# WRONG - bundles all models together
+@dbt_assets(select="tag:core")  # Triggers ALL core models at once
+def core_dbt_models(...):
+```
+
+### Verification After Code Push
+
+**ALWAYS verify deployed code matches repo before testing:**
+```bash
+# Check sensor code
+kubectl exec -n lotus-lake deploy/dagster-dagster-user-deployments-lotus-lake \
+  -- grep -A3 "asset_selection" /app/orchestration/sensors.py
+
+# Check asset factory
+kubectl exec -n lotus-lake deploy/dagster-dagster-user-deployments-lotus-lake \
+  -- head -50 /app/orchestration/assets/core/assets.py
+
+# Force image pull if stale
+kubectl delete pod -n lotus-lake -l component=user-deployments
+```
+
+**CI takes ~2 minutes. Don't test until new image is deployed.**
+
+---
+
 ## Troubleshooting
 
 ### Terraform Stuck/Failing
