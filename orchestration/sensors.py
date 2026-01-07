@@ -16,7 +16,7 @@ from dagster import (
     sensor,
     RunRequest,
     SensorEvaluationContext,
-    AssetSelection,
+    AssetKey,
     DefaultSensorStatus,
 )
 
@@ -96,24 +96,21 @@ def make_stream_sensor(source: str, stream: str):
     Factory for stream-specific S3 sensors.
 
     - S3 path: raw/{source}/{stream}/YYYY/MM/DD/part_N.parquet (Hive-partitioned)
-    - Asset selection: tag("{source}__{stream}") + downstream (marts via ref())
+    - Triggers: ONLY the specific core model for this stream
 
     dbt models must be tagged with source__stream to be triggered:
         {{ config(tags=['core', 'shopify__orders']) }}
-
-    Downstream models (marts) auto-trigger via ref() dependencies.
     """
     tag = f"{source}__{stream}"
+    model_name = f"int_{source}__{stream}"
     # Airbyte writes to: raw/{source}/{stream}/YYYY/MM/DD/part_N.parquet
     s3_prefix = f"{S3_RAW_PREFIX}/{source}/{stream}/"
 
-    # Select the tagged model AND anything downstream of it (marts via ref())
-    # dbt tags become dagster tags with key "dagster-dbt/tag"
-    selection = AssetSelection.tag("dagster-dbt/tag", tag) | AssetSelection.tag("dagster-dbt/tag", tag).downstream()
+    # Asset key for this specific model (dagster-dbt uses ["main", "model_name"])
+    asset_key = AssetKey(["main", model_name])
 
     @sensor(
         name=f"{source}_{stream}_sensor",
-        asset_selection=selection,
         minimum_interval_seconds=300,  # 5 min
         default_status=DefaultSensorStatus.RUNNING,
     )
@@ -136,7 +133,11 @@ def make_stream_sensor(source: str, stream: str):
         if latest > last_seen:
             context.log.info(f"New {source}/{stream} data: {latest} > {last_seen}")
             context.update_cursor(latest.isoformat())
-            yield RunRequest(run_key=f"{tag}_{latest.isoformat()}")
+            # Explicitly specify which asset to materialize
+            yield RunRequest(
+                run_key=f"{tag}_{latest.isoformat()}",
+                asset_selection=[asset_key],
+            )
         else:
             context.log.info(f"No new {source}/{stream} data since {last_seen}")
 
