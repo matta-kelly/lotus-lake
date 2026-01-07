@@ -14,8 +14,8 @@ with deduped as (
         day
     from read_parquet('s3://landing/raw/shopify/order_refunds/**/*', hive_partitioning=true)
     {% if is_incremental() %}
-    where year * 10000 + month * 100 + day >= (
-        select max(year * 10000 + month * 100 + day) from {{ this }}
+    where cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer) >= (
+        select max(cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer)) from {{ this }}
     )
     {% endif %}
     qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

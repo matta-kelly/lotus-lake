@@ -79,8 +79,8 @@ select
 from read_parquet('s3://landing/raw/{source}/{stream}/**/*', hive_partitioning=true)
 
 {% if is_incremental() %}
-where year * 10000 + month * 100 + day >= (
-    select max(year * 10000 + month * 100 + day) from {{ this }}
+where cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer) >= (
+    select max(cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer)) from {{ this }}
 )
 {% endif %}
 
@@ -133,8 +133,8 @@ Simple `append` would create duplicates. `delete+insert` maintains dedupe.
 
 The `is_incremental()` WHERE clause:
 ```sql
-where year * 10000 + month * 100 + day >= (
-    select max(year * 10000 + month * 100 + day) from {{ this }}
+where cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer) >= (
+    select max(cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer)) from {{ this }}
 )
 ```
 
@@ -208,11 +208,8 @@ For full sensor/asset wiring details, see `CLAUDE.md` → "Dagster Sensor & Asse
 | Stream | Core Model | Mart |
 |--------|-----------|------|
 | orders | int_shopify__orders | fct_sales |
-| orders | int_shopify__order_lines | - |
 | customers | int_shopify__customers | - |
 | order_refunds | int_shopify__order_refunds | (via fct_sales) |
-
-Note: `orders` and `order_lines` share the same tag (`shopify__orders`) so both run when orders syncs.
 
 ### Klaviyo
 | Stream | Core Model | Mart |

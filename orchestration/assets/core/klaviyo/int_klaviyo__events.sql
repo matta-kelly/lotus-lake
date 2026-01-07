@@ -28,8 +28,8 @@ select
 from read_parquet('s3://landing/raw/klaviyo/events/**/*', hive_partitioning=true)
 
 {% if is_incremental() %}
-where year * 10000 + month * 100 + day >= (
-    select max(year * 10000 + month * 100 + day) from {{ this }}
+where cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer) >= (
+    select max(cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer)) from {{ this }}
 )
 {% endif %}
 
