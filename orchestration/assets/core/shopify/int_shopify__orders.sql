@@ -5,6 +5,13 @@
     incremental_strategy='delete+insert'
 ) }}
 
+{% if is_incremental() %}
+with max_partition as (
+    select max(cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer)) as max_date
+    from {{ this }}
+)
+{% endif %}
+
 select
     -- identifiers
     id as order_id,
@@ -36,9 +43,7 @@ select
 from read_parquet('s3://landing/raw/shopify/orders/**/*', hive_partitioning=true)
 
 {% if is_incremental() %}
-where cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer) >= (
-    select max(cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer)) from {{ this }}
-)
+where cast(year as integer) * 10000 + cast(month as integer) * 100 + cast(day as integer) >= (select max_date from max_partition)
 {% endif %}
 
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
