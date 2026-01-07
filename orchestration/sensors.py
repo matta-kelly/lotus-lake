@@ -35,11 +35,15 @@ S3_RAW_PREFIX = "raw"  # Airbyte writes to s3://landing/raw/{source}/{stream}/
 
 def get_s3_client():
     """Create S3 client for SeaweedFS."""
+    endpoint = os.getenv("S3_ENDPOINT", "localhost:8333")
+    # boto3 needs http:// prefix, but DuckDB doesn't - handle both
+    if not endpoint.startswith("http"):
+        endpoint = f"http://{endpoint}"
     return boto3.client(
         "s3",
-        endpoint_url=os.getenv("S3_ENDPOINT", "http://localhost:8333"),
-        aws_access_key_id=os.getenv("S3_ACCESS_KEY_ID", "minio"),
-        aws_secret_access_key=os.getenv("S3_SECRET_ACCESS_KEY", "minio123"),
+        endpoint_url=endpoint,
+        aws_access_key_id=os.getenv("S3_ACCESS_KEY_ID", os.getenv("minio_user", "minio")),
+        aws_secret_access_key=os.getenv("S3_SECRET_ACCESS_KEY", os.getenv("minio_password", "minio123")),
     )
 
 
