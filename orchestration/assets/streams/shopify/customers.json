@@ -11,6 +11,7 @@
   "cursor_field": [
     "updated_at"
   ],
+  "selected": true,
   "fields": {
     "id": {
       "type": "integer",
