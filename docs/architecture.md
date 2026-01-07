@@ -82,11 +82,52 @@ orchestration/
 | Core | `int_<source>__<entity>` | `int_shopify__orders` |
 | Mart | `fct_<domain>`, `dim_<entity>` | `fct_daily_sales`, `dim_customers` |
 
+## Dagster Architecture
+
+Dagster runs as a Helm release in lotus-lake namespace with three components:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Dagster Helm Release                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌──────────────────┐    ┌──────────────────┐               │
+│  │ dagster-webserver│    │  dagster-daemon  │               │
+│  │ (Dagster image)  │    │ (Dagster image)  │               │
+│  │                  │    │                  │               │
+│  │ - UI             │    │ - Schedules      │               │
+│  │ - GraphQL API    │    │ - Sensors        │               │
+│  └────────┬─────────┘    │ - Run queue      │               │
+│           │              └────────┬─────────┘               │
+│           │    gRPC               │                          │
+│           └───────────┬───────────┘                          │
+│                       ▼                                      │
+│  ┌─────────────────────────────────────────┐                │
+│  │     dagster-user-deployments            │                │
+│  │     (lotus-lake image)                  │                │
+│  │                                         │                │
+│  │  - orchestration/definitions.py         │                │
+│  │  - dbt models + profiles.yml            │                │
+│  │  - Python assets                        │                │
+│  │                                         │                │
+│  │  Runs gRPC server on port 3030          │                │
+│  └─────────────────────────────────────────┘                │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Key points:**
+- Webserver and daemon use Dagster's official images (generic infrastructure)
+- User deployment uses `ghcr.io/lotusandluna/lotus-lake` (your code)
+- User deployment container runs gRPC server that webserver/daemon call to discover assets, trigger runs
+- Logs stored in SeaweedFS via S3ComputeLogManager
+
 ## Infrastructure (h-kube)
 
 | Component | Namespace | Purpose |
 |-----------|-----------|---------|
-| SeaweedFS | `seaweedfs` | S3-compatible storage for Parquet |
+| SeaweedFS | `seaweedfs` | S3-compatible storage for Parquet + logs |
 | CNPG `ducklake-db` | `lotus-lake` | DuckLake metadata catalog |
+| CNPG `dagster-db` | `lotus-lake` | Dagster run/event storage |
 | Airbyte | `airbyte` | Data ingestion |
 | tofu-controller | `flux-system` | GitOps for Terraform |

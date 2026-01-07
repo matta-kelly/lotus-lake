@@ -1,10 +1,16 @@
-{{ config(tags=['core'], materialized='table') }}
+{{ config(tags=['core', 'shopify__order_refunds'], materialized='table') }}
 
--- Aggregate refunds per order
+-- Dedupe then aggregate refunds per order
+with deduped as (
+    select *
+    from {{ source('shopify', 'order_refunds') }}
+    qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
+)
+
 select
     order_id,
     sum(cast(t::JSON->>'$.amount' as decimal(10,2))) as returns
 
-from {{ source('shopify', 'order_refunds') }},
+from deduped,
 unnest(transactions) as u(t)
 group by order_id

@@ -1,0 +1,96 @@
+name: Build and Push
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────
+  # Validate - Catch errors before they hit the cluster
+  # ─────────────────────────────────────────────────────────────────────────
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # TICKET-003: Block commits with local terraform state
+      - name: Check for terraform state files
+        run: |
+          if find . -name "*.tfstate*" -o -name ".terraform" -type d | grep -q .; then
+            echo "::error::Found terraform state files. These should not be committed."
+            echo "Run: rm -f orchestration/airbyte/terraform/terraform.tfstate*"
+            echo "Run: rm -rf orchestration/airbyte/terraform/.terraform"
+            exit 1
+          fi
+          echo "No terraform state files found"
+
+      # TICKET-001: Validate terraform before push
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5"
+
+      - name: Terraform validate
+        working-directory: orchestration/airbyte/terraform
+        run: |
+          terraform init -backend=false
+          terraform validate
+          echo "Terraform validation passed"
+
+      # Validate dbt SQL
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate dbt
+        run: |
+          pip install dbt-duckdb
+          cd orchestration && dbt parse --profiles-dir . --project-dir .
+          echo "dbt validation passed"
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Build - Only runs if validation passes
+  # ─────────────────────────────────────────────────────────────────────────
+  build:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

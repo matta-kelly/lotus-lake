@@ -4,6 +4,27 @@ Quick reference for working on Lotus Lake.
 
 ---
 
+## After Context Compaction: Re-read the Docs
+
+**If this session was resumed from a compacted/summarized conversation, immediately read the full docs directory to restore context:**
+
+```bash
+# Read all docs to restore full context
+cat docs/*.md
+```
+
+| Doc | Purpose |
+|-----|---------|
+| `docs/architecture.md` | System architecture and data flow |
+| `docs/adding-a-source.md` | Adding Airbyte sources and streams |
+| `docs/adding-a-flow.md` | Adding dbt core/mart models |
+| `docs/github-actions.md` | CI/CD pipeline |
+| `docs/tickets.md` | Known issues |
+
+**Compaction loses details. The docs have the full picture.**
+
+---
+
 ## CRITICAL: Never Run Terraform Locally
 
 ```
@@ -43,6 +64,8 @@ rm -rf orchestration/airbyte/terraform/.terraform
 2. Identify which procedure doc applies:
    - Adding/changing sources → `docs/adding-a-source.md`
    - Adding/changing destinations → `docs/adding-a-destination.md`
+   - Adding dbt models (core layer) → `docs/adding-a-flow.md`
+   - Deploying/updating Dagster → `docs/deploying-dagster.md`
    - Architecture questions → `docs/architecture.md`
 3. **State the doc you're following** when presenting the plan (e.g., "Following `docs/adding-a-destination.md`")
 
@@ -251,7 +274,12 @@ See `docs/tickets.md` for details.
 
 ## Reference Docs
 
-- `docs/adding-a-source.md` - Adding/modifying sources
-- `docs/adding-a-destination.md` - Adding/modifying destinations
-- `docs/tickets.md` - Known issues and TODOs
-- `docs/architecture.md` - System architecture
+| Doc | Purpose |
+|-----|---------|
+| `docs/architecture.md` | System architecture and data flow |
+| `docs/adding-a-source.md` | Adding Airbyte sources and streams |
+| `docs/adding-a-destination.md` | Adding Airbyte destinations |
+| `docs/adding-a-flow.md` | Adding dbt core/mart models |
+| `docs/deploying-dagster.md` | Dagster deployment and configuration |
+| `docs/github-actions.md` | CI/CD pipeline and image builds |
+| `docs/tickets.md` | Known issues and TODOs |

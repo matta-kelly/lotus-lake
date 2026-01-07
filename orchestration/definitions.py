@@ -2,24 +2,28 @@
 Lotus Lake Dagster Definitions
 
 Asset layers:
-- Core: shopify_sync, klaviyo_sync → core_dbt_models (int_shopify__*, int_klaviyo__*)
+- Core: core_dbt_models (int_shopify__*, int_klaviyo__*)
 - Marts: mart_dbt_models (fct_*) - depends on core models via dbt ref()
 
-Dependencies are auto-wired by dbt manifest. Each @dbt_assets factory
-generates assets from the manifest filtered by tag.
+Sensors:
+- Auto-discovered from orchestration/assets/streams/
+- Each source folder gets a sensor that polls S3 for new data
+
+Airbyte syncs run independently. Sensors detect new data and trigger dbt.
 """
 from dagster import Definitions, load_assets_from_modules
 
 from . import assets
-from .resources import airbyte_resource, dbt_resource
+from .resources import dbt_resource
+from .sensors import get_all_sensors
 
 # Load all assets from the assets module
 all_assets = load_assets_from_modules([assets])
 
 defs = Definitions(
     assets=all_assets,
+    sensors=get_all_sensors(),
     resources={
-        "airbyte": airbyte_resource,
         "dbt": dbt_resource,
     },
 )

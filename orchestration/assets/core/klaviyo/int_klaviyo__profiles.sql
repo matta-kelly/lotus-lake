@@ -1,4 +1,4 @@
-{{ config(tags=['core'], materialized='table') }}
+{{ config(tags=['core', 'klaviyo__profiles'], materialized='table') }}
 
 select
     -- identifiers
@@ -32,3 +32,4 @@ select
     cast(attributes::JSON->>'$.predictive_analytics.historic_number_of_orders' as bigint) as historic_orders
 
 from {{ source('klaviyo', 'profiles') }}
+qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

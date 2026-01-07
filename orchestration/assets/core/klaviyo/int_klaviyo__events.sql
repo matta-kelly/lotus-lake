@@ -1,4 +1,4 @@
-{{ config(tags=['core'], materialized='table') }}
+{{ config(tags=['core', 'klaviyo__events'], materialized='table') }}
 
 select
     -- identifiers
@@ -15,3 +15,4 @@ select
     attributes::JSON->>'$.event_properties' as properties
 
 from {{ source('klaviyo', 'events') }}
+qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

@@ -184,7 +184,7 @@ spec:
 
 - [ ] Open GitHub issue on flux-iac/tofu-controller requesting this feature
 - [ ] Consider implementing Notification Controller webhook as interim solution
-- [ ] Add pre-commit terraform validate to lotus-lake CI
+- [x] Add pre-commit terraform validate to lotus-lake CI (`.github/workflows/build.yaml`)
 - [ ] Document manual recovery procedure for stuck Terraform resources
 
 ### References
@@ -410,6 +410,7 @@ kubectl exec -n airbyte deploy/airbyte-server -- curl -s \
 2. **NEVER run `terraform plan` locally** - it can create state files
 3. **Delete local .tfstate files** - add to .gitignore (already done)
 4. **All Terraform changes go through git push** - that's the GitOps contract
+5. **CI blocks commits with state files** - `.github/workflows/build.yaml` checks for `.tfstate*` and `.terraform/`
 
 If you need to debug Terraform:
 - Read the tofu-controller logs

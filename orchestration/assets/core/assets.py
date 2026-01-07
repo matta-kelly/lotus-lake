@@ -1,32 +1,15 @@
 """
 Core Layer Assets
 
-Syncs: shopify_sync, klaviyo_sync (Airbyte)
 Models: int_shopify__*, int_klaviyo__* (dbt factory)
+
+Note: Airbyte syncs run independently on their own schedule.
+Dagster only handles dbt transforms.
 """
-from dagster import asset, AssetExecutionContext, Output
+from dagster import AssetExecutionContext
 from dagster_dbt import DbtCliResource, dbt_assets, DagsterDbtTranslator
-from dagster_airbyte import AirbyteResource
 
-from ...resources import DBT_MANIFEST, SHOPIFY_CONNECTION_ID, KLAVIYO_CONNECTION_ID
-
-
-# =============================================================================
-# Airbyte Sync Assets
-# =============================================================================
-
-@asset(group_name="shopify", compute_kind="airbyte")
-def shopify_sync(airbyte: AirbyteResource) -> Output[None]:
-    """Syncs Shopify data to S3 Parquet via Airbyte."""
-    result = airbyte.sync_and_poll(connection_id=SHOPIFY_CONNECTION_ID)
-    return Output(None, metadata={"records_synced": result.records_synced})
-
-
-@asset(group_name="klaviyo", compute_kind="airbyte")
-def klaviyo_sync(airbyte: AirbyteResource) -> Output[None]:
-    """Syncs Klaviyo data to S3 Parquet via Airbyte."""
-    result = airbyte.sync_and_poll(connection_id=KLAVIYO_CONNECTION_ID)
-    return Output(None, metadata={"records_synced": result.records_synced})
+from ...resources import DBT_MANIFEST
 
 
 # =============================================================================

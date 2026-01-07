@@ -1,4 +1,4 @@
-{{ config(tags=['core'], materialized='table') }}
+{{ config(tags=['core', 'shopify__customers'], materialized='table') }}
 
 select
     -- identifiers
@@ -22,3 +22,4 @@ select
     state as customer_state
 
 from {{ source('shopify', 'customers') }}
+qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
