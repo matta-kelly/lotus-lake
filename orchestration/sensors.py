@@ -103,7 +103,8 @@ def make_stream_sensor(source: str, stream: str):
     s3_prefix = f"{S3_RAW_PREFIX}/{source}/{stream}/"
 
     # Select the tagged model AND anything downstream of it (marts via ref())
-    selection = AssetSelection.tag(tag) | AssetSelection.tag(tag).downstream()
+    # dbt tags become dagster tags with key "dagster-dbt/tag"
+    selection = AssetSelection.tag("dagster-dbt/tag", tag) | AssetSelection.tag("dagster-dbt/tag", tag).downstream()
 
     @sensor(
         name=f"{source}_{stream}_sensor",

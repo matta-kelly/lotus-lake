@@ -56,6 +56,13 @@ jobs:
           cd orchestration && dbt parse --profiles-dir . --project-dir .
           echo "dbt validation passed"
 
+      # Validate Dagster Python code loads without errors
+      - name: Validate Dagster definitions
+        run: |
+          pip install dagster dagster-dbt dagster-postgres boto3
+          cd orchestration && python -c "from definitions import defs; print(f'Loaded {len(list(defs.get_all_job_defs()))} jobs, {len(list(defs.get_sensor_defs()))} sensors')"
+          echo "Dagster validation passed"
+
   # ─────────────────────────────────────────────────────────────────────────
   # Build - Only runs if validation passes
   # ─────────────────────────────────────────────────────────────────────────
