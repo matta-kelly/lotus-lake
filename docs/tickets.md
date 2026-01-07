@@ -261,6 +261,168 @@ When debugging duplicate Airbyte resources:
 
 ---
 
+## TICKET-003: State Drift from Local Terraform Runs
+
+**Status:** Open (Critical)
+**Priority:** Critical
+**Discovered:** 2026-01-07
+**Component:** Terraform State / tofu-controller
+
+### Problem Statement
+
+Running `terraform apply` locally while tofu-controller manages the same resources creates **two separate states** that drift apart, causing:
+- Syncs fail with "secret not found" errors
+- HTTP 409 conflicts when triggering syncs
+- Resources point to deleted/orphaned IDs
+- "Applied successfully" lies - Terraform trusts stale state
+
+### Root Cause
+
+```
+tofu-controller state: stored in K8s secret (tfstate-default-lotus-lake-airbyte)
+Local terraform state: stored in terraform.tfstate file
+
+These are COMPLETELY INDEPENDENT. Changes in one don't affect the other.
+```
+
+**What happens when you run terraform locally:**
+
+```
+1. Local terraform sees no state (or old state)
+2. Creates NEW sources/connections with NEW IDs
+3. Saves to LOCAL terraform.tfstate
+4. tofu-controller's K8s state still has OLD IDs
+5. tofu-controller "applies successfully" (trusts its stale state)
+6. Connections in K8s state point to DELETED sources
+7. Syncs fail: "secret not found for source <old-id>"
+```
+
+### How to Diagnose
+
+**Check for local state file:**
+```bash
+ls -la orchestration/airbyte/terraform/*.tfstate*
+# If these exist, you have a problem
+```
+
+**Compare states:**
+```bash
+# Local state
+cat orchestration/airbyte/terraform/terraform.tfstate | \
+  jq '[.resources[] | select(.type == "airbyte_source") | {name: .name, id: .instances[0].attributes.source_id}]'
+
+# K8s state
+kubectl get secret tfstate-default-lotus-lake-airbyte -n lotus-lake \
+  -o jsonpath='{.data.tfstate}' | base64 -d | gunzip | \
+  jq '[.resources[] | select(.type == "airbyte_source") | {name: .name, id: .instances[0].attributes.source_id}]'
+
+# If IDs don't match, states are drifted
+```
+
+**Check Airbyte reality:**
+```bash
+kubectl exec -n airbyte deploy/airbyte-server -- curl -s \
+  "http://localhost:8001/api/v1/sources/list" \
+  -H "Content-Type: application/json" \
+  -d '{"workspaceId":"YOUR_WORKSPACE_ID"}' | jq '[.sources[] | {name: .name, id: .sourceId}]'
+```
+
+### How to Fix (Nuclear Option)
+
+When states are drifted, the cleanest fix is to delete everything and let Terraform recreate:
+
+**1. Delete all Airbyte resources:**
+```bash
+# Get workspace ID
+WORKSPACE_ID="b93dc139-15d7-4729-9cdc-5c754b9d9401"
+
+# Delete connections first (they reference sources)
+kubectl exec -n airbyte deploy/airbyte-server -- curl -s \
+  "http://localhost:8001/api/v1/connections/list" \
+  -H "Content-Type: application/json" \
+  -d "{\"workspaceId\":\"$WORKSPACE_ID\"}" | \
+  jq -r '.connections[].connectionId' | while read id; do
+    kubectl exec -n airbyte deploy/airbyte-server -- curl -s -X POST \
+      "http://localhost:8001/api/v1/connections/delete" \
+      -H "Content-Type: application/json" \
+      -d "{\"connectionId\":\"$id\"}"
+    echo "Deleted connection $id"
+  done
+
+# Delete sources
+kubectl exec -n airbyte deploy/airbyte-server -- curl -s \
+  "http://localhost:8001/api/v1/sources/list" \
+  -H "Content-Type: application/json" \
+  -d "{\"workspaceId\":\"$WORKSPACE_ID\"}" | \
+  jq -r '.sources[].sourceId' | while read id; do
+    kubectl exec -n airbyte deploy/airbyte-server -- curl -s -X POST \
+      "http://localhost:8001/api/v1/sources/delete" \
+      -H "Content-Type: application/json" \
+      -d "{\"sourceId\":\"$id\"}"
+    echo "Deleted source $id"
+  done
+
+# Delete destination (if needed)
+kubectl exec -n airbyte deploy/airbyte-server -- curl -s \
+  "http://localhost:8001/api/v1/destinations/list" \
+  -H "Content-Type: application/json" \
+  -d "{\"workspaceId\":\"$WORKSPACE_ID\"}" | \
+  jq -r '.destinations[].destinationId' | while read id; do
+    kubectl exec -n airbyte deploy/airbyte-server -- curl -s -X POST \
+      "http://localhost:8001/api/v1/destinations/delete" \
+      -H "Content-Type: application/json" \
+      -d "{\"destinationId\":\"$id\"}"
+    echo "Deleted destination $id"
+  done
+```
+
+**2. Delete Terraform state:**
+```bash
+# Delete K8s state
+kubectl delete secret tfstate-default-lotus-lake-airbyte -n lotus-lake
+
+# Delete local state
+rm -f orchestration/airbyte/terraform/terraform.tfstate*
+rm -rf orchestration/airbyte/terraform/.terraform
+```
+
+**3. Force tofu-controller to recreate:**
+```bash
+kubectl annotate terraform -n lotus-lake lotus-lake-airbyte \
+  reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite
+```
+
+**4. Verify:**
+```bash
+# Wait for apply
+kubectl get terraform -n lotus-lake -w
+
+# Check sources/connections created
+kubectl exec -n airbyte deploy/airbyte-server -- curl -s \
+  "http://localhost:8001/api/v1/connections/list" \
+  -H "Content-Type: application/json" \
+  -d '{"workspaceId":"YOUR_WORKSPACE_ID"}' | jq '.connections[].name'
+```
+
+### Prevention (CRITICAL RULES)
+
+1. **NEVER run `terraform apply` locally** - tofu-controller owns this
+2. **NEVER run `terraform plan` locally** - it can create state files
+3. **Delete local .tfstate files** - add to .gitignore (already done)
+4. **All Terraform changes go through git push** - that's the GitOps contract
+
+If you need to debug Terraform:
+- Read the tofu-controller logs
+- Check the stored plan: `kubectl get configmap tfplan-default-lotus-lake-airbyte -n lotus-lake`
+- Use `terraform validate` (doesn't touch state) if needed
+
+### Related
+
+- TICKET-002: Orphaned connections (same root cause - state mismatch)
+- TICKET-001: Retry caching (compounds the problem)
+
+---
+
 ## Template for New Tickets
 
 ```markdown

@@ -4,6 +4,33 @@ Quick reference for working on Lotus Lake.
 
 ---
 
+## CRITICAL: Never Run Terraform Locally
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  DO NOT RUN `terraform apply` OR `terraform plan` LOCALLY                ║
+║                                                                           ║
+║  tofu-controller manages Terraform state in K8s.                         ║
+║  Running locally creates a SEPARATE state file that drifts.              ║
+║  This causes syncs to fail with "secret not found" errors.               ║
+║                                                                           ║
+║  See TICKET-003 in docs/tickets.md for full explanation.                 ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+**If you see `terraform.tfstate` files locally, DELETE THEM:**
+```bash
+rm -f orchestration/airbyte/terraform/terraform.tfstate*
+rm -rf orchestration/airbyte/terraform/.terraform
+```
+
+**The ONLY way to apply Terraform changes:**
+1. Edit files
+2. `git commit && git push`
+3. tofu-controller applies automatically
+
+---
+
 ## Before You Execute: Stop and Assess
 
 **Always follow this framework before making changes:**
