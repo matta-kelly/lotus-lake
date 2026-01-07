@@ -111,6 +111,7 @@ def make_stream_sensor(source: str, stream: str):
 
     @sensor(
         name=f"{source}_{stream}_sensor",
+        asset_selection=[asset_key],  # Target: only this specific asset
         minimum_interval_seconds=300,  # 5 min
         default_status=DefaultSensorStatus.RUNNING,
     )
@@ -133,11 +134,7 @@ def make_stream_sensor(source: str, stream: str):
         if latest > last_seen:
             context.log.info(f"New {source}/{stream} data: {latest} > {last_seen}")
             context.update_cursor(latest.isoformat())
-            # Explicitly specify which asset to materialize
-            yield RunRequest(
-                run_key=f"{tag}_{latest.isoformat()}",
-                asset_selection=[asset_key],
-            )
+            yield RunRequest(run_key=f"{tag}_{latest.isoformat()}")
         else:
             context.log.info(f"No new {source}/{stream} data since {last_seen}")
 
