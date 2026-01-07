@@ -49,3 +49,7 @@ where year = '{{ max_year }}' and month = '{{ max_month }}' and day >= '{{ max_d
 {% endif %}
 
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
+
+{% if var('batch_size', none) %}
+limit {{ var('batch_size') }}
+{% endif %}

@@ -40,3 +40,7 @@ select
 from deduped,
 unnest(transactions) as u(t)
 group by order_id
+
+{% if var('batch_size', none) %}
+limit {{ var('batch_size') }}
+{% endif %}

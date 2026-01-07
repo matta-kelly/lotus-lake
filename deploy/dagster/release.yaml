@@ -58,6 +58,7 @@ spec:
     additionalInstanceConfig:
       auto_materialize:
         enabled: true
+        use_sensors: true
 
     dagsterDaemon:
       nodeSelector:
