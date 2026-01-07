@@ -37,7 +37,8 @@ lotus_lake:
         s3_use_ssl: false
         s3_url_style: path
       attach:
-        - path: "ducklake:postgres:host={{ env_var('DUCKLAKE_DB_HOST') }} port=5432 dbname=ducklake user=ducklake password={{ env_var('DUCKLAKE_DB_PASSWORD') }}"
+        # DUCKLAKE_DB_PASSWORD or 'password' (from ducklake-db-app secret via envSecrets)
+        - path: "ducklake:postgres:host={{ env_var('DUCKLAKE_DB_HOST') }} port=5432 dbname=ducklake user=ducklake password={{ env_var('DUCKLAKE_DB_PASSWORD', env_var('password', '')) }}"
           alias: lakehouse
           options:
             DATA_PATH: "s3://landing/raw/"

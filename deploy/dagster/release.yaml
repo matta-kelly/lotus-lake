@@ -140,10 +140,13 @@ spec:
     # -------------------------------------------------------------------------
     # Storage config
     # -------------------------------------------------------------------------
-    computeLogManager:
-      type: S3ComputeLogManager
-      config:
-        s3ComputeLogManager:
-          bucket: lotus-lake-logs
-          endpointUrl: http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333
-          skipEmptyFiles: true
+    # S3ComputeLogManager disabled - boto3 needs AWS_* env vars which conflict
+    # with our minio_* naming. Using default local logs for now.
+    # TODO: Re-enable once we have proper credential mapping
+    # computeLogManager:
+    #   type: S3ComputeLogManager
+    #   config:
+    #     s3ComputeLogManager:
+    #       bucket: lotus-lake-logs
+    #       endpointUrl: http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333
+    #       skipEmptyFiles: true
