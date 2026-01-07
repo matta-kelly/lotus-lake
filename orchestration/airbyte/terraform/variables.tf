@@ -17,6 +17,3 @@ variable "klaviyo_api_key" {}
 variable "minio_user" {}
 variable "minio_password" {}
 variable "minio_endpoint" {}
-
-# Nessie
-variable "nessie_endpoint" {}
