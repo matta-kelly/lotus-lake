@@ -1,4 +1,9 @@
-{{ config(tags=['core', 'klaviyo__flows'], materialized='table') }}
+{{ config(
+    tags=['core', 'klaviyo__flows'],
+    materialized='incremental',
+    unique_key='flow_id',
+    incremental_strategy='delete+insert'
+) }}
 
 select
     -- identifiers
@@ -12,7 +17,18 @@ select
 
     -- timestamps
     attributes::JSON->>'$.created' as created_at,
-    attributes::JSON->>'$.updated' as updated_at
+    attributes::JSON->>'$.updated' as updated_at,
+
+    -- metadata
+    _airbyte_extracted_at,
+    year,
+    month,
+    day
 
 from read_parquet('s3://landing/raw/klaviyo/flows/**/*', hive_partitioning=true)
+
+{% if is_incremental() %}
+where (year, month, day) >= (select (max(year), max(month), max(day)) from {{ this }})
+{% endif %}
+
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

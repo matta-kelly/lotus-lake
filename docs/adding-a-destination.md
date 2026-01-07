@@ -37,8 +37,9 @@ resource "airbyte_destination" "s3" {
     s3_bucket_path    = "raw"
     s3_bucket_region  = "us-west-1"
     s3_endpoint       = var.minio_endpoint
-    # Date-partitioned paths: raw/{namespace}/{stream}/YYYY/MM/DD/part_0.parquet
-    s3_path_format    = "$${NAMESPACE}/$${STREAM_NAME}/$${YEAR}/$${MONTH}/$${DAY}"
+    # Hive-partitioned paths: raw/{namespace}/{stream}/year=YYYY/month=MM/day=DD/part_0.parquet
+    # CRITICAL: Use Hive format (key=value) for DuckDB partition pruning
+    s3_path_format    = "$${NAMESPACE}/$${STREAM_NAME}/year=$${YEAR}/month=$${MONTH}/day=$${DAY}"
     file_name_pattern = "part_{part_number}"
     format = {
       format_type       = "Parquet"
@@ -149,4 +150,17 @@ When using S3 destination, these variables are available for `s3_path_format`:
 | `${YEAR}`, `${MONTH}`, `${DAY}` | Upload date |
 | `${EPOCH}` | Timestamp |
 
-Example: `${NAMESPACE}/${STREAM_NAME}/${YEAR}/${MONTH}/${DAY}` → `shopify/orders/2026/01/07/`
+**CRITICAL: Use Hive partition format for DuckDB partition pruning:**
+
+```
+${NAMESPACE}/${STREAM_NAME}/year=${YEAR}/month=${MONTH}/day=${DAY}
+→ shopify/orders/year=2026/month=01/day=07/
+```
+
+This enables DuckDB to auto-detect `year`, `month`, `day` as partition columns and skip folders that don't match WHERE filters.
+
+**Don't use plain directories:**
+```
+${NAMESPACE}/${STREAM_NAME}/${YEAR}/${MONTH}/${DAY}  ← NO partition pruning
+→ shopify/orders/2026/01/07/
+```

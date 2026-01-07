@@ -18,11 +18,13 @@ Sources (Shopify, Klaviyo)
     ↓
 Airbyte (append to S3 Parquet)
     ↓
-SeaweedFS: s3://landing/raw/{namespace}/{stream}/YYYY/MM/DD/
+SeaweedFS: s3://landing/raw/{namespace}/{stream}/year=YYYY/month=MM/day=DD/
+    ↓                                          └── Hive partition format
+DuckDB read_parquet() with hive_partitioning=true
+    ↓                  └── Auto-detects year/month/day columns, enables partition pruning
+dbt-duckdb transforms (core models = incremental, marts = table)
     ↓
-DuckLake (Postgres catalog tracks files)
-    ↓
-dbt-duckdb transforms (core, marts)
+DuckLake tables (Postgres catalog)
     ↓
 Dagster orchestration
 ```
@@ -38,8 +40,28 @@ ATTACH 'ducklake:postgres:' AS lakehouse (DATA_PATH 's3://landing/raw/');
 
 **Components:**
 - **Postgres (CNPG)**: `ducklake-db` cluster in h-kube stores table metadata
-- **SeaweedFS**: Stores actual Parquet files at `s3://landing/raw/{namespace}/{stream}/YYYY/MM/DD/` (Hive-partitioned by date)
-- **DuckDB**: Queries catalog, reads Parquet directly from S3
+- **SeaweedFS**: Stores Parquet files at `s3://landing/raw/{namespace}/{stream}/year=YYYY/month=MM/day=DD/`
+- **DuckDB**: Queries catalog, reads Parquet directly from S3 with partition pruning
+
+## Partition Pruning & Incremental Models
+
+**Why Hive format matters:**
+
+Airbyte writes Parquet with Hive-style partitions: `year=2026/month=01/day=07/`
+
+When dbt reads with `hive_partitioning=true`, DuckDB:
+1. Auto-detects `year`, `month`, `day` as partition columns
+2. Skips entire folders that don't match WHERE filters
+3. Only reads data from relevant partitions
+
+**Incremental model behavior:**
+
+| Run Type | What Happens |
+|----------|--------------|
+| Full refresh | Reads ALL partitions, rebuilds entire table |
+| Incremental | Reads only recent partitions (e.g., last 2 days), delete+insert changed records |
+
+This reduces memory usage from "all historical data" to "just recent data" per run.
 
 ## Project Organization
 

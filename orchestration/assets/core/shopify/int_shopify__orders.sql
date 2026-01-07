@@ -1,4 +1,9 @@
-{{ config(tags=['core', 'shopify__orders'], materialized='table') }}
+{{ config(
+    tags=['core', 'shopify__orders'],
+    materialized='incremental',
+    unique_key='order_id',
+    incremental_strategy='delete+insert'
+) }}
 
 select
     -- identifiers
@@ -20,7 +25,18 @@ select
     cast(total_line_items_price as decimal(10,2)) as gross_sales,
     cast(total_discounts as decimal(10,2)) as discounts,
     cast(total_shipping_price_set::JSON->>'$.shop_money.amount' as decimal(10,2)) as shipping,
-    cast(total_tax as decimal(10,2)) as taxes
+    cast(total_tax as decimal(10,2)) as taxes,
+
+    -- metadata
+    _airbyte_extracted_at,
+    year,
+    month,
+    day
 
 from read_parquet('s3://landing/raw/shopify/orders/**/*', hive_partitioning=true)
+
+{% if is_incremental() %}
+where (year, month, day) >= (select (max(year), max(month), max(day)) from {{ this }})
+{% endif %}
+
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

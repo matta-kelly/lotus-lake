@@ -1,4 +1,9 @@
-{{ config(tags=['core', 'shopify__customers'], materialized='table') }}
+{{ config(
+    tags=['core', 'shopify__customers'],
+    materialized='incremental',
+    unique_key='customer_id',
+    incremental_strategy='delete+insert'
+) }}
 
 select
     -- identifiers
@@ -19,7 +24,18 @@ select
 
     -- attributes
     tags,
-    state as customer_state
+    state as customer_state,
+
+    -- metadata
+    _airbyte_extracted_at,
+    year,
+    month,
+    day
 
 from read_parquet('s3://landing/raw/shopify/customers/**/*', hive_partitioning=true)
+
+{% if is_incremental() %}
+where (year, month, day) >= (select (max(year), max(month), max(day)) from {{ this }})
+{% endif %}
+
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

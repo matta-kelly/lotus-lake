@@ -260,13 +260,13 @@ streams/{source}/{stream}.json
 ┌──────┴──────────────────────────────────────────────────┐
 │                                                          │
 ▼                                                          ▼
-S3 Path                                          Code Generation
-raw/{source}/{stream}/YYYY/MM/DD/                         │
-                                          ┌───────────────┼───────────────┐
+S3 Path (Hive format)                            Code Generation
+raw/{source}/{stream}/year=YYYY/month=MM/day=DD/          │
+       └── enables partition pruning      ┌───────────────┼───────────────┐
                                           ▼               ▼               ▼
                                        Sensor          Asset           dbt Model
                                   {source}_{stream}  {source}_{stream}  int_{source}__{stream}
-                                     _sensor            _dbt              .sql
+                                     _sensor            _dbt              .sql (incremental)
 ```
 
 ### Asset Key Format

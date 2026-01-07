@@ -7,11 +7,11 @@ How to add dbt models for a new or existing source.
 ```
 Airbyte sync (Incremental Append)
     ↓
-S3: raw/{source}/{stream}/YYYY/MM/DD/  ← Hive-partitioned Parquet
+S3: raw/{source}/{stream}/year=YYYY/month=MM/day=DD/  ← Hive partition format
     ↓
 {source}_{stream}_sensor        ← Auto-created per stream
     ↓
-Core Model                      ← YOU CREATE (dedupe + flatten)
+Core Model (incremental)        ← YOU CREATE (dedupe + flatten + partition filter)
     ↓
 Mart Model (optional)           ← YOU CREATE (business logic)
 ```
@@ -49,7 +49,12 @@ cat orchestration/assets/core/{source}/_{source}__sources.yml
 Create `orchestration/assets/core/{source}/int_{source}__{stream}.sql`:
 
 ```sql
-{{ config(tags=['core', '{source}__{stream}'], materialized='table') }}
+{{ config(
+    tags=['core', '{source}__{stream}'],
+    materialized='incremental',
+    unique_key='entity_id',
+    incremental_strategy='delete+insert'
+) }}
 
 select
     -- identifiers (rename for clarity)
@@ -63,13 +68,29 @@ select
 
     -- timestamps
     created_at,
-    updated_at
+    updated_at,
+    _airbyte_extracted_at,
 
-from {{ source('{source}', '{stream}') }}
+    -- partition columns (from Hive path, used for incremental filter)
+    year,
+    month,
+    day
+
+from read_parquet('s3://landing/raw/{source}/{stream}/**/*', hive_partitioning=true)
+
+{% if is_incremental() %}
+where (year, month, day) >= (select (max(year), max(month), max(day)) from {{ this }})
+{% endif %}
+
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
 ```
 
-**Critical:** Tag must be `'{source}__{stream}'` (double underscore) to match the sensor.
+**Critical points:**
+- Tag must be `'{source}__{stream}'` (double underscore) to match the sensor
+- `unique_key` enables delete+insert to find existing records
+- Partition columns `year`, `month`, `day` come from Hive path automatically
+- `is_incremental()` filter enables partition pruning (DuckDB skips old folders)
+- `qualify` dedupe still runs on both full refresh and incremental
 
 ### 3. Regenerate Manifest
 
@@ -84,6 +105,41 @@ git add orchestration/assets/core/{source}/
 git commit -m "Add int_{source}__{stream} core model"
 git push
 ```
+
+## Incremental Behavior
+
+### How It Works
+
+| Run Type | Trigger | What Happens |
+|----------|---------|--------------|
+| **Full refresh** | First run, or `dbt run --full-refresh` | Reads ALL partitions, rebuilds entire table |
+| **Incremental** | Sensor trigger (normal operation) | Reads recent partitions only, delete+insert changed records |
+
+### Why delete+insert?
+
+Airbyte appends data. If order #123 is updated in Shopify:
+1. Airbyte syncs a NEW row with updated `_airbyte_extracted_at`
+2. Incremental run reads this new row
+3. `delete+insert` removes old order #123, inserts new version
+4. `qualify` dedupe ensures only latest version remains
+
+Simple `append` would create duplicates. `delete+insert` maintains dedupe.
+
+### Partition Pruning
+
+The `is_incremental()` WHERE clause:
+```sql
+where (year, month, day) >= (select (max(year), max(month), max(day)) from {{ this }})
+```
+
+DuckDB sees this filter on partition columns and **skips reading older folders entirely**. This is the memory savings - we don't load historical data.
+
+### When to Full Refresh
+
+Run `dbt run --full-refresh -s int_{source}__{stream}` when:
+- Adding new columns (backfill historical values)
+- Fixing bugs in transformation logic
+- After schema changes in source
 
 ## Adding a Mart Model
 
@@ -113,21 +169,21 @@ left join {{ ref('int_shopify__order_refunds') }} r on o.order_id = r.order_id
 - Uses `ref()` not `source()` - references core models
 - Contains business logic (net_sales calculation)
 
-**Marts auto-trigger** via `.downstream()` in the sensor - no extra config needed.
+**Note:** Marts do NOT auto-trigger when core models run. See TICKET-007.
 
 ## How Sensors Work
 
 ```
 shopify_orders_sensor fires
     ↓
-AssetSelection.tag("shopify__orders") | .downstream()
+asset_selection=[AssetKey(["main", "int_shopify__orders"])]
     ↓
-int_shopify__orders runs (has tag "shopify__orders")
-    ↓
-fct_sales runs (downstream via ref())
+int_shopify__orders runs (ONLY this model)
 ```
 
-Each stream gets its own sensor. Only that stream's models run.
+Each stream gets its own sensor. Each sensor triggers exactly ONE core model.
+
+For full sensor/asset wiring details, see `CLAUDE.md` → "Dagster Sensor & Asset Wiring".
 
 ## Quick Reference
 

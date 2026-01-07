@@ -1,4 +1,9 @@
-{{ config(tags=['core', 'klaviyo__events'], materialized='table') }}
+{{ config(
+    tags=['core', 'klaviyo__events'],
+    materialized='incremental',
+    unique_key='event_id',
+    incremental_strategy='delete+insert'
+) }}
 
 select
     -- identifiers
@@ -12,7 +17,18 @@ select
 
     -- event details
     attributes::JSON->>'$.uuid' as event_uuid,
-    attributes::JSON->>'$.event_properties' as properties
+    attributes::JSON->>'$.event_properties' as properties,
+
+    -- metadata
+    _airbyte_extracted_at,
+    year,
+    month,
+    day
 
 from read_parquet('s3://landing/raw/klaviyo/events/**/*', hive_partitioning=true)
+
+{% if is_incremental() %}
+where (year, month, day) >= (select (max(year), max(month), max(day)) from {{ this }})
+{% endif %}
+
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

@@ -9,8 +9,8 @@ resource "airbyte_destination" "s3" {
     s3_bucket_path    = "raw"
     s3_bucket_region  = "us-west-1"
     s3_endpoint       = var.minio_endpoint
-    # Date-partitioned paths: raw/{namespace}/{stream}/YYYY/MM/DD/part_0.parquet
-    s3_path_format    = "$${NAMESPACE}/$${STREAM_NAME}/$${YEAR}/$${MONTH}/$${DAY}/"
+    # Hive-partitioned paths for DuckDB partition pruning
+    s3_path_format    = "$${NAMESPACE}/$${STREAM_NAME}/year=$${YEAR}/month=$${MONTH}/day=$${DAY}/"
     file_name_pattern = "part_{part_number}.parquet"
     format = {
       format_type            = "Parquet"
