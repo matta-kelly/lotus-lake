@@ -5,71 +5,88 @@
 | Layer | Tool | Why |
 |-------|------|-----|
 | Ingestion | Airbyte | Built-in Shopify/Klaviyo connectors, incremental sync |
-| Storage | MinIO → Iceberg → Nessie | S3-compatible, ACID tables, git-like catalog |
-| Transform | dbt-trino | SQL transforms with testing and lineage |
+| Storage | SeaweedFS (S3) + Parquet | S3-compatible object storage, columnar format |
+| Catalog | DuckLake + Postgres (CNPG) | SQL-based metadata catalog, ACID, time travel |
+| Transform | dbt-duckdb | SQL transforms with DuckLake integration |
 | Orchestration | Dagster | Asset-based, sensors for Airbyte completion |
-| Query | Trino | Distributed SQL, native Iceberg support |
-| Semantic | Cube.js | Metrics, caching, API generation |
+| Query | DuckDB | Embedded OLAP, reads Parquet from S3 via DuckLake |
 
 ## Data Flow
 
 ```
 Sources (Shopify, Klaviyo)
     ↓
-Airbyte (append_dedup to Iceberg)
+Airbyte (append to S3 Parquet)
     ↓
-Bronze (raw tables in source schemas)
+SeaweedFS: s3://landing/raw/{namespace}/{stream}/
     ↓
-Streams (stg_* views - rename, cast)
+DuckLake (Postgres catalog tracks files)
     ↓
-Core (int_* incremental - flatten, filter, join)
+dbt-duckdb transforms (core, marts)
     ↓
-Marts (fct_*, dim_* tables - aggregations)
-    ↓
-Cube.js → API/Dashboards
+Dagster orchestration
 ```
+
+## DuckLake Setup
+
+DuckLake uses Postgres as the metadata catalog and SeaweedFS for Parquet storage:
+
+```sql
+-- Attach DuckLake with Postgres catalog and S3 storage
+ATTACH 'ducklake:postgres:' AS lakehouse (DATA_PATH 's3://landing/raw/');
+```
+
+**Components:**
+- **Postgres (CNPG)**: `ducklake-db` cluster in h-kube stores table metadata
+- **SeaweedFS**: Stores actual Parquet files at `s3://landing/raw/{namespace}/{stream}/`
+- **DuckDB**: Queries catalog, reads Parquet directly from S3
 
 ## Project Organization
 
 SQL models and dagster Python assets live together per source:
 
 ```
-orchestration/assets/
-├── streams/shopify/
-│   ├── orders.json              # Schema reference
-│   ├── stg_shopify__orders.sql  # Staging model
-│   └── _shopify__sources.yml    # dbt source definition
-├── core/shopify/
-│   ├── int_shopify__orders.sql  # Core model
-│   └── shopify.py               # Dagster asset (@dbt_assets)
-└── marts/
-    └── fct_daily_sales.sql
+orchestration/
+├── airbyte/terraform/       # Airbyte sources, destinations, connections
+├── assets/
+│   ├── streams/shopify/
+│   │   ├── orders.json      # Stream config (fields to sync)
+│   │   └── _catalog.json    # Generated catalog for Airbyte
+│   ├── core/shopify/
+│   │   ├── int_shopify__orders.sql
+│   │   ├── _shopify__sources.yml
+│   │   └── assets.py        # Dagster assets
+│   └── marts/
+│       └── fct_daily_sales.sql
+├── profiles.yml             # dbt-duckdb connection config
+└── dbt_project.yml
 ```
 
 ## Key Decisions
 
-**Iceberg over raw Parquet** - ACID transactions, schema evolution, time travel.
+**DuckLake over Iceberg/Nessie** - Simpler SQL-based catalog using Postgres. No complex file-based metadata. Same features: ACID, time travel, schema evolution.
 
-**Nessie over Glue/Hive** - Git-like versioning, self-hosted, multi-table transactions.
+**Postgres (CNPG) for catalog** - Managed by h-kube, already running for other services. Low overhead.
 
-**Trino over DuckDB** - DuckDB can't write Iceberg yet. Revisit when it can.
+**SeaweedFS over MinIO** - Already deployed in h-kube, S3-compatible, distributed.
+
+**DuckDB over Trino** - Embedded, no cluster to manage. DuckLake enables full lakehouse features.
 
 **Dagster over Airflow** - Asset-based model fits dbt. Sensors react to Airbyte syncs.
-
-**Combined orchestration/** - dbt and dagster configs together reduces context switching.
 
 ## Naming Conventions
 
 | Layer | Pattern | Example |
 |-------|---------|---------|
-| Staging | `stg_<source>__<entity>` | `stg_shopify__orders` |
-| Core | `int_<source>__<entity>` | `int_shopify__order_lines` |
-| Mart | `fct_<domain>`, `dim_<entity>` | `fct_daily_sales`, `dim_products` |
+| Raw (Airbyte) | `{namespace}/{stream}` | `shopify/orders` |
+| Core | `int_<source>__<entity>` | `int_shopify__orders` |
+| Mart | `fct_<domain>`, `dim_<entity>` | `fct_daily_sales`, `dim_customers` |
 
-## Dev Resources
+## Infrastructure (h-kube)
 
-| Component | CPU | Memory |
-|-----------|-----|--------|
-| Airbyte Server | 250m-1 | 512Mi-2Gi |
-| Airbyte Worker | 500m-2 | 1-4Gi |
-| Trino | 1 | 10-12Gi |
+| Component | Namespace | Purpose |
+|-----------|-----------|---------|
+| SeaweedFS | `seaweedfs` | S3-compatible storage for Parquet |
+| CNPG `ducklake-db` | `lotus-lake` | DuckLake metadata catalog |
+| Airbyte | `airbyte` | Data ingestion |
+| tofu-controller | `flux-system` | GitOps for Terraform |
