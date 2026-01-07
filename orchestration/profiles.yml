@@ -30,9 +30,10 @@ lotus_lake:
         - ducklake
         - httpfs
       settings:
-        s3_access_key_id: "{{ env_var('S3_ACCESS_KEY_ID') }}"
-        s3_secret_access_key: "{{ env_var('S3_SECRET_ACCESS_KEY') }}"
-        s3_endpoint: "{{ env_var('S3_ENDPOINT') }}"
+        # Try S3_* first, fall back to minio_* (from lotus-lake-terraform-vars secret)
+        s3_access_key_id: "{{ env_var('S3_ACCESS_KEY_ID', env_var('minio_user', '')) }}"
+        s3_secret_access_key: "{{ env_var('S3_SECRET_ACCESS_KEY', env_var('minio_password', '')) }}"
+        s3_endpoint: "{{ env_var('S3_ENDPOINT', env_var('minio_endpoint', '')) }}"
         s3_use_ssl: false
         s3_url_style: path
       attach:
