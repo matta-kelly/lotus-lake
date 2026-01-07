@@ -14,5 +14,5 @@ select
     attributes::JSON->>'$.uuid' as event_uuid,
     attributes::JSON->>'$.event_properties' as properties
 
-from read_parquet('s3://landing/raw/klaviyo/events/**/*.parquet', hive_partitioning=true)
+from read_parquet('s3://landing/raw/klaviyo/events/**/*', hive_partitioning=true)
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

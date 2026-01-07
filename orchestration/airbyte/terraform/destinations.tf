@@ -11,7 +11,7 @@ resource "airbyte_destination" "s3" {
     s3_endpoint       = var.minio_endpoint
     # Date-partitioned paths: raw/{namespace}/{stream}/YYYY/MM/DD/part_0.parquet
     s3_path_format    = "$${NAMESPACE}/$${STREAM_NAME}/$${YEAR}/$${MONTH}/$${DAY}/"
-    file_name_pattern = "part_{part_number}"
+    file_name_pattern = "part_{part_number}.parquet"
     format = {
       format_type            = "Parquet"
       compression_codec      = "UNCOMPRESSED"

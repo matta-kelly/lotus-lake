@@ -3,7 +3,7 @@
 -- Dedupe then aggregate refunds per order
 with deduped as (
     select *
-    from read_parquet('s3://landing/raw/shopify/order_refunds/**/*.parquet', hive_partitioning=true)
+    from read_parquet('s3://landing/raw/shopify/order_refunds/**/*', hive_partitioning=true)
     qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
 )
 
