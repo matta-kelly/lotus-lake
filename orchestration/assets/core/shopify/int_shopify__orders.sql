@@ -22,5 +22,5 @@ select
     cast(total_shipping_price_set::JSON->>'$.shop_money.amount' as decimal(10,2)) as shipping,
     cast(total_tax as decimal(10,2)) as taxes
 
-from read_parquet('s3://landing/raw/shopify/orders*.parquet')
+from read_parquet('s3://landing/raw/shopify/orders/**/*.parquet', hive_partitioning=true)
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

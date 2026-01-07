@@ -18,7 +18,7 @@ Sources (Shopify, Klaviyo)
     ↓
 Airbyte (append to S3 Parquet)
     ↓
-SeaweedFS: s3://landing/raw/{namespace}/{stream}/
+SeaweedFS: s3://landing/raw/{namespace}/{stream}/YYYY/MM/DD/
     ↓
 DuckLake (Postgres catalog tracks files)
     ↓
@@ -38,7 +38,7 @@ ATTACH 'ducklake:postgres:' AS lakehouse (DATA_PATH 's3://landing/raw/');
 
 **Components:**
 - **Postgres (CNPG)**: `ducklake-db` cluster in h-kube stores table metadata
-- **SeaweedFS**: Stores actual Parquet files at `s3://landing/raw/{namespace}/{stream}/`
+- **SeaweedFS**: Stores actual Parquet files at `s3://landing/raw/{namespace}/{stream}/YYYY/MM/DD/` (Hive-partitioned by date)
 - **DuckDB**: Queries catalog, reads Parquet directly from S3
 
 ## Project Organization

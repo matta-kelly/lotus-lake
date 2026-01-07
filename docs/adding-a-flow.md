@@ -7,7 +7,7 @@ How to add dbt models for a new or existing source.
 ```
 Airbyte sync (Incremental Append)
     ↓
-S3: raw/{source}/{stream}/      ← Parquet files land here
+S3: raw/{source}/{stream}/YYYY/MM/DD/  ← Hive-partitioned Parquet
     ↓
 {source}_{stream}_sensor        ← Auto-created per stream
     ↓

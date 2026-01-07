@@ -37,7 +37,9 @@ resource "airbyte_destination" "s3" {
     s3_bucket_path    = "raw"
     s3_bucket_region  = "us-west-1"
     s3_endpoint       = var.minio_endpoint
-    s3_path_format    = "$${NAMESPACE}/$${STREAM_NAME}"
+    # Date-partitioned paths: raw/{namespace}/{stream}/YYYY/MM/DD/part_0.parquet
+    s3_path_format    = "$${NAMESPACE}/$${STREAM_NAME}/$${YEAR}/$${MONTH}/$${DAY}"
+    file_name_pattern = "part_{part_number}"
     format = {
       format_type       = "Parquet"
       compression_codec = "UNCOMPRESSED"
@@ -147,4 +149,4 @@ When using S3 destination, these variables are available for `s3_path_format`:
 | `${YEAR}`, `${MONTH}`, `${DAY}` | Upload date |
 | `${EPOCH}` | Timestamp |
 
-Example: `${NAMESPACE}/${STREAM_NAME}` → `shopify/orders/`
+Example: `${NAMESPACE}/${STREAM_NAME}/${YEAR}/${MONTH}/${DAY}` → `shopify/orders/2026/01/07/`
