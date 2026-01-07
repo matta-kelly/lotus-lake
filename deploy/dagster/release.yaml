@@ -55,6 +55,9 @@ spec:
     dagsterDaemon:
       nodeSelector:
         kubernetes.io/hostname: monkeybusiness
+      config:
+        autoMaterialize:
+          enabled: true
       env:
         - name: DAGSTER_PG_PASSWORD
           valueFrom:
