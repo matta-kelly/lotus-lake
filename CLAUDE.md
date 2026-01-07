@@ -47,12 +47,25 @@ Before committing, know exactly how you'll verify success:
 
 Review `docs/tickets.md` for known limitations that may affect your change.
 
-### 6. Document Learnings
+### 6. Post-Execution Review (Required)
 
-When things don't go as expected:
-1. Stop and understand why
-2. Update `docs/tickets.md` if it's a new issue
-3. Update this file or relevant docs if process needs clarification
+After every significant change, review what happened:
+
+**If everything worked as expected:**
+- ✅ Confirm docs are still accurate
+- ✅ No action needed
+
+**If something unexpected happened:**
+1. **STOP** - Don't just work around it
+2. **Understand** - Why did this happen? What assumption was wrong?
+3. **Document** - Add to `docs/tickets.md` as new ticket
+4. **Update** - Fix relevant docs/CLAUDE.md if process was unclear
+
+**This is not optional.** Every bump becomes a ticket. Every lesson updates the docs. This keeps the system learnable and maintainable.
+
+### 7. Reference Tickets Before Execution
+
+Before executing, always check `docs/tickets.md` for known issues that may affect your change. If you hit a known issue, that's expected - not a new problem
 
 ---
 
