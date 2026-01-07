@@ -105,7 +105,7 @@ select
     o.gross_sales - o.discounts - coalesce(r.returns, 0) as net_sales
 
 from {{ ref('int_shopify__orders') }} o
-left join {{ ref('int_shopify__refunds') }} r on o.order_id = r.order_id
+left join {{ ref('int_shopify__order_refunds') }} r on o.order_id = r.order_id
 ```
 
 **Key differences from core:**
@@ -145,7 +145,7 @@ Each stream gets its own sensor. Only that stream's models run.
 |--------|-----------|------|
 | orders | int_shopify__orders | fct_sales |
 | customers | int_shopify__customers | - |
-| order_refunds | int_shopify__refunds | (via fct_sales) |
+| order_refunds | int_shopify__order_refunds | (via fct_sales) |
 
 ### Klaviyo
 | Stream | Core Model | Mart |

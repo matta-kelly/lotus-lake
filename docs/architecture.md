@@ -52,12 +52,15 @@ orchestration/
 │   ├── streams/shopify/
 │   │   ├── orders.json      # Stream config (fields to sync)
 │   │   └── _catalog.json    # Generated catalog for Airbyte
-│   ├── core/shopify/
-│   │   ├── int_shopify__orders.sql
-│   │   ├── _shopify__sources.yml
-│   │   └── assets.py        # Dagster assets
+│   ├── core/
+│   │   ├── assets.py        # Dagster asset factory (auto-generates per stream)
+│   │   └── shopify/
+│   │       ├── int_shopify__orders.sql
+│   │       └── _shopify__sources.yml
 │   └── marts/
-│       └── fct_daily_sales.sql
+│       └── sales/
+│           └── fct_sales.sql
+├── sensors.py               # S3 sensors (auto-generated per stream)
 ├── profiles.yml             # dbt-duckdb connection config
 └── dbt_project.yml
 ```

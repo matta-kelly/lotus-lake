@@ -24,4 +24,4 @@ select
     o.gross_sales - o.discounts - coalesce(r.returns, 0) + o.shipping + o.taxes as total_sales
 
 from {{ ref('int_shopify__orders') }} o
-left join {{ ref('int_shopify__refunds') }} r on o.order_id = r.order_id
+left join {{ ref('int_shopify__order_refunds') }} r on o.order_id = r.order_id
