@@ -205,7 +205,11 @@ To re-sync all historical data for a stream:
 | Discover streams | `make discover` |
 | Generate catalog | `python orchestration/airbyte/generate-catalog.py` |
 | Check terraform status | `kubectl get terraform -n lotus-lake` |
-| Force reconcile | `kubectl annotate terraform -n lotus-lake lotus-lake-airbyte reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite` |
+| Check GitRepository revision | `kubectl get gitrepository -n lotus-lake lotus-lake -o jsonpath='{.status.artifact.revision}'` |
+| Force GitRepository fetch | `kubectl annotate gitrepository -n lotus-lake lotus-lake reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite` |
+| Force terraform reconcile | `kubectl annotate terraform -n lotus-lake lotus-lake-airbyte reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite` |
+
+> **Note:** When forcing reconcile after a push, always force GitRepository first (to fetch new commit), then Terraform.
 
 ## Secrets
 
