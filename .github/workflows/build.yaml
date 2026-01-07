@@ -56,14 +56,31 @@ jobs:
           cd orchestration && dbt parse --profiles-dir . --project-dir .
           echo "dbt validation passed"
 
-      # Validate Dagster Python code syntax (import check)
+      # Validate Dagster Python code syntax
       - name: Validate Dagster Python syntax
         run: |
           pip install dagster dagster-dbt dagster-postgres boto3
           cd orchestration
-          # Check Python syntax
           python -m py_compile definitions.py sensors.py resources.py assets/core/assets.py
           echo "Python syntax validation passed"
+
+      # Validate Helm values render correctly
+      - name: Validate Helm release
+        run: |
+          helm repo add dagster https://dagster-io.github.io/helm
+          helm template dagster dagster/dagster -f deploy/dagster/release.yaml --set postgresql.enabled=false > /dev/null
+          echo "Helm template validation passed"
+
+      # Validate image path matches repo
+      - name: Validate image path
+        run: |
+          EXPECTED="ghcr.io/${{ github.repository }}"
+          ACTUAL=$(grep -o 'ghcr.io/[^"]*' deploy/dagster/release.yaml | head -1 | sed 's/:.*$//')
+          if [ "$ACTUAL" != "$EXPECTED" ]; then
+            echo "::error::Image path mismatch: expected $EXPECTED, got $ACTUAL"
+            exit 1
+          fi
+          echo "Image path validation passed: $ACTUAL"
 
   # ─────────────────────────────────────────────────────────────────────────
   # Build - Only runs if validation passes
