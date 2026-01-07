@@ -16,5 +16,5 @@ select
     attributes::JSON->>'$.scheduled_at' as scheduled_at,
     attributes::JSON->>'$.send_time' as send_time
 
-from read_parquet('s3://landing/raw/klaviyo/campaigns/*.parquet')
+from read_parquet('s3://landing/raw/klaviyo/campaigns*.parquet')
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

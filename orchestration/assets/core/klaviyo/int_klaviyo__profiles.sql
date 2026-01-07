@@ -31,5 +31,5 @@ select
     cast(attributes::JSON->>'$.predictive_analytics.average_order_value' as double) as average_order_value,
     cast(attributes::JSON->>'$.predictive_analytics.historic_number_of_orders' as bigint) as historic_orders
 
-from read_parquet('s3://landing/raw/klaviyo/profiles/*.parquet')
+from read_parquet('s3://landing/raw/klaviyo/profiles*.parquet')
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

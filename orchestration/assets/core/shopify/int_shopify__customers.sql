@@ -21,5 +21,5 @@ select
     tags,
     state as customer_state
 
-from read_parquet('s3://landing/raw/shopify/customers/*.parquet')
+from read_parquet('s3://landing/raw/shopify/customers*.parquet')
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
