@@ -34,6 +34,11 @@ spec:
     # -------------------------------------------------------------------------
     postgresql:
       enabled: false
+      # External PostgreSQL connection for init containers
+      postgresqlHost: "dagster-db-rw.lotus-lake.svc.cluster.local"
+      postgresqlPort: 5432
+      postgresqlUsername: "dagster"
+      postgresqlDatabase: "dagster"
 
     generatePostgresqlPasswordSecret: false
 
