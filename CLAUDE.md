@@ -35,13 +35,26 @@ rm -rf orchestration/airbyte/terraform/.terraform
 
 **Always follow this framework before making changes:**
 
-### 1. Understand the Change
+### 1. Check Tickets and Identify Procedure Doc
+
+**Before creating any plan of action:**
+
+1. Review `docs/tickets.md` for open issues that may affect your change
+2. Identify which procedure doc applies:
+   - Adding/changing sources → `docs/adding-a-source.md`
+   - Adding/changing destinations → `docs/adding-a-destination.md`
+   - Architecture questions → `docs/architecture.md`
+3. **State the doc you're following** when presenting the plan (e.g., "Following `docs/adding-a-destination.md`")
+
+If no procedure doc exists for your task, create one as part of the work.
+
+### 2. Understand the Change
 
 - What files are being modified?
 - What is the expected outcome?
 - What systems are affected? (Airbyte, Terraform, dbt, Dagster)
 
-### 2. Know the Execution Path
+### 4. Know the Execution Path
 
 ```
 Push to git
@@ -55,7 +68,7 @@ Auto-approve + apply
 Airbyte/infrastructure updates
 ```
 
-### 3. Identify Risks
+### 5. Identify Risks
 
 | Question | Why It Matters |
 |----------|----------------|
@@ -63,18 +76,14 @@ Airbyte/infrastructure updates
 | How will I know it failed? | Define verification steps |
 | What's the rollback? | Know before you need it |
 
-### 4. Define Verification Steps
+### 6. Define Verification Steps
 
 Before committing, know exactly how you'll verify success:
 - What commands will you run?
 - What output do you expect?
 - What's the timeline? (immediate vs. wait for interval)
 
-### 5. Check Open Tickets
-
-Review `docs/tickets.md` for known limitations that may affect your change.
-
-### 6. Post-Execution Review (Required)
+### 7. Post-Execution Review (Required)
 
 After every significant change, review what happened:
 
@@ -89,10 +98,6 @@ After every significant change, review what happened:
 4. **Update** - Fix relevant docs/CLAUDE.md if process was unclear
 
 **This is not optional.** Every bump becomes a ticket. Every lesson updates the docs. This keeps the system learnable and maintainable.
-
-### 7. Reference Tickets Before Execution
-
-Before executing, always check `docs/tickets.md` for known issues that may affect your change. If you hit a known issue, that's expected - not a new problem
 
 ---
 
@@ -246,5 +251,7 @@ See `docs/tickets.md` for details.
 
 ## Reference Docs
 
-- `docs/adding-a-source.md` - Full guide for adding sources
+- `docs/adding-a-source.md` - Adding/modifying sources
+- `docs/adding-a-destination.md` - Adding/modifying destinations
 - `docs/tickets.md` - Known issues and TODOs
+- `docs/architecture.md` - System architecture
