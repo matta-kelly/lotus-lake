@@ -3,21 +3,39 @@
 ## Overview
 
 ```
-1. Define source in Terraform
-2. Deploy source to Airbyte
-3. Discover available streams
-4. Select & configure streams
-5. Generate catalog
-6. Apply connection
+1. Discover available streams (optional - if source exists in Airbyte)
+2. Define source in Terraform
+3. Select & configure streams
+4. Generate catalog
+5. Push to git → tofu-controller applies automatically
 ```
 
 ## Steps
 
-### 1. Define Source in Terraform
+### 1. Discover Available Streams (Optional)
 
-Add source definition to `infrastructure/airbyte/terraform/sources.tf`:
+If the source already exists in Airbyte, discover what streams are available:
 
-Note: perhaps easier to config in UI & Copy json over
+```bash
+make discover
+```
+
+Select your source. This fetches all available streams and saves to:
+```
+orchestration/assets/sources/my_source/
+├── stream_a.json
+├── stream_b.json
+└── stream_c.json
+```
+
+Each file shows:
+- Available sync modes
+- Default primary key / cursor
+- Full field schema with types and descriptions
+
+### 2. Define Source in Terraform
+
+Add source definition to `orchestration/airbyte/terraform/sources.tf`:
 
 ```hcl
 resource "airbyte_source" "my_source" {
@@ -32,111 +50,170 @@ resource "airbyte_source" "my_source" {
 }
 ```
 
-Add connection to `infrastructure/airbyte/terraform/connections.tf`:
+Add any new variables to `orchestration/airbyte/terraform/variables.tf`:
 
 ```hcl
-resource "airbyte_connection" "my_source_to_lake" {
-  source_id      = airbyte_source.my_source.source_id
-  destination_id = airbyte_destination.s3_data_lake.destination_id
-  name           = "My Source → S3 Data Lake"
-  # ... config
-
-  sync_catalog = jsondecode(file("${path.module}/../streams/my_source.json"))
+variable "my_source_api_key" {
+  description = "API key for My Source"
+  type        = string
+  sensitive   = true
 }
 ```
 
-### 2. Deploy Source to Airbyte
+> **Tip:** Sometimes it's easier to configure the source in the Airbyte UI first, then copy the JSON configuration over.
 
-```bash
-cd infrastructure/airbyte/terraform
-terraform apply
-```
+### 3. Select & Configure Streams
 
-This creates the source in Airbyte (connection will fail until we have streams).
-
-### 3. Discover Available Streams
-
-```bash
-make discover
-```
-
-Select your new source. This fetches all available streams and saves to:
-```
-orchestration/assets/sources/my_source/
-├── stream_a.json
-├── stream_b.json
-└── stream_c.json
-```
-
-Each file shows:
-- Available sync modes
-- Default primary key / cursor
-- Full field schema
-
-### 4. Select & Configure Streams
-
-Copy the streams you want:
+Create stream configs in `orchestration/assets/streams/my_source/`:
 
 ```bash
 mkdir -p orchestration/assets/streams/my_source
-cp orchestration/assets/sources/my_source/stream_a.json \
-   orchestration/assets/streams/my_source/
 ```
 
-Edit the stream file to configure:
+Create a JSON file for each stream you want to sync (e.g., `stream_a.json`):
 
 ```json
 {
   "stream": "stream_a",
   "sync_mode": "incremental",
   "destination_sync_mode": "append_dedup",
-  "primary_key": [["id"]],
-  "cursor_field": ["updated_at"],
+  "backfill": false,
+  "primary_key": [
+    [
+      "id"
+    ]
+  ],
+  "cursor_field": [
+    "updated_at"
+  ],
   "fields": {
-    "id": { "type": "integer" },
-    "name": { "type": "string" },
-    "updated_at": { "type": "string", "format": "date-time" }
+    "id": {
+      "type": "integer",
+      "description": "Unique identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the record"
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "Last update timestamp",
+      "format": "date-time"
+    }
   }
 }
 ```
 
-- Set `sync_mode` from available options
-- Set `destination_sync_mode`: `overwrite`, `append`, or `append_dedup`
-- Keep or override `primary_key` and `cursor_field`
-- Trim `fields` to only what you need
+**Configuration options:**
 
-### 5. Generate Catalog
+| Field | Options | Description |
+|-------|---------|-------------|
+| `sync_mode` | `full_refresh`, `incremental` | How to read from source |
+| `destination_sync_mode` | `overwrite`, `append`, `append_dedup` | How to write to destination |
+| `backfill` | `true`, `false` | Set `true` to trigger a full re-sync |
+| `primary_key` | `[["field"]]` | Dedup key for append_dedup mode |
+| `cursor_field` | `["field"]` | Field for incremental sync |
+| `fields` | `{...}` | Only these fields will be synced |
 
-```bash
-make generate
-```
+**Field selection:** Only include fields you actually need. Reference `orchestration/assets/sources/my_source/` for available fields with types and descriptions.
 
-Select your source. This creates:
-```
-infrastructure/airbyte/streams/my_source.json
-```
-
-### 6. Apply Connection
+### 4. Generate Catalog
 
 ```bash
-make apply
+python orchestration/airbyte/generate-catalog.py
 ```
 
-This updates Terraform with the new catalog and applies to Airbyte.
+This creates `orchestration/assets/streams/my_source/_catalog.json` from your stream configs.
 
-## Verify
+### 5. Add Connection to Terraform
 
-Check Airbyte UI or trigger a sync:
+Add connection to `orchestration/airbyte/terraform/connections.tf`:
+
+```hcl
+resource "airbyte_connection" "my_source_to_lake" {
+  source_id      = airbyte_source.my_source.source_id
+  destination_id = airbyte_destination.s3_data_lake.destination_id
+  name           = "My Source → S3 Data Lake"
+
+  schedule = {
+    schedule_type = "cron"
+    cron_expression = "0 0 * * * ?"  # Every hour
+  }
+
+  sync_catalog = jsondecode(file("${path.module}/../../assets/streams/my_source/_catalog.json"))
+}
+```
+
+### 6. Push to Git
+
 ```bash
-# List connections
-curl -s http://localhost:8080/api/public/v1/connections | jq '.data[].name'
+git add orchestration/
+git commit -m "Add My Source to Airbyte"
+git push
 ```
+
+tofu-controller will automatically:
+1. Detect the new commit (within 5 minutes)
+2. Run `terraform plan`
+3. Auto-approve and apply
+4. Create source and connection in Airbyte
+
+### 7. Verify
+
+Check tofu-controller status:
+```bash
+kubectl get terraform -n lotus-lake
+```
+
+Expected output:
+```
+NAME                 READY   STATUS                              AGE
+lotus-lake-airbyte   True    Applied successfully: main@sha1:...  5m
+```
+
+Check Airbyte connections:
+```bash
+kubectl exec -n airbyte deploy/airbyte-server -- curl -s \
+  "http://localhost:8001/api/v1/connections/list" \
+  -H "Content-Type: application/json" \
+  -d '{"workspaceId":"YOUR_WORKSPACE_ID"}' | jq '.connections[].name'
+```
+
+## Adding a Stream to an Existing Source
+
+Simpler workflow when the source already exists:
+
+1. Create stream config in `orchestration/assets/streams/SOURCE_NAME/STREAM.json`
+2. Run `python orchestration/airbyte/generate-catalog.py`
+3. Push to git
+
+That's it. tofu-controller handles the rest.
+
+## Triggering a Backfill
+
+To re-sync all historical data for a stream:
+
+1. Edit the stream config, set `"backfill": true`
+2. Push to git
+3. Wait for sync to complete
+4. Set `"backfill": false` and push again
 
 ## Quick Reference
 
-| Command | What it does |
-|---------|--------------|
-| `make discover` | Fetch available streams from Airbyte source |
-| `make generate` | Build Airbyte catalog from stream configs |
-| `make plan` | Generate all + terraform plan |
-| `make apply` | Generate all + terraform apply |
+| Task | Command |
+|------|---------|
+| Discover streams | `make discover` |
+| Generate catalog | `python orchestration/airbyte/generate-catalog.py` |
+| Check terraform status | `kubectl get terraform -n lotus-lake` |
+| Force reconcile | `kubectl annotate terraform -n lotus-lake lotus-lake-airbyte reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite` |
+
+## Secrets
+
+New source credentials must be added to the terraform vars secret in h-kube:
+
+```bash
+# In h-kube repo
+sops cluster/namespaces/lotus-lake/lotus-lake-secrets.yaml
+```
+
+Add your variable (e.g., `TF_VAR_my_source_api_key`), then commit and push h-kube.

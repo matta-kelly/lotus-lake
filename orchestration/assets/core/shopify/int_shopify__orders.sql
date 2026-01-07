@@ -3,6 +3,7 @@
 select
     -- identifiers
     id as order_id,
+    cast(json_extract_scalar(json_parse(customer), '$.id') as bigint) as customer_id,
 
     -- timestamps
     created_at as order_date,

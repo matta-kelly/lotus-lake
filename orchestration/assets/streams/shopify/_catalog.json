@@ -2,6 +2,97 @@
   "streams": [
     {
       "stream": {
+        "name": "customers",
+        "supportedSyncModes": [
+          "full_refresh",
+          "incremental"
+        ],
+        "json_schema": {
+          "type": "[\"null\", \"object\"]",
+          "properties": "{\"note\": {\"type\": [\"null\", \"string\"], \"description\": \"Additional notes or comments related to the customer.\"}, \"addresses\": {\"type\": [\"null\", \"array\"], \"description\": \"List of addresses associated with the customer\", \"items\": {\"type\": [\"null\", \"object\"], \"properties\": {\"zip\": {\"type\": [\"null\", \"string\"], \"description\": \"Postal or ZIP code of the customer's address.\"}, \"country\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's country.\"}, \"city\": {\"type\": [\"null\", \"string\"], \"description\": \"City where the customer is located.\"}, \"address2\": {\"type\": [\"null\", \"string\"], \"description\": \"Second line of customer's address.\"}, \"address1\": {\"type\": [\"null\", \"string\"], \"description\": \"First line of customer's address.\"}, \"last_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's last name.\"}, \"province_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Province or state code.\"}, \"country_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Country code of the customer's country.\"}, \"default\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if this address is the default address for the customer.\"}, \"province\": {\"type\": [\"null\", \"string\"], \"description\": \"Province or state where the customer is located.\"}, \"phone\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's phone number.\"}, \"name\": {\"type\": [\"null\", \"string\"], \"description\": \"Full name associated with the address.\"}, \"country_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the customer's country.\"}, \"company\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's company name.\"}, \"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the address.\"}, \"customer_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the customer.\"}, \"first_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's first name.\"}}}}, \"last_order_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the customer's last order.\"}, \"created_at\": {\"type\": [\"null\", \"string\"], \"description\": \"Timestamp when the customer was created.\", \"format\": \"date-time\"}, \"multipass_identifier\": {\"type\": [\"null\", \"string\"], \"description\": \"Multipass identifier for the customer.\"}, \"accepts_marketing_updated_at\": {\"type\": [\"null\", \"unknown\"], \"description\": \"Timestamp when the marketing consent status was last updated.\"}, \"default_address\": {\"type\": [\"null\", \"object\"], \"description\": \"Customer's default address\", \"properties\": {\"zip\": {\"type\": [\"null\", \"string\"], \"description\": \"Postal or ZIP code of the customer's default address.\"}, \"country\": {\"type\": [\"null\", \"string\"], \"description\": \"Country of the customer's default address.\"}, \"city\": {\"type\": [\"null\", \"string\"], \"description\": \"City where the customer's default address is located.\"}, \"address2\": {\"type\": [\"null\", \"string\"], \"description\": \"Second line of customer's default address.\"}, \"address1\": {\"type\": [\"null\", \"string\"], \"description\": \"First line of customer's default address.\"}, \"last_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's last name associated with the default address.\"}, \"province_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Province or state code of the customer's default address.\"}, \"country_code\": {\"type\": [\"null\", \"string\"], \"description\": \"Country code of the customer's default address.\"}, \"default\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if this is the default address for the customer.\"}, \"province\": {\"type\": [\"null\", \"string\"], \"description\": \"Province or state where the customer's default address is located.\"}, \"phone\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's phone number associated with the default address.\"}, \"name\": {\"type\": [\"null\", \"string\"], \"description\": \"Full name associated with the default address.\"}, \"country_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Name of the country for the customer's default address.\"}, \"company\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's company name associated with the default address.\"}, \"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the default address.\"}, \"customer_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the customer.\"}, \"first_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's first name associated with the default address.\"}}}, \"updated_at\": {\"type\": [\"null\", \"string\"], \"description\": \"Timestamp when the customer data was last updated.\", \"format\": \"date-time\"}, \"accepts_marketing\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the customer has agreed to receive marketing materials.\"}, \"shop_url\": {\"type\": [\"null\", \"string\"], \"description\": \"URL of the customer's associated shop.\"}, \"currency\": {\"type\": [\"null\", \"string\"], \"description\": \"Currency associated with the customer.\"}, \"id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the customer.\"}, \"state\": {\"type\": [\"null\", \"string\"], \"description\": \"Current state or status of the customer.\"}, \"marketing_opt_in_level\": {\"type\": [\"null\", \"string\"], \"description\": \"Level of opt-in for marketing activities.\"}, \"first_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's first name.\"}, \"email\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's email address.\"}, \"total_spent\": {\"type\": [\"null\", \"number\"], \"description\": \"Total amount spent by the customer.\"}, \"last_order_id\": {\"type\": [\"null\", \"integer\"], \"description\": \"Unique identifier for the customer's last order.\"}, \"tax_exempt\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the customer is tax exempt.\"}, \"email_marketing_consent\": {\"type\": [\"null\", \"object\"], \"description\": \"Indicates if the customer has consented to receive marketing emails\", \"properties\": {\"consent_updated_at\": {\"type\": [\"null\", \"string\"], \"description\": \"Timestamp when the email marketing consent was last updated.\", \"format\": \"date-time\"}, \"state\": {\"type\": [\"null\", \"string\"], \"description\": \"Current state of email marketing consent.\"}, \"opt_in_level\": {\"type\": [\"null\", \"string\"], \"description\": \"Level of opt-in for email marketing.\"}}}, \"last_name\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's last name.\"}, \"verified_email\": {\"type\": [\"null\", \"boolean\"], \"description\": \"Indicates if the customer's email address has been verified.\"}, \"tags\": {\"type\": [\"null\", \"string\"], \"description\": \"Tags associated with the customer for categorization.\"}, \"orders_count\": {\"type\": [\"null\", \"integer\"], \"description\": \"Total number of orders placed by the customer.\"}, \"sms_marketing_consent\": {\"type\": [\"null\", \"object\"], \"description\": \"Indicates if the customer has consented to receive marketing SMS messages\", \"properties\": {\"consent_updated_at\": {\"type\": [\"null\", \"string\"], \"description\": \"Timestamp when the SMS marketing consent was last updated.\", \"format\": \"date-time\"}, \"consent_collected_from\": {\"type\": [\"null\", \"string\"], \"description\": \"Source from which SMS marketing consent was collected.\"}, \"state\": {\"type\": [\"null\", \"string\"], \"description\": \"Current state of SMS marketing consent.\"}, \"opt_in_level\": {\"type\": [\"null\", \"string\"], \"description\": \"Level of opt-in for SMS marketing.\"}}}, \"phone\": {\"type\": [\"null\", \"string\"], \"description\": \"Customer's phone number.\"}, \"admin_graphql_api_id\": {\"type\": [\"null\", \"string\"], \"description\": \"Unique identifier for the customer in the Admin GraphQL API.\"}, \"tax_exemptions\": {\"type\": [\"null\", \"string\"], \"description\": \"Information about tax exemptions for the customer.\"}}",
+          "additionalProperties": "true"
+        },
+        "default_cursor_field": [
+          "updated_at"
+        ],
+        "source_defined_cursor": true,
+        "source_defined_primary_key": [
+          [
+            "id"
+          ]
+        ]
+      },
+      "config": {
+        "sync_mode": "incremental",
+        "cursor_field": [
+          "updated_at"
+        ],
+        "destination_sync_mode": "append_dedup",
+        "primary_key": [
+          [
+            "id"
+          ]
+        ],
+        "alias_name": "customers",
+        "selected": true,
+        "suggested": false,
+        "field_selection_enabled": true,
+        "selected_fields": [
+          {
+            "field_path": [
+              "id"
+            ]
+          },
+          {
+            "field_path": [
+              "email"
+            ]
+          },
+          {
+            "field_path": [
+              "first_name"
+            ]
+          },
+          {
+            "field_path": [
+              "last_name"
+            ]
+          },
+          {
+            "field_path": [
+              "created_at"
+            ]
+          },
+          {
+            "field_path": [
+              "updated_at"
+            ]
+          },
+          {
+            "field_path": [
+              "orders_count"
+            ]
+          },
+          {
+            "field_path": [
+              "total_spent"
+            ]
+          },
+          {
+            "field_path": [
+              "tags"
+            ]
+          },
+          {
+            "field_path": [
+              "state"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "stream": {
         "name": "order_refunds",
         "supportedSyncModes": [
           "full_refresh",
@@ -162,6 +253,11 @@
           {
             "field_path": [
               "cancel_reason"
+            ]
+          },
+          {
+            "field_path": [
+              "customer"
             ]
           }
         ]

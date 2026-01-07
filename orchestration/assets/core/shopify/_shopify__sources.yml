@@ -7,3 +7,4 @@ sources:
     tables:
       - name: orders
       - name: order_refunds
+      - name: customers

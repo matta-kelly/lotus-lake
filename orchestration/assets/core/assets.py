@@ -55,7 +55,7 @@ def core_dbt_models(context: AssetExecutionContext, dbt: DbtCliResource):
     """All core layer dbt models - auto-generated from manifest.
 
     Includes:
-    - int_shopify__orders, int_shopify__refunds
+    - int_shopify__orders, int_shopify__refunds, int_shopify__customers
     - int_klaviyo__profiles, int_klaviyo__events
     """
     yield from dbt.cli(["run"], context=context).stream()
