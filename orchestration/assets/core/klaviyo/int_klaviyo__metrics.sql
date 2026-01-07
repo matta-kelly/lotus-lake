@@ -25,7 +25,9 @@ select
 from read_parquet('s3://landing/raw/klaviyo/metrics/**/*', hive_partitioning=true)
 
 {% if is_incremental() %}
-where (year, month, day) >= (select (max(year), max(month), max(day)) from {{ this }})
+where year * 10000 + month * 100 + day >= (
+    select max(year * 10000 + month * 100 + day) from {{ this }}
+)
 {% endif %}
 
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

@@ -79,7 +79,9 @@ select
 from read_parquet('s3://landing/raw/{source}/{stream}/**/*', hive_partitioning=true)
 
 {% if is_incremental() %}
-where (year, month, day) >= (select (max(year), max(month), max(day)) from {{ this }})
+where year * 10000 + month * 100 + day >= (
+    select max(year * 10000 + month * 100 + day) from {{ this }}
+)
 {% endif %}
 
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
@@ -87,9 +89,11 @@ qualify row_number() over (partition by id order by _airbyte_extracted_at desc) 
 
 **Critical points:**
 - Tag must be `'{source}__{stream}'` (double underscore) to match the sensor
+- Multiple models can share the same tag (e.g., `orders` + `order_lines` both use `shopify__orders`)
 - `unique_key` enables delete+insert to find existing records
 - Partition columns `year`, `month`, `day` come from Hive path automatically
 - `is_incremental()` filter enables partition pruning (DuckDB skips old folders)
+- Use integer comparison for partitions (DuckDB doesn't support tuple comparison with aggregates)
 - `qualify` dedupe still runs on both full refresh and incremental
 
 ### 3. Regenerate Manifest
@@ -129,10 +133,14 @@ Simple `append` would create duplicates. `delete+insert` maintains dedupe.
 
 The `is_incremental()` WHERE clause:
 ```sql
-where (year, month, day) >= (select (max(year), max(month), max(day)) from {{ this }})
+where year * 10000 + month * 100 + day >= (
+    select max(year * 10000 + month * 100 + day) from {{ this }}
+)
 ```
 
 DuckDB sees this filter on partition columns and **skips reading older folders entirely**. This is the memory savings - we don't load historical data.
+
+**Note:** We use integer comparison (`year * 10000 + month * 100 + day`) because DuckDB doesn't support tuple comparison with aggregate subqueries.
 
 ### When to Full Refresh
 
@@ -169,7 +177,7 @@ left join {{ ref('int_shopify__order_refunds') }} r on o.order_id = r.order_id
 - Uses `ref()` not `source()` - references core models
 - Contains business logic (net_sales calculation)
 
-**Note:** Marts do NOT auto-trigger when core models run. See TICKET-007.
+**Auto-materialize:** Marts automatically trigger when upstream core models materialize. This is configured via `AutoMaterializePolicy.eager()` in `orchestration/assets/marts/assets.py`.
 
 ## How Sensors Work
 
@@ -200,8 +208,11 @@ For full sensor/asset wiring details, see `CLAUDE.md` → "Dagster Sensor & Asse
 | Stream | Core Model | Mart |
 |--------|-----------|------|
 | orders | int_shopify__orders | fct_sales |
+| orders | int_shopify__order_lines | - |
 | customers | int_shopify__customers | - |
 | order_refunds | int_shopify__order_refunds | (via fct_sales) |
+
+Note: `orders` and `order_lines` share the same tag (`shopify__orders`) so both run when orders syncs.
 
 ### Klaviyo
 | Stream | Core Model | Mart |
