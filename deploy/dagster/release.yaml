@@ -92,6 +92,12 @@ spec:
             podSpecConfig:
               nodeSelector:
                 kubernetes.io/hostname: monkeybusiness
+            containerConfig:
+              resources:
+                limits:
+                  memory: "15Gi"
+                requests:
+                  memory: "2Gi"
           envSecrets:
             - name: dagster-db-app
             - name: lotus-lake-terraform-vars
