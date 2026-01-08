@@ -5,7 +5,9 @@ Models: fct_*, dim_* (dbt factory)
 
 Auto-materializes when upstream core models are updated.
 """
-from dagster import AssetExecutionContext, AutoMaterializePolicy
+from typing import Any, Mapping, Optional
+
+from dagster import AssetExecutionContext, AutomationCondition
 from dagster_dbt import DbtCliResource, dbt_assets, DagsterDbtTranslator
 
 from ...resources import DBT_MANIFEST
@@ -21,9 +23,11 @@ class MartsDbtTranslator(DagsterDbtTranslator):
     def get_group_name(self, dbt_resource_props):
         return "marts"
 
-    def get_auto_materialize_policy(self, dbt_resource_props):
+    def get_automation_condition(
+        self, dbt_resource_props: Mapping[str, Any]
+    ) -> Optional[AutomationCondition]:
         """Auto-materialize marts when upstream core models update."""
-        return AutoMaterializePolicy.eager()
+        return AutomationCondition.eager()
 
 
 @dbt_assets(
