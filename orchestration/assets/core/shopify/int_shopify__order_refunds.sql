@@ -40,3 +40,5 @@ select
 from deduped,
 unnest(transactions) as u(t)
 group by order_id
+
+order by order_id

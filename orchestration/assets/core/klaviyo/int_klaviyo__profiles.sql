@@ -60,3 +60,5 @@ where year = '{{ max_year }}' and month = '{{ max_month }}' and day >= '{{ max_d
 
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
 
+order by updated_at
+

@@ -25,3 +25,5 @@ select
 
 from {{ ref('int_shopify__orders') }} o
 left join {{ ref('int_shopify__order_refunds') }} r on o.order_id = r.order_id
+
+order by order_date
