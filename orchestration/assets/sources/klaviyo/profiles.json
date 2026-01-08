@@ -310,14 +310,8 @@
             "ip": {
               "type": "string"
             },
-            "latitude": {
-              "type": "unknown"
-            },
             "region": {
               "type": "string"
-            },
-            "longitude": {
-              "type": "unknown"
             }
           }
         },
