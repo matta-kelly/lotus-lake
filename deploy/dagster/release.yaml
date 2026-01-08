@@ -61,6 +61,12 @@ spec:
         use_sensors: true
 
     dagsterDaemon:
+      runCoordinator:
+        enabled: true
+        type: QueuedRunCoordinator
+        config:
+          queuedRunCoordinator:
+            maxConcurrentRuns: 2
       nodeSelector:
         kubernetes.io/hostname: monkeybusiness
       env:
