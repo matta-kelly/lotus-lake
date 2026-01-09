@@ -183,12 +183,21 @@ def landing_tables():
             existing_cols = _get_existing_columns(conn, table_name)
             ddl_cols = _parse_columns_from_ddl(ddl)
             new_cols = set(ddl_cols.keys()) - set(existing_cols.keys())
+            removed_cols = set(existing_cols.keys()) - set(ddl_cols.keys())
 
-            if new_cols:
-                for col_name in new_cols:
-                    col_type = ddl_cols[col_name]
-                    conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {col_name} {col_type};")
-                    logger.info(f"Added column {col_name} to {table_name}")
+            changed = False
+            for col_name in new_cols:
+                col_type = ddl_cols[col_name]
+                conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {col_name} {col_type};")
+                logger.info(f"Added column {col_name} to {table_name}")
+                changed = True
+
+            for col_name in removed_cols:
+                conn.execute(f"ALTER TABLE {table_name} DROP COLUMN {col_name};")
+                logger.info(f"Dropped column {col_name} from {table_name}")
+                changed = True
+
+            if changed:
                 altered.append(table_name)
             else:
                 unchanged.append(table_name)
@@ -209,30 +218,44 @@ def landing_tables():
 
 def _ensure_landing_table(conn: duckdb.DuckDBPyConnection, source: str, stream: str, logger) -> bool:
     """
-    Ensure landing table exists by creating from DDL if missing.
-    Self-healing: feeders don't require manual landing_tables materialization.
+    Ensure landing table exists and matches DDL exactly.
+    Self-healing: creates table if missing, syncs columns if schema changed.
+    DDL is source of truth - adds new columns, drops removed columns.
     """
     table_name = f"lakehouse.staging.stg_{source}__{stream}"
 
-    # Check if table exists
-    if _table_exists(conn, table_name):
-        return True
-
-    # Find and execute DDL file
+    # Find DDL file
     ddl_file = LANDING_DIR / source / f"stg_{source}__{stream}.sql"
     if not ddl_file.exists():
         logger.error(f"DDL file not found: {ddl_file}")
         return False
 
-    # Ensure schema exists
-    conn.execute("CREATE SCHEMA IF NOT EXISTS lakehouse.staging;")
-
-    # Create table from DDL
     with open(ddl_file) as f:
         ddl = f.read()
 
-    conn.execute(ddl)
-    logger.info(f"Created landing table {table_name} from DDL")
+    # Ensure schema exists
+    conn.execute("CREATE SCHEMA IF NOT EXISTS lakehouse.staging;")
+
+    if not _table_exists(conn, table_name):
+        # Create table from DDL
+        conn.execute(ddl)
+        logger.info(f"Created landing table {table_name}")
+    else:
+        # Sync columns to match DDL exactly
+        existing_cols = _get_existing_columns(conn, table_name)
+        ddl_cols = _parse_columns_from_ddl(ddl)
+        new_cols = set(ddl_cols.keys()) - set(existing_cols.keys())
+        removed_cols = set(existing_cols.keys()) - set(ddl_cols.keys())
+
+        for col_name in new_cols:
+            col_type = ddl_cols[col_name]
+            conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {col_name} {col_type};")
+            logger.info(f"Added column {col_name} to {table_name}")
+
+        for col_name in removed_cols:
+            conn.execute(f"ALTER TABLE {table_name} DROP COLUMN {col_name};")
+            logger.info(f"Dropped column {col_name} from {table_name}")
+
     return True
 
 
