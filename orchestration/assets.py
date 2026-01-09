@@ -386,9 +386,11 @@ def make_feeder_sensor(source: str, stream: str):
             conn.close()
 
             if files:
-                context.log.info(f"Detected {len(files)} new files for {source}/{stream}")
+                # Use latest file path as run_key - changes when new files arrive
+                latest_file = files[-1]
+                context.log.info(f"Detected {len(files)} new files for {source}/{stream}, latest: {latest_file}")
                 yield RunRequest(
-                    run_key=f"{source}_{stream}_{context.cursor}",
+                    run_key=f"{source}_{stream}_{latest_file}",
                     tags={"feeder": f"{source}/{stream}"},
                 )
 
