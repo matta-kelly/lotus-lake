@@ -59,9 +59,9 @@ jobs:
       # Validate Dagster Python code syntax
       - name: Validate Dagster Python syntax
         run: |
-          pip install dagster dagster-dbt dagster-postgres boto3
+          pip install dagster dagster-dbt dagster-postgres boto3 duckdb
           cd orchestration
-          python -m py_compile definitions.py sensors.py resources.py assets/core/assets.py
+          python -m py_compile definitions.py resources.py assets.py
           echo "Python syntax validation passed"
 
       # Validate Helm values render correctly
