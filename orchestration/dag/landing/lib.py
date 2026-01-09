@@ -52,13 +52,13 @@ def get_ducklake_connection() -> duckdb.DuckDBPyConnection:
 def ensure_cursor_table(conn: duckdb.DuckDBPyConnection):
     """Create cursor tracking table if it doesn't exist."""
     conn.execute("CREATE SCHEMA IF NOT EXISTS lakehouse.meta;")
+    # Note: DuckLake doesn't support PRIMARY KEY constraints
     conn.execute("""
         CREATE TABLE IF NOT EXISTS lakehouse.meta.feeder_cursors (
             source VARCHAR,
             stream VARCHAR,
             cursor_path VARCHAR,
-            updated_at TIMESTAMP,
-            PRIMARY KEY (source, stream)
+            updated_at TIMESTAMP
         )
     """)
 
@@ -76,12 +76,14 @@ def get_cursor(conn: duckdb.DuckDBPyConnection, source: str, stream: str) -> str
 def set_cursor(conn: duckdb.DuckDBPyConnection, source: str, stream: str, cursor_path: str):
     """Update the cursor to the last processed file path."""
     ensure_cursor_table(conn)
+    # DuckLake doesn't support ON CONFLICT, so delete then insert
+    conn.execute(f"""
+        DELETE FROM lakehouse.meta.feeder_cursors
+        WHERE source = '{source}' AND stream = '{stream}'
+    """)
     conn.execute(f"""
         INSERT INTO lakehouse.meta.feeder_cursors (source, stream, cursor_path, updated_at)
         VALUES ('{source}', '{stream}', '{cursor_path}', now())
-        ON CONFLICT (source, stream) DO UPDATE SET
-            cursor_path = EXCLUDED.cursor_path,
-            updated_at = EXCLUDED.updated_at
     """)
 
 
