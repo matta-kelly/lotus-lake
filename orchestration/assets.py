@@ -27,6 +27,7 @@ from dagster import (
     AutomationCondition,
     DagsterRunStatus,
     DefaultSensorStatus,
+    Output,
     RunRequest,
     RunsFilter,
     SensorEvaluationContext,
@@ -315,7 +316,8 @@ def make_feeder_asset(source: str, stream: str):
         if not files:
             conn.close()
             context.log.info(f"[{source}/{stream}] No new files to process")
-            return {"status": "no_files", "processed": 0}
+            yield Output({"status": "no_files", "processed": 0})
+            return
 
         # Log overview of work to do
         first_date = _extract_date_from_path(files[0])
@@ -401,12 +403,12 @@ def make_feeder_asset(source: str, stream: str):
             f"[{source}/{stream}] COMPLETE: {total_registered} files processed "
             f"in {total_batches} batches, cursor now at {_extract_date_from_path(last_file)}"
         )
-        return {
+        yield Output({
             "status": "complete",
             "processed": total_registered,
             "batches": total_batches,
             "cursor": last_file,
-        }
+        })
 
     return _feeder
 
