@@ -355,11 +355,12 @@ def make_feeder_asset(source: str, stream: str):
 
             models_succeeded = []
             models_failed = []
-            # Use stream_raw_events() - stream() requires @dbt_assets context
+            # Use stream_raw_events() - returns DbtCliEventMessage objects
             for event in dbt_result.stream_raw_events():
-                if isinstance(event, dict) and event.get('info', {}).get('name') == 'LogModelResult':
-                    model_name = event.get('data', {}).get('node_info', {}).get('node_name', '')
-                    status = event.get('data', {}).get('status', '')
+                raw = event.raw_event  # Get the dict from the event object
+                if raw.get('info', {}).get('name') == 'LogModelResult':
+                    model_name = raw.get('data', {}).get('node_info', {}).get('node_name', '')
+                    status = raw.get('data', {}).get('status', '')
                     if model_name and status == 'success':
                         models_succeeded.append(model_name)
                     elif model_name:
