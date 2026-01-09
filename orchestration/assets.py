@@ -32,6 +32,7 @@ from dagster_dbt import DbtCliResource, dbt_assets, DagsterDbtTranslator
 from .resources import DBT_MANIFEST
 from .dag.landing.lib import (
     get_ducklake_connection,
+    get_cursor,
     get_files_after_cursor,
     set_cursor,
     batch_by_size,
@@ -201,6 +202,15 @@ def landing_tables():
 # Feeder Factory - One asset per stream
 # =============================================================================
 
+def _extract_date_from_path(path: str) -> str:
+    """Extract date from hive partition path for logging."""
+    import re
+    match = re.search(r'year=(\d+)/month=(\d+)/day=(\d+)', path)
+    if match:
+        return f"{match.group(1)}-{match.group(2).zfill(2)}-{match.group(3).zfill(2)}"
+    return path.split('/')[-1]  # fallback to filename
+
+
 def make_feeder_asset(source: str, stream: str):
     """
     Factory to create a feeder asset for a stream.
@@ -222,46 +232,90 @@ def make_feeder_asset(source: str, stream: str):
     def _feeder(context: AssetExecutionContext, dbt: DbtCliResource) -> dict:
         conn = get_ducklake_connection()
 
+        # Log current cursor position
+        current_cursor = get_cursor(conn, source, stream)
+        if current_cursor:
+            cursor_date = _extract_date_from_path(current_cursor)
+            context.log.info(f"[{source}/{stream}] Current cursor: {cursor_date}")
+        else:
+            context.log.info(f"[{source}/{stream}] No cursor - starting fresh")
+
         files = get_files_after_cursor(conn, source, stream)
 
         if not files:
             conn.close()
-            context.log.info(f"No new files for {source}/{stream}")
+            context.log.info(f"[{source}/{stream}] No new files to process")
             return {"status": "no_files", "processed": 0}
 
-        context.log.info(f"Found {len(files)} new files for {source}/{stream}")
+        # Log overview of work to do
+        first_date = _extract_date_from_path(files[0])
+        last_date = _extract_date_from_path(files[-1])
+        context.log.info(f"[{source}/{stream}] Found {len(files)} files spanning {first_date} to {last_date}")
+
+        # Pre-calculate batches for progress tracking
+        batches = list(batch_by_size(conn, files))
+        total_batches = len(batches)
+        context.log.info(f"[{source}/{stream}] Will process in {total_batches} batch(es)")
 
         total_registered = 0
-        batch_count = 0
         last_file = None
 
-        for batch in batch_by_size(conn, files):
-            batch_count += 1
-            context.log.info(f"Processing batch {batch_count}: {len(batch)} files")
+        for batch_num, batch in enumerate(batches, 1):
+            batch_first = _extract_date_from_path(batch[0])
+            batch_last = _extract_date_from_path(batch[-1])
+
+            context.log.info(
+                f"[{source}/{stream}] Batch {batch_num}/{total_batches}: "
+                f"{len(batch)} files ({batch_first} to {batch_last})"
+            )
 
             # Register batch into landing
             registered = register_batch(conn, landing_table, batch)
             total_registered += registered
-            context.log.info(f"Registered {registered} files into {landing_table}")
+            context.log.info(
+                f"[{source}/{stream}] Registered {registered} files into {landing_table}"
+            )
 
             # Run processed dbt model(s) with this tag
-            context.log.info(f"Running dbt model with tag:{dbt_tag}")
+            context.log.info(f"[{source}/{stream}] Running dbt models (tag:{dbt_tag})...")
             dbt_result = dbt.cli(["run", "--select", f"tag:{dbt_tag}"], context=context)
+
+            models_run = []
             for event in dbt_result.stream():
                 yield event
+                # Try to capture model names from dbt events
+                if hasattr(event, 'raw_event'):
+                    raw = event.raw_event
+                    if isinstance(raw, dict) and raw.get('info', {}).get('name') == 'LogModelResult':
+                        model_name = raw.get('data', {}).get('node_info', {}).get('node_name', '')
+                        status = raw.get('data', {}).get('status', '')
+                        if model_name:
+                            models_run.append(f"{model_name}:{status}")
+
+            if models_run:
+                context.log.info(f"[{source}/{stream}] dbt results: {', '.join(models_run)}")
+            else:
+                context.log.info(f"[{source}/{stream}] dbt run complete")
 
             # Update cursor to last file in batch
             last_file = batch[-1]
             set_cursor(conn, source, stream, last_file)
-            context.log.info(f"Updated cursor to {last_file}")
+            new_cursor_date = _extract_date_from_path(last_file)
+            context.log.info(
+                f"[{source}/{stream}] Cursor updated to {new_cursor_date} "
+                f"(batch {batch_num}/{total_batches} complete)"
+            )
 
         conn.close()
 
-        context.log.info(f"Feeder complete: {total_registered} files in {batch_count} batches")
+        context.log.info(
+            f"[{source}/{stream}] COMPLETE: {total_registered} files processed "
+            f"in {total_batches} batches, cursor now at {_extract_date_from_path(last_file)}"
+        )
         return {
             "status": "complete",
             "processed": total_registered,
-            "batches": batch_count,
+            "batches": total_batches,
             "cursor": last_file,
         }
 
