@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS lakehouse.staging.stg_klaviyo__metrics (
     id VARCHAR,
     type VARCHAR,
     links STRUCT(self VARCHAR),
-    attributes STRUCT("name" VARCHAR, created TIMESTAMP WITH TIME ZONE, updated TIMESTAMP WITH TIME ZONE, integration STRUCT()),
+    attributes STRUCT("name" VARCHAR, created TIMESTAMP WITH TIME ZONE, updated TIMESTAMP WITH TIME ZONE, integration JSON),
     updated TIMESTAMP WITH TIME ZONE,
     relationships STRUCT(flow_triggers STRUCT("data" STRUCT(id VARCHAR, "type" VARCHAR), links STRUCT(self VARCHAR, related VARCHAR))),
 
