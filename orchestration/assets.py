@@ -95,9 +95,18 @@ def _parse_columns_from_ddl(ddl: str) -> dict[str, str]:
     if not match:
         return {}
 
-    columns = {}
-    content = match.group(1)
+    # Strip comments from each line first
+    content_lines = []
+    for line in match.group(1).split('\n'):
+        # Remove inline comments
+        if '--' in line:
+            line = line[:line.index('--')]
+        line = line.strip()
+        if line:
+            content_lines.append(line)
+    content = ' '.join(content_lines)
 
+    columns = {}
     depth = 0
     current = ""
     for char in content:
@@ -107,20 +116,19 @@ def _parse_columns_from_ddl(ddl: str) -> dict[str, str]:
             depth -= 1
         elif char == "," and depth == 0:
             col_def = current.strip()
-            if col_def and not col_def.startswith("--"):
+            if col_def:
                 parts = col_def.split(None, 2)
                 if len(parts) >= 2:
                     col_name = parts[0]
-                    col_type = parts[1] if len(parts) == 2 else " ".join(parts[1:])
-                    if "STRUCT" in col_type.upper() or "VARCHAR" in col_type.upper():
-                        col_type = " ".join(parts[1:]) if len(parts) > 2 else parts[1]
+                    col_type = " ".join(parts[1:]) if len(parts) > 2 else parts[1]
                     columns[col_name] = col_type
             current = ""
             continue
         current += char
 
+    # Handle last column (no trailing comma)
     col_def = current.strip()
-    if col_def and not col_def.startswith("--"):
+    if col_def:
         parts = col_def.split(None, 2)
         if len(parts) >= 2:
             columns[parts[0]] = " ".join(parts[1:]) if len(parts) > 2 else parts[1]
@@ -345,18 +353,15 @@ def make_feeder_asset(source: str, stream: str):
 
             models_succeeded = []
             models_failed = []
-            for event in dbt_result.stream():
-                yield event
-                # Capture model results from dbt events
-                if hasattr(event, 'raw_event'):
-                    raw = event.raw_event
-                    if isinstance(raw, dict) and raw.get('info', {}).get('name') == 'LogModelResult':
-                        model_name = raw.get('data', {}).get('node_info', {}).get('node_name', '')
-                        status = raw.get('data', {}).get('status', '')
-                        if model_name and status == 'success':
-                            models_succeeded.append(model_name)
-                        elif model_name:
-                            models_failed.append(f"{model_name}:{status}")
+            # Use stream_raw_events() - stream() requires @dbt_assets context
+            for event in dbt_result.stream_raw_events():
+                if isinstance(event, dict) and event.get('info', {}).get('name') == 'LogModelResult':
+                    model_name = event.get('data', {}).get('node_info', {}).get('node_name', '')
+                    status = event.get('data', {}).get('status', '')
+                    if model_name and status == 'success':
+                        models_succeeded.append(model_name)
+                    elif model_name:
+                        models_failed.append(f"{model_name}:{status}")
 
             # Log results
             if models_succeeded:
