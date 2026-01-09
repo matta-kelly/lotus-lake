@@ -277,8 +277,9 @@ def make_feeder_asset(source: str, stream: str):
             )
 
             # Run processed dbt model(s) with this tag
+            # Note: Don't pass context=context as feeder isn't a @dbt_assets asset
             context.log.info(f"[{source}/{stream}] Running dbt models (tag:{dbt_tag})...")
-            dbt_result = dbt.cli(["run", "--select", f"tag:{dbt_tag}"], context=context)
+            dbt_result = dbt.cli(["run", "--select", f"tag:{dbt_tag}"])
 
             models_run = []
             for event in dbt_result.stream():
