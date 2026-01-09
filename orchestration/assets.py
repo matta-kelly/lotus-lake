@@ -361,7 +361,7 @@ def make_feeder_asset(source: str, stream: str):
                 if raw.get('info', {}).get('name') == 'LogModelResult':
                     model_name = raw.get('data', {}).get('node_info', {}).get('node_name', '')
                     status = raw.get('data', {}).get('status', '')
-                    if model_name and status == 'success':
+                    if model_name and status.lower() in ('success', 'ok'):
                         models_succeeded.append(model_name)
                     elif model_name:
                         models_failed.append(f"{model_name}:{status}")
