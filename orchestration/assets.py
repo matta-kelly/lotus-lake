@@ -370,7 +370,8 @@ def make_feeder_asset(source: str, stream: str):
             if models_succeeded:
                 context.log.info(f"[{source}/{stream}] dbt succeeded: {', '.join(models_succeeded)}")
             if models_failed:
-                context.log.warning(f"[{source}/{stream}] dbt issues: {', '.join(models_failed)}")
+                context.log.error(f"[{source}/{stream}] dbt failed: {', '.join(models_failed)}")
+                raise Exception(f"dbt failed for {source}/{stream}: {', '.join(models_failed)}")
 
             # Emit AssetMaterialization for each successful model
             # This notifies Dagster that the processed assets have been updated,
