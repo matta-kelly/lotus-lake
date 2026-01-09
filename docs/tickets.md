@@ -33,7 +33,7 @@ These are the workflows the platform should support. Use these as acceptance cri
 **Status:** Implemented
 **Workflow:**
 
-1. Edit stream config (e.g., `orchestration/assets/streams/shopify/orders.json`)
+1. Edit stream config (e.g., `orchestration/dag/streams/shopify/orders.json`)
    - Add new field selection or change sync_mode
 2. Regenerate catalog:
    ```bash
@@ -67,7 +67,7 @@ These are the workflows the platform should support. Use these as acceptance cri
 **Status:** Implemented
 **Workflow:**
 
-1. Edit stream config (e.g., `orchestration/assets/streams/shopify/orders.json`)
+1. Edit stream config (e.g., `orchestration/dag/streams/shopify/orders.json`)
    - Set `"backfill": true`
 2. `git add . && git commit -m "Trigger orders backfill" && git push`
 3. tofu-controller applies:

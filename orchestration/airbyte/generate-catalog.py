@@ -2,7 +2,7 @@
 """
 Generate Airbyte-compatible catalogs from stream definitions.
 
-Outputs _catalog.json alongside stream configs in assets/streams/<source>/.
+Outputs _catalog.json alongside stream configs in dag/streams/<source>/.
 
 Usage:
   python generate-catalog.py
@@ -12,8 +12,8 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent.parent  # lotus-lake/
-STREAMS_DIR = REPO_ROOT / "orchestration" / "assets" / "streams"
-SOURCES_DIR = REPO_ROOT / "orchestration" / "assets" / "sources"
+STREAMS_DIR = REPO_ROOT / "orchestration" / "dag" / "streams"
+SOURCES_DIR = REPO_ROOT / "orchestration" / "dag" / "sources"
 
 
 def load_json(path):

@@ -2,17 +2,17 @@
 
 locals {
   # Read all stream configs and check for backfill flags
-  shopify_stream_files = fileset("${path.module}/../../assets/streams/shopify", "*.json")
-  klaviyo_stream_files = fileset("${path.module}/../../assets/streams/klaviyo", "*.json")
+  shopify_stream_files = fileset("${path.module}/../../dag/streams/shopify", "*.json")
+  klaviyo_stream_files = fileset("${path.module}/../../dag/streams/klaviyo", "*.json")
 
   shopify_needs_backfill = anytrue([
     for f in local.shopify_stream_files :
-    f != "_catalog.json" ? try(jsondecode(file("${path.module}/../../assets/streams/shopify/${f}")).backfill, false) : false
+    f != "_catalog.json" ? try(jsondecode(file("${path.module}/../../dag/streams/shopify/${f}")).backfill, false) : false
   ])
 
   klaviyo_needs_backfill = anytrue([
     for f in local.klaviyo_stream_files :
-    f != "_catalog.json" ? try(jsondecode(file("${path.module}/../../assets/streams/klaviyo/${f}")).backfill, false) : false
+    f != "_catalog.json" ? try(jsondecode(file("${path.module}/../../dag/streams/klaviyo/${f}")).backfill, false) : false
   ])
 }
 
