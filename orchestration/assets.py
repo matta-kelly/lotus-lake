@@ -207,6 +207,35 @@ def landing_tables():
 # Feeder Factory - One asset per stream
 # =============================================================================
 
+def _ensure_landing_table(conn: duckdb.DuckDBPyConnection, source: str, stream: str, logger) -> bool:
+    """
+    Ensure landing table exists by creating from DDL if missing.
+    Self-healing: feeders don't require manual landing_tables materialization.
+    """
+    table_name = f"lakehouse.staging.stg_{source}__{stream}"
+
+    # Check if table exists
+    if _table_exists(conn, table_name):
+        return True
+
+    # Find and execute DDL file
+    ddl_file = LANDING_DIR / source / f"stg_{source}__{stream}.sql"
+    if not ddl_file.exists():
+        logger.error(f"DDL file not found: {ddl_file}")
+        return False
+
+    # Ensure schema exists
+    conn.execute("CREATE SCHEMA IF NOT EXISTS lakehouse.staging;")
+
+    # Create table from DDL
+    with open(ddl_file) as f:
+        ddl = f.read()
+
+    conn.execute(ddl)
+    logger.info(f"Created landing table {table_name} from DDL")
+    return True
+
+
 def _extract_date_from_path(path: str) -> str:
     """Extract date from hive partition path for logging."""
     import re
@@ -236,6 +265,11 @@ def make_feeder_asset(source: str, stream: str):
     )
     def _feeder(context: AssetExecutionContext, dbt: DbtCliResource) -> dict:
         conn = get_ducklake_connection()
+
+        # Ensure landing table exists (self-healing)
+        if not _ensure_landing_table(conn, source, stream, context.log):
+            conn.close()
+            raise Exception(f"Failed to ensure landing table for {source}/{stream}")
 
         # Log current cursor position
         current_cursor = get_cursor(conn, source, stream)
