@@ -310,9 +310,11 @@ def make_feeder_asset(source: str, stream: str):
             # Emit AssetMaterialization for each successful model
             # This notifies Dagster that the processed assets have been updated,
             # which triggers enriched auto-materialization
+            # Note: Asset keys include schema prefix ["main", "model_name"] from dbt config
             for model_name in models_succeeded:
+                asset_key = AssetKey(["main", model_name])
                 yield AssetMaterialization(
-                    asset_key=AssetKey(model_name),
+                    asset_key=asset_key,
                     metadata={
                         "source": source,
                         "stream": stream,
@@ -320,7 +322,7 @@ def make_feeder_asset(source: str, stream: str):
                         "total_batches": total_batches,
                     }
                 )
-                context.log.info(f"[{source}/{stream}] Emitted materialization for {model_name}")
+                context.log.info(f"[{source}/{stream}] Emitted materialization for {asset_key.to_user_string()}")
 
             # Update cursor to last file in batch
             last_file = batch[-1]
