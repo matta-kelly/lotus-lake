@@ -3,7 +3,7 @@ version: '1.0.0'
 
 profile: 'lotus_lake'
 
-model-paths: ["assets/core/shopify", "assets/core/klaviyo", "assets/marts/sales"]
+model-paths: ["dag/processed/shopify", "dag/processed/klaviyo", "dag/enriched/sales"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
 seed-paths: ["seeds"]

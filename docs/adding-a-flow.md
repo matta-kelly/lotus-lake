@@ -1,191 +1,137 @@
-# Adding a Flow (Core + Mart Models)
+# Adding a Flow (Landing + Processed + Enriched)
 
-How to add dbt models for a new or existing source.
+How to add the complete data flow for a new stream.
 
 ## Overview
 
 ```
-Airbyte sync (Incremental Append)
-    ↓
-S3: raw/{source}/{stream}/year=YYYY/month=MM/day=DD/  ← Hive partition format
-    ↓
-{source}_{stream}_sensor        ← Auto-created per stream
-    ↓
-Core Model (incremental)        ← YOU CREATE (dedupe + flatten + partition filter)
-    ↓
-Mart Model (optional)           ← YOU CREATE (business logic)
+sources → streams → landing → processed → enriched
 ```
 
-## Core Layer: What It Does
+When you add a stream, data flows through three layers:
 
-Core models transform raw data into clean, queryable tables:
+| Layer | Folder | File Pattern | Purpose |
+|-------|--------|--------------|---------|
+| **Landing** | `dag/landing/{source}/` | `stg_{source}__{stream}.sql` | DDL defining raw schema |
+| **Processed** | `dag/processed/{source}/` | `int_{source}__{stream}.sql` | Dedupe, flatten JSON, type cast |
+| **Enriched** | `dag/enriched/{domain}/` | `fct_*.sql` | Business logic, joins |
 
-| Step | What | Why |
-|------|------|-----|
-| **Dedupe** | `qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1` | Airbyte Append mode keeps appending - take latest |
-| **Flatten** | `attributes::JSON->>'$.email'` | Extract nested JSON into columns |
-| **Type** | `cast(amount as decimal(10,2))` | Proper SQL types |
-| **Rename** | `id as customer_id` | Clear, consistent names |
+## Adding a Complete Flow
 
-**Core does NOT:**
-- Filter (test orders, cancelled, etc.)
-- Join across entities
-- Calculate metrics
+### Step 1: Create Landing DDL
 
-## Adding a Core Model
+Create `orchestration/dag/landing/{source}/stg_{source}__{stream}.sql`:
 
-### 1. Verify Prerequisites
+```sql
+CREATE TABLE IF NOT EXISTS lakehouse.staging.stg_shopify__orders (
+    -- Airbyte metadata (always include these)
+    _airbyte_raw_id VARCHAR,
+    _airbyte_extracted_at TIMESTAMP WITH TIME ZONE,
+    _airbyte_meta STRUCT(sync_id BIGINT, changes STRUCT(field VARCHAR, change VARCHAR, reason VARCHAR)[]),
+    _airbyte_generation_id BIGINT,
 
-```bash
-# Stream config exists (triggers sensor creation)
-ls orchestration/assets/streams/{source}/{stream}.json
+    -- Source columns (from Airbyte schema)
+    id BIGINT,
+    created_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE,
+    customer STRUCT(id BIGINT, email VARCHAR, ...),
+    total_price DOUBLE,
+    ...
 
-# Source definition has the table
-cat orchestration/assets/core/{source}/_{source}__sources.yml
+    -- Hive partition columns (always include these)
+    day VARCHAR,
+    month VARCHAR,
+    year BIGINT
+);
 ```
 
-### 2. Create the Model
+**Tips:**
+- Reference `dag/sources/{source}/{stream}.json` for available fields and types
+- Use STRUCT for nested objects
+- Include all Airbyte metadata columns
+- Include Hive partition columns (year, month, day)
 
-Create `orchestration/assets/core/{source}/int_{source}__{stream}.sql`:
+### Step 2: Create Processed Model
+
+Create `orchestration/dag/processed/{source}/int_{source}__{stream}.sql`:
 
 ```sql
 {{ config(
-    tags=['core', '{source}__{stream}'],
+    tags=['processed', '{source}__{stream}'],
     materialized='incremental',
-    unique_key='entity_id',
-    incremental_strategy='delete+insert'
+    unique_key='order_id',
+    incremental_strategy='merge'
 ) }}
-
-{% if is_incremental() %}
-  {% set partition_query %}
-    select max(year) as max_year, max(month) as max_month, max(day) as max_day from {{ this }}
-  {% endset %}
-  {% set results = run_query(partition_query) %}
-  {% set max_year = results.columns[0][0] %}
-  {% set max_month = results.columns[1][0] %}
-  {% set max_day = results.columns[2][0] %}
-{% endif %}
 
 select
     -- identifiers (rename for clarity)
-    id as entity_id,
+    id as order_id,
 
     -- flatten nested JSON
-    attributes::JSON->>'$.email' as email,
+    cast(customer::JSON->>'$.id' as bigint) as customer_id,
+    customer::JSON->>'$.email' as customer_email,
 
-    -- type cast money fields
-    cast(amount as decimal(10,2)) as amount,
+    -- type cast
+    cast(total_price as decimal(10,2)) as total_price,
 
     -- timestamps
     created_at,
     updated_at,
-    _airbyte_extracted_at,
 
-    -- partition columns (from Hive path, required for incremental)
+    -- metadata (for incremental)
+    _airbyte_extracted_at,
     year,
     month,
     day
 
-from read_parquet('s3://landing/raw/{source}/{stream}/**/*', hive_partitioning=true)
+from lakehouse.staging.stg_{source}__{stream}
 
 {% if is_incremental() %}
-where year = '{{ max_year }}' and month = '{{ max_month }}' and day >= '{{ max_day }}'
+where _airbyte_extracted_at > (select max(_airbyte_extracted_at) from {{ this }})
 {% endif %}
 
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
+
+order by created_at
 ```
 
 **Critical points:**
-- Tag must be `'{source}__{stream}'` (double underscore) to match the sensor
-- Multiple models can share the same tag (e.g., `orders` + `order_lines` both use `shopify__orders`)
-- `unique_key` enables delete+insert to find existing records
-- Partition columns `year`, `month`, `day` come from Hive path automatically and **must be in SELECT**
-- The `run_query` block runs at **compile time**, injecting literal values into the WHERE clause
-- Literal partition filters enable DuckDB partition pruning (skips old folders entirely)
-- `qualify` dedupe still runs on both full refresh and incremental
-- **Schema changes require full refresh** - if you add/remove columns, run `dbt run --full-refresh`
 
-### 3. Regenerate Manifest
+| Element | Why |
+|---------|-----|
+| `tags=['processed', '{source}__{stream}']` | Feeder runs `dbt run --select tag:{source}__{stream}` |
+| `incremental_strategy='merge'` | DuckLake native upsert, efficient for updates |
+| `from lakehouse.staging.stg_*` | Reads from DuckLake landing table, not raw S3 |
+| `_airbyte_extracted_at` filter | Only process new records on incremental runs |
+| `qualify row_number()` | Dedupe - take latest version of each record |
+| `order by` | Enables DuckDB zonemap optimization |
 
-```bash
-cd orchestration && dbt parse
+**Processed does NOT:**
+- Filter data (test orders, cancelled, etc.)
+- Join across entities
+- Calculate business metrics
+
+### Step 3: Add to dbt Sources (if new source)
+
+Create/update `orchestration/dag/processed/{source}/_{source}__sources.yml`:
+
+```yaml
+version: 2
+
+sources:
+  - name: {source}
+    schema: staging
+    database: lakehouse
+    tables:
+      - name: stg_{source}__{stream}
 ```
 
-### 4. Push
+### Step 4: Create Enriched Model (Optional)
 
-```bash
-git add orchestration/assets/core/{source}/
-git commit -m "Add int_{source}__{stream} core model"
-git push
-```
-
-## Incremental Behavior
-
-### How It Works
-
-| Run Type | Trigger | What Happens |
-|----------|---------|--------------|
-| **Full refresh** | First run, or `dbt run --full-refresh` | Reads ALL partitions, rebuilds entire table |
-| **Incremental** | Sensor trigger (normal operation) | Reads recent partitions only, delete+insert changed records |
-
-### Why delete+insert?
-
-Airbyte appends data. If order #123 is updated in Shopify:
-1. Airbyte syncs a NEW row with updated `_airbyte_extracted_at`
-2. Incremental run reads this new row
-3. `delete+insert` removes old order #123, inserts new version
-4. `qualify` dedupe ensures only latest version remains
-
-Simple `append` would create duplicates. `delete+insert` maintains dedupe.
-
-### Partition Pruning
-
-For DuckDB to skip old partition folders, it needs **literal values** in the WHERE clause at query planning time. Subqueries are evaluated too late.
-
-**How it works:**
+Create `orchestration/dag/enriched/{domain}/fct_{metric}.sql`:
 
 ```sql
-{% if is_incremental() %}
-  {% set partition_query %}
-    select max(year), max(month), max(day) from {{ this }}
-  {% endset %}
-  {% set results = run_query(partition_query) %}
-  {% set max_year = results.columns[0][0] %}
-  ...
-{% endif %}
-
-where year = '{{ max_year }}' and month = '{{ max_month }}' and day >= '{{ max_day }}'
-```
-
-1. `run_query` executes at **compile time** (before the main query runs)
-2. Results are stored in Jinja variables
-3. Variables are injected as **literals** into the WHERE clause
-4. DuckDB sees `year = '2026'` (not a subquery) and pushes filter to scan
-5. Old partition folders are **never read from S3**
-
-**Verified behavior:**
-- With filter: `Scanning Files: 11/12` (skips old partitions)
-- Without filter: `Total Files Read: 12` (reads everything)
-
-This is critical for performance with large datasets - incremental runs only read new data.
-
-### When to Full Refresh
-
-Run `dbt run --full-refresh -s int_{source}__{stream}` when:
-- Adding new columns (backfill historical values)
-- Fixing bugs in transformation logic
-- After schema changes in source
-
-## Adding a Mart Model
-
-Marts contain business logic and join core models.
-
-### Create the Model
-
-Create `orchestration/assets/marts/{domain}/fct_{metric}.sql`:
-
-```sql
-{{ config(tags=['mart'], materialized='table') }}
+{{ config(tags=['enriched'], materialized='table') }}
 
 select
     o.order_id,
@@ -197,53 +143,101 @@ select
 
 from {{ ref('int_shopify__orders') }} o
 left join {{ ref('int_shopify__order_refunds') }} r on o.order_id = r.order_id
+
+order by order_date
 ```
 
-**Key differences from core:**
-- Tag is just `['mart']` - no stream tag
-- Uses `ref()` not `source()` - references core models
-- Contains business logic (net_sales calculation)
+**Key differences from processed:**
+- Tag is just `['enriched']`
+- Uses `ref()` to reference processed models
+- Contains business logic (calculations, joins, filters)
+- Auto-materializes when upstream processed models update
 
-**Auto-materialize:** Marts automatically trigger when upstream core models materialize. This is configured via `AutoMaterializePolicy.eager()` in `orchestration/assets/marts/assets.py`.
+### Step 5: Regenerate dbt Manifest
 
-## How Sensors Work
-
-```
-shopify_orders_sensor fires
-    ↓
-asset_selection=[AssetKey(["main", "int_shopify__orders"])]
-    ↓
-int_shopify__orders runs (ONLY this model)
+```bash
+cd orchestration && dbt parse
 ```
 
-Each stream gets its own sensor. Each sensor triggers exactly ONE core model.
+### Step 6: Push
 
-For full sensor/asset wiring details, see `CLAUDE.md` → "Dagster Sensor & Asset Wiring".
+```bash
+git add orchestration/dag/
+git commit -m "Add {source}/{stream} flow"
+git push
+```
+
+## How It All Connects
+
+When Airbyte syncs new data:
+
+```
+1. Airbyte writes Parquet to S3
+       ↓
+2. Sensor detects new files (checks cursor)
+       ↓
+3. Feeder asset runs:
+   a. get_files_after_cursor() → partition-aware discovery
+   b. batch_by_size() → ~500MB chunks
+   c. register_batch() → ducklake_add_data_files()
+   d. dbt run --select tag:{source}__{stream}
+   e. set_cursor() → update progress
+   f. cleanup_old_files() → delete old S3 files
+       ↓
+4. Processed model merges new data into DuckLake
+       ↓
+5. Enriched auto-materializes (via automation sensor)
+```
+
+## Incremental Behavior
+
+| Run Type | What Happens |
+|----------|--------------|
+| **First run** | Full table scan, create table |
+| **Incremental** | Only rows where `_airbyte_extracted_at > max(existing)` |
+| **Full refresh** | `dbt run --full-refresh -s model_name` rebuilds from scratch |
+
+### When to Full Refresh
+
+- Adding new columns (backfill historical values)
+- Fixing bugs in transformation logic
+- After schema changes in source
+
+## The Merge Strategy
+
+Processed models use `incremental_strategy='merge'` (DuckLake native):
+
+1. New rows are inserted
+2. Existing rows (by `unique_key`) are updated
+3. No need to delete first
+
+This is more efficient than `delete+insert` for DuckLake tables.
 
 ## Quick Reference
 
 | What | Where | Tag |
 |------|-------|-----|
-| Stream config | `streams/{source}/{stream}.json` | - |
-| Source definition | `core/{source}/_{source}__sources.yml` | - |
-| Core model | `core/{source}/int_{source}__{stream}.sql` | `{source}__{stream}` |
-| Mart model | `marts/{domain}/fct_{metric}.sql` | `mart` |
+| Landing DDL | `dag/landing/{source}/stg_{source}__{stream}.sql` | - |
+| Processed model | `dag/processed/{source}/int_{source}__{stream}.sql` | `{source}__{stream}` |
+| Enriched model | `dag/enriched/{domain}/fct_{metric}.sql` | `enriched` |
 
 ## Current Models
 
 ### Shopify
-| Stream | Core Model | Mart |
-|--------|-----------|------|
-| orders | int_shopify__orders | fct_sales |
-| customers | int_shopify__customers | - |
-| order_refunds | int_shopify__order_refunds | (via fct_sales) |
+
+| Stream | Landing | Processed | Enriched |
+|--------|---------|-----------|----------|
+| orders | stg_shopify__orders | int_shopify__orders | fct_sales |
+| customers | stg_shopify__customers | int_shopify__customers | - |
+| order_refunds | stg_shopify__order_refunds | int_shopify__order_refunds | (via fct_sales) |
 
 ### Klaviyo
-| Stream | Core Model | Mart |
-|--------|-----------|------|
-| profiles | int_klaviyo__profiles | - |
-| events | int_klaviyo__events | - |
-| campaigns | int_klaviyo__campaigns | - |
-| flows | int_klaviyo__flows | - |
-| metrics | int_klaviyo__metrics | - |
-| lists | int_klaviyo__lists | - |
+
+| Stream | Landing | Processed | Enriched |
+|--------|---------|-----------|----------|
+| profiles | stg_klaviyo__profiles | int_klaviyo__profiles | - |
+| events | stg_klaviyo__events | int_klaviyo__events | - |
+| campaigns | stg_klaviyo__campaigns | int_klaviyo__campaigns | - |
+| flows | stg_klaviyo__flows | int_klaviyo__flows | - |
+| metrics | stg_klaviyo__metrics | int_klaviyo__metrics | - |
+| lists | stg_klaviyo__lists | int_klaviyo__lists | - |

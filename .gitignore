@@ -10,3 +10,5 @@ __pycache__/
 *.pyc
 orchestration/target/
 orchestration/logs/
+orchestration/.user.yml
+.claude/

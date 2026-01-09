@@ -1,41 +1,40 @@
-# Adding a New Source
+# Adding a Source
+
+How to add a new data source (Shopify, Klaviyo, etc.) to Airbyte.
 
 ## Overview
 
 ```
-1. Discover available streams (optional - if source exists in Airbyte)
+1. Discover available streams (optional)
 2. Define source in Terraform
-3. Select & configure streams
-4. Generate catalog
-5. Push to git → tofu-controller applies automatically
+3. Configure streams to sync
+4. Generate Airbyte catalog
+5. Add connection in Terraform
+6. Push → tofu-controller applies
 ```
 
 ## Steps
 
 ### 1. Discover Available Streams (Optional)
 
-If the source already exists in Airbyte, discover what streams are available:
+If exploring a new source, discover what's available:
 
 ```bash
 make discover
 ```
 
-Select your source. This fetches all available streams and saves to:
-```
-orchestration/assets/sources/my_source/
-├── stream_a.json
-├── stream_b.json
-└── stream_c.json
-```
+Select your source. This saves schemas to `orchestration/dag/sources/{source}/`:
 
-Each file shows:
-- Available sync modes
-- Default primary key / cursor
-- Full field schema with types and descriptions
+```
+dag/sources/shopify/
+├── orders.json       # Available fields, types, sync modes
+├── customers.json
+└── ...
+```
 
 ### 2. Define Source in Terraform
 
-Add source definition to `orchestration/airbyte/terraform/sources.tf`:
+Add to `orchestration/airbyte/terraform/sources.tf`:
 
 ```hcl
 resource "airbyte_source" "my_source" {
@@ -45,77 +44,51 @@ resource "airbyte_source" "my_source" {
   configuration = {
     source_type = "my-source"
     api_key     = var.my_source_api_key
-    # ... other config
   }
 }
 ```
 
-Add any new variables to `orchestration/airbyte/terraform/variables.tf`:
+Add variables to `variables.tf`:
 
 ```hcl
 variable "my_source_api_key" {
-  description = "API key for My Source"
-  type        = string
-  sensitive   = true
+  type      = string
+  sensitive = true
 }
 ```
 
-> **Tip:** Sometimes it's easier to configure the source in the Airbyte UI first, then copy the JSON configuration over.
+### 3. Configure Streams
 
-### 3. Select & Configure Streams
-
-Create stream configs in `orchestration/assets/streams/my_source/`:
+Create stream configs in `orchestration/dag/streams/{source}/`:
 
 ```bash
-mkdir -p orchestration/assets/streams/my_source
+mkdir -p orchestration/dag/streams/my_source
 ```
 
-Create a JSON file for each stream you want to sync (e.g., `stream_a.json`):
+Create `{stream}.json` for each stream to sync:
 
 ```json
 {
-  "stream": "stream_a",
+  "stream": "orders",
   "sync_mode": "incremental",
-  "destination_sync_mode": "append_dedup",
-  "backfill": false,
-  "primary_key": [
-    [
-      "id"
-    ]
-  ],
-  "cursor_field": [
-    "updated_at"
-  ],
+  "destination_sync_mode": "append",
+  "primary_key": [["id"]],
+  "cursor_field": ["updated_at"],
   "fields": {
-    "id": {
-      "type": "integer",
-      "description": "Unique identifier"
-    },
-    "name": {
-      "type": "string",
-      "description": "Name of the record"
-    },
-    "updated_at": {
-      "type": "string",
-      "description": "Last update timestamp",
-      "format": "date-time"
-    }
+    "id": {"type": "integer"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "total_price": {"type": "number"}
   }
 }
 ```
 
-**Configuration options:**
-
-| Field | Options | Description |
-|-------|---------|-------------|
-| `sync_mode` | `full_refresh`, `incremental` | How to read from source |
-| `destination_sync_mode` | `overwrite`, `append`, `append_dedup` | How to write to destination |
-| `backfill` | `true`, `false` | Set `true` to trigger a full re-sync |
-| `primary_key` | `[["field"]]` | Dedup key for append_dedup mode |
-| `cursor_field` | `["field"]` | Field for incremental sync |
-| `fields` | `{...}` | Only these fields will be synced |
-
-**Field selection:** Only include fields you actually need. Reference `orchestration/assets/sources/my_source/` for available fields with types and descriptions.
+| Field | Options | Purpose |
+|-------|---------|---------|
+| `sync_mode` | `incremental`, `full_refresh` | How to read from source |
+| `destination_sync_mode` | `append`, `overwrite` | How to write to S3 |
+| `primary_key` | `[["id"]]` | Dedup key |
+| `cursor_field` | `["updated_at"]` | Incremental cursor |
+| `fields` | `{...}` | Only sync these fields |
 
 ### 4. Generate Catalog
 
@@ -123,11 +96,11 @@ Create a JSON file for each stream you want to sync (e.g., `stream_a.json`):
 python orchestration/airbyte/generate-catalog.py
 ```
 
-This creates `orchestration/assets/streams/my_source/_catalog.json` from your stream configs.
+Creates `dag/streams/{source}/_catalog.json` for Airbyte.
 
-### 5. Add Connection to Terraform
+### 5. Add Connection
 
-Add connection to `orchestration/airbyte/terraform/connections.tf`:
+Add to `orchestration/airbyte/terraform/connections.tf`:
 
 ```hcl
 resource "airbyte_connection" "my_source_to_lake" {
@@ -136,67 +109,68 @@ resource "airbyte_connection" "my_source_to_lake" {
   name           = "My Source → S3 Data Lake"
 
   schedule = {
-    schedule_type = "cron"
+    schedule_type   = "cron"
     cron_expression = "0 0 * * * ?"  # Every hour
   }
 
-  sync_catalog = jsondecode(file("${path.module}/../../assets/streams/my_source/_catalog.json"))
+  sync_catalog = jsondecode(file("${path.module}/../../dag/streams/my_source/_catalog.json"))
 }
 ```
 
-### 6. Push to Git
+### 6. Add Secrets
+
+In h-kube repo:
+
+```bash
+sops cluster/namespaces/lotus-lake/lotus-lake-secrets.yaml
+```
+
+Add `TF_VAR_my_source_api_key`, commit, push h-kube.
+
+### 7. Push
 
 ```bash
 git add orchestration/
-git commit -m "Add My Source to Airbyte"
+git commit -m "Add My Source"
 git push
 ```
 
-tofu-controller will automatically:
-1. Detect the new commit (within 5 minutes)
-2. Run `terraform plan`
-3. Auto-approve and apply
-4. Create source and connection in Airbyte
+tofu-controller applies within 5 minutes.
 
-### 7. Verify
+## Adding a Stream to Existing Source
 
-Check tofu-controller status:
-```bash
-kubectl get terraform -n lotus-lake
-```
+Simpler workflow:
 
-Expected output:
-```
-NAME                 READY   STATUS                              AGE
-lotus-lake-airbyte   True    Applied successfully: main@sha1:...  5m
-```
-
-Check Airbyte connections:
-```bash
-kubectl exec -n airbyte deploy/airbyte-server -- curl -s \
-  "http://localhost:8001/api/v1/connections/list" \
-  -H "Content-Type: application/json" \
-  -d '{"workspaceId":"YOUR_WORKSPACE_ID"}' | jq '.connections[].name'
-```
-
-## Adding a Stream to an Existing Source
-
-Simpler workflow when the source already exists:
-
-1. Create stream config in `orchestration/assets/streams/SOURCE_NAME/STREAM.json`
+1. Create `dag/streams/{source}/{stream}.json`
 2. Run `python orchestration/airbyte/generate-catalog.py`
-3. Push to git
+3. Push
 
-That's it. tofu-controller handles the rest.
+The feeder asset and sensor are auto-generated from stream configs.
 
 ## Triggering a Backfill
 
-To re-sync all historical data for a stream:
+To re-sync all historical data:
 
-1. Edit the stream config, set `"backfill": true`
-2. Push to git
-3. Wait for sync to complete
-4. Set `"backfill": false` and push again
+1. Set `"backfill": true` in stream config
+2. Push, wait for sync
+3. Set `"backfill": false`, push again
+
+## Verification
+
+```bash
+# Check terraform status
+kubectl get terraform -n lotus-lake
+
+# Force reconcile (if impatient)
+kubectl annotate terraform -n lotus-lake lotus-lake-airbyte \
+  reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite
+
+# List connections
+kubectl exec -n airbyte deploy/airbyte-server -- curl -s \
+  "http://localhost:8001/api/v1/connections/list" \
+  -H "Content-Type: application/json" \
+  -d '{"workspaceId":"b93dc139-15d7-4729-9cdc-5c754b9d9401"}' | jq '.connections[].name'
+```
 
 ## Quick Reference
 
@@ -204,20 +178,17 @@ To re-sync all historical data for a stream:
 |------|---------|
 | Discover streams | `make discover` |
 | Generate catalog | `python orchestration/airbyte/generate-catalog.py` |
-| Check terraform status | `kubectl get terraform -n lotus-lake` |
-| Check GitRepository revision | `kubectl get gitrepository -n lotus-lake lotus-lake -o jsonpath='{.status.artifact.revision}'` |
-| Force GitRepository fetch | `kubectl annotate gitrepository -n lotus-lake lotus-lake reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite` |
-| Force terraform reconcile | `kubectl annotate terraform -n lotus-lake lotus-lake-airbyte reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite` |
+| Check terraform | `kubectl get terraform -n lotus-lake` |
+| Force reconcile | See above |
 
-> **Note:** When forcing reconcile after a push, always force GitRepository first (to fetch new commit), then Terraform.
+## What Happens After
 
-## Secrets
+Once Airbyte is syncing:
 
-New source credentials must be added to the terraform vars secret in h-kube:
+1. Parquet files land in `s3://landing/raw/{source}/{stream}/year=.../`
+2. Sensor detects new files
+3. Feeder registers files into landing table
+4. Processed dbt model transforms data
+5. Enriched auto-materializes
 
-```bash
-# In h-kube repo
-sops cluster/namespaces/lotus-lake/lotus-lake-secrets.yaml
-```
-
-Add your variable (e.g., `TF_VAR_my_source_api_key`), then commit and push h-kube.
+See [Adding a Flow](adding-a-flow.md) to set up the landing DDL and dbt models.

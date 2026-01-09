@@ -1,4 +1,4 @@
-{{ config(tags=['mart'], materialized='table') }}
+{{ config(tags=['enriched'], materialized='table') }}
 
 select
     -- identifiers

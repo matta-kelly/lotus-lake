@@ -15,9 +15,9 @@ cat docs/*.md
 
 | Doc | Purpose |
 |-----|---------|
-| `docs/architecture.md` | System architecture and data flow |
+| `docs/architecture.md` | System architecture, Duck Feeder pattern, data flow |
 | `docs/adding-a-source.md` | Adding Airbyte sources and streams |
-| `docs/adding-a-flow.md` | Adding dbt core/mart models |
+| `docs/adding-a-flow.md` | Adding landing DDL + dbt processed/enriched models |
 | `docs/github-actions.md` | CI/CD pipeline |
 | `docs/tickets.md` | Known issues |
 
@@ -69,193 +69,87 @@ rm -rf orchestration/airbyte/terraform/.terraform
 
 ---
 
-## Before You Execute: Stop and Assess
-
-**Always follow this framework before making changes:**
-
-### 1. Check Tickets and Identify Procedure Doc
-
-**Before creating any plan of action:**
-
-1. Review `docs/tickets.md` for open issues that may affect your change
-2. Identify which procedure doc applies:
-   - Adding/changing sources → `docs/adding-a-source.md`
-   - Adding/changing destinations → `docs/adding-a-destination.md`
-   - Adding dbt models (core layer) → `docs/adding-a-flow.md`
-   - Deploying/updating Dagster → `docs/deploying-dagster.md`
-   - Architecture questions → `docs/architecture.md`
-3. **State the doc you're following** when presenting the plan (e.g., "Following `docs/adding-a-destination.md`")
-
-If no procedure doc exists for your task, create one as part of the work.
-
-### 2. Understand the Change
-
-- What files are being modified?
-- What is the expected outcome?
-- What systems are affected? (Airbyte, Terraform, dbt, Dagster)
-
-### 4. Know the Execution Path
-
-```
-Push to git
-  ↓
-Flux GitRepository detects (≤5 min interval)
-  ↓
-tofu-controller runs terraform plan
-  ↓
-Auto-approve + apply
-  ↓
-Airbyte/infrastructure updates
-```
-
-### 5. Identify Risks
-
-| Question | Why It Matters |
-|----------|----------------|
-| What could fail? | Prepare mitigation |
-| How will I know it failed? | Define verification steps |
-| What's the rollback? | Know before you need it |
-
-### 6. Define Verification Steps
-
-Before committing, know exactly how you'll verify success:
-- What commands will you run?
-- What output do you expect?
-- What's the timeline? (immediate vs. wait for interval)
-
-### 7. Post-Execution Review (Required)
-
-After every significant change, review what happened:
-
-**If everything worked as expected:**
-- ✅ Confirm docs are still accurate
-- ✅ No action needed
-
-**If something unexpected happened:**
-1. **STOP** - Don't just work around it
-2. **Understand** - Why did this happen? What assumption was wrong?
-3. **Document** - Add to `docs/tickets.md` as new ticket
-4. **Update** - Fix relevant docs/CLAUDE.md if process was unclear
-
-**This is not optional.** Every bump becomes a ticket. Every lesson updates the docs. This keeps the system learnable and maintainable.
-
----
-
-## GitOps Workflow
-
-This repo uses **tofu-controller** for GitOps. You don't run terraform locally.
-
-### Making Changes
-
-```bash
-# 1. Make changes to orchestration/airbyte/terraform/*
-# 2. If stream changes, regenerate catalog:
-python orchestration/airbyte/generate-catalog.py
-
-# 3. Commit and push
-git add . && git commit -m "description" && git push
-
-# 4. Verify (wait up to 5 min for reconciliation)
-kubectl get terraform -n lotus-lake
-```
-
-### Force Reconciliation
-
-If you can't wait for the interval:
-```bash
-kubectl annotate terraform -n lotus-lake lotus-lake-airbyte \
-  reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite
-```
-
-### Check Status
-
-```bash
-# Terraform status
-kubectl get terraform -n lotus-lake
-
-# Airbyte connections
-kubectl exec -n airbyte deploy/airbyte-server -- curl -s \
-  "http://localhost:8001/api/v1/connections/list" \
-  -H "Content-Type: application/json" \
-  -d '{"workspaceId":"b93dc139-15d7-4729-9cdc-5c754b9d9401"}' | jq '.connections[].name'
-```
-
----
-
 ## Key Paths
 
 | What | Where |
 |------|-------|
 | Airbyte terraform | `orchestration/airbyte/terraform/` |
-| Stream configs | `orchestration/assets/streams/<source>/*.json` |
-| Source schemas | `orchestration/assets/sources/<source>/*.json` |
-| dbt core models | `orchestration/assets/core/<source>/int_*.sql` |
-| dbt sources | `orchestration/assets/core/<source>/_<source>__sources.yml` |
-| Dagster assets | `orchestration/assets/core/assets.py` |
+| **Dagster assets** | `orchestration/assets.py` |
+| Duck Feeder library | `orchestration/dag/landing/lib.py` |
+| Stream configs | `orchestration/dag/streams/{source}/*.json` |
+| Source schemas | `orchestration/dag/sources/{source}/*.json` |
+| Landing DDL | `orchestration/dag/landing/{source}/stg_*.sql` |
+| Processed dbt models | `orchestration/dag/processed/{source}/int_*.sql` |
+| Enriched dbt models | `orchestration/dag/enriched/{domain}/fct_*.sql` |
 | Tickets/issues | `docs/tickets.md` |
+
+---
+
+## Data Flow
+
+```
+sources → streams → landing → processed → enriched
+```
+
+```
+Airbyte → S3 Parquet → Sensor → Feeder → Landing → Processed → Enriched
+                                  │
+                                  ├── get_files_after_cursor (partition-aware)
+                                  ├── batch_by_size (~500MB)
+                                  ├── register_batch (ducklake_add_data_files)
+                                  ├── dbt run (merge into processed)
+                                  ├── set_cursor
+                                  └── cleanup_old_files (trails by 7 days)
+```
+
+**Three asset layers in one file** (`assets.py`):
+1. `landing_tables` - Reconciles DDL files to DuckLake tables
+2. `feeder_{source}_{stream}` - Auto-generated per stream, registers files + runs dbt
+3. `enriched_dbt_models` - All enriched models, auto-materializes
 
 ---
 
 ## Naming Conventions
 
-### dbt Models
-
-Double underscore separates layer from entity:
-
-```
-int_shopify__orders
-│   │        │
-│   │        └── entity
-│   └── source
-└── layer (int = intermediate)
-```
-
-| Prefix | Layer |
-|--------|-------|
-| `stg_` | Staging - light cleaning |
-| `int_` | Intermediate - business logic |
-| `fct_` | Fact tables |
-| `dim_` | Dimension tables |
-
-### Stream Configs
-
-```
-orchestration/assets/streams/shopify/
-├── orders.json        # Stream config (what we sync)
-├── customers.json     # Stream config
-└── _catalog.json      # Generated - don't edit manually
-```
+| Layer | Pattern | Example |
+|-------|---------|---------|
+| Landing DDL | `stg_{source}__{stream}` | `stg_shopify__orders` |
+| Processed model | `int_{source}__{stream}` | `int_shopify__orders` |
+| Enriched model | `fct_{domain}` | `fct_sales` |
+| Feeder asset | `feeder_{source}_{stream}` | `feeder_shopify_orders` |
+| Sensor | `{source}_{stream}_sensor` | `shopify_orders_sensor` |
 
 ---
 
 ## Common Tasks
 
-### Add a Stream to Existing Source
+### Add a Stream (Complete Flow)
 
 ```bash
-# 1. Check available fields
-cat orchestration/assets/sources/SOURCE/STREAM.json
+# 1. Create stream config (for Airbyte)
+vim orchestration/dag/streams/SOURCE/STREAM.json
 
-# 2. Create stream config
-vim orchestration/assets/streams/SOURCE/STREAM.json
-
-# 3. Regenerate catalog
+# 2. Regenerate Airbyte catalog
 python orchestration/airbyte/generate-catalog.py
 
-# 4. Add dbt source (if new table)
-vim orchestration/assets/core/SOURCE/_SOURCE__sources.yml
+# 3. Create landing DDL (defines raw schema)
+vim orchestration/dag/landing/SOURCE/stg_SOURCE__STREAM.sql
 
-# 5. Create dbt model
-vim orchestration/assets/core/SOURCE/int_SOURCE__STREAM.sql
+# 4. Create processed dbt model (transforms + dedupe)
+vim orchestration/dag/processed/SOURCE/int_SOURCE__STREAM.sql
+
+# 5. Regenerate dbt manifest
+cd orchestration && dbt parse
 
 # 6. Commit and push
+git add . && git commit -m "Add SOURCE/STREAM" && git push
 ```
 
 ### Trigger Backfill
 
 ```bash
 # 1. Set backfill flag
-vim orchestration/assets/streams/SOURCE/STREAM.json
+vim orchestration/dag/streams/SOURCE/STREAM.json
 # Set "backfill": true
 
 # 2. Push, wait for sync to complete
@@ -265,82 +159,51 @@ vim orchestration/assets/streams/SOURCE/STREAM.json
 
 ---
 
-## CRITICAL: Dagster Sensor & Asset Wiring
+## Dagster Asset & Sensor Wiring
 
 ### Stream Config is Source of Truth
 
-The stream config filename drives ALL naming:
+The stream config filename drives ALL auto-generation:
 
 ```
-streams/{source}/{stream}.json
+dag/streams/{source}/{stream}.json
        ↓
-┌──────┴──────────────────────────────────────────────────┐
-│                                                          │
-▼                                                          ▼
-S3 Path (Hive format)                            Code Generation
-raw/{source}/{stream}/year=YYYY/month=MM/day=DD/          │
-       └── enables partition pruning      ┌───────────────┼───────────────┐
-                                          ▼               ▼               ▼
-                                       Sensor          Asset           dbt Model
-                                  {source}_{stream}  {source}_{stream}  int_{source}__{stream}
-                                     _sensor            _dbt              .sql (incremental)
+┌──────┴────────────────────────────────────────────┐
+│                                                    │
+▼                                                    ▼
+S3 Path (Hive format)                       Auto-generated
+raw/{source}/{stream}/year=.../                     │
+                                    ┌───────────────┼───────────────┐
+                                    ▼               ▼               ▼
+                                 Sensor          Feeder          Landing DDL
+                            {source}_{stream}  feeder_{source}  stg_{source}__{stream}
+                               _sensor            _{stream}
 ```
 
-### Asset Key Format
+### Feeder Factory
 
-dagster-dbt creates asset keys as `["main", "model_name"]`:
-```python
-asset_key = AssetKey(["main", f"int_{source}__{stream}"])
-```
-
-### Sensor Requirements
-
-**Sensors MUST have `asset_selection` on the decorator:**
-```python
-@sensor(
-    name=f"{source}_{stream}_sensor",
-    asset_selection=[asset_key],  # REQUIRED - defines target
-    ...
-)
-def _sensor(context):
-    yield RunRequest(run_key="...")  # Uses decorator's target
-```
-
-Without `asset_selection`, you get:
-> "Sensor evaluation function returned a RunRequest for a sensor lacking a specified target"
-
-### Factory Pattern for Assets
-
-Each stream needs its OWN `@dbt_assets` decorator (not one bundled decorator):
+Each stream gets its own feeder asset (auto-generated in `assets.py`):
 
 ```python
-# CORRECT - one asset per stream
-def make_dbt_asset(source: str, stream: str):
-    @dbt_assets(
-        manifest=DBT_MANIFEST,
-        select=f"tag:{source}__{stream}",  # Select ONLY this model
-        name=f"{source}_{stream}_dbt",
-    )
-    def _asset(context, dbt):
-        yield from dbt.cli(["run"], context=context).stream()
-    return _asset
-
-# WRONG - bundles all models together
-@dbt_assets(select="tag:core")  # Triggers ALL core models at once
-def core_dbt_models(...):
+def make_feeder_asset(source: str, stream: str):
+    @asset(name=f"feeder_{source}_{stream}", deps=[AssetKey("landing_tables")])
+    def _feeder(context, dbt):
+        # 1. Get files after cursor
+        # 2. Batch by size
+        # 3. Register batch into landing
+        # 4. Run processed dbt model
+        # 5. Update cursor
+        # 6. Cleanup old files
 ```
 
-### Verification After Code Push
+---
 
-**ALWAYS verify deployed code matches repo before testing:**
+## Verification After Code Push
+
 ```bash
-# Check sensor code
+# Check deployed code
 kubectl exec -n lotus-lake deploy/dagster-dagster-user-deployments-lotus-lake \
-  -- grep -A3 "asset_selection" /app/orchestration/sensors.py
-
-# Check asset factory
-kubectl exec -n lotus-lake deploy/dagster-dagster-user-deployments-lotus-lake \
-  -- head -50 /app/orchestration/assets/core/assets.py
+  -- head -50 /app/orchestration/assets.py
 
 # Force image pull if stale
 kubectl delete pod -n lotus-lake -l component=user-deployments
@@ -363,14 +226,21 @@ kubectl annotate terraform -n lotus-lake lotus-lake-airbyte \
   reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite
 ```
 
-### Known Limitation: TICKET-001
+### Check Feeder Cursors
 
-When terraform fails, retries use **cached source artifacts**. Your fix won't be picked up until:
-- Next interval cycle (5 min), OR
-- Manual annotation (above), OR
-- Change to h-kube terraform spec
+```sql
+-- In DuckDB connected to DuckLake
+SELECT * FROM lakehouse.meta.feeder_cursors;
+```
 
-See `docs/tickets.md` for details.
+### Force Feeder Re-run
+
+Delete the cursor to reprocess all files:
+
+```sql
+DELETE FROM lakehouse.meta.feeder_cursors
+WHERE source = 'shopify' AND stream = 'orders';
+```
 
 ---
 
@@ -378,10 +248,8 @@ See `docs/tickets.md` for details.
 
 | Doc | Purpose |
 |-----|---------|
-| `docs/architecture.md` | System architecture and data flow |
+| `docs/architecture.md` | System architecture, Duck Feeder pattern |
 | `docs/adding-a-source.md` | Adding Airbyte sources and streams |
-| `docs/adding-a-destination.md` | Adding Airbyte destinations |
-| `docs/adding-a-flow.md` | Adding dbt core/mart models |
-| `docs/deploying-dagster.md` | Dagster deployment and configuration |
+| `docs/adding-a-flow.md` | Adding landing DDL + dbt models |
 | `docs/github-actions.md` | CI/CD pipeline and image builds |
 | `docs/tickets.md` | Known issues and TODOs |
