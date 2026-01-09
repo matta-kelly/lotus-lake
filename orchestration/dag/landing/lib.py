@@ -12,9 +12,15 @@ Batching:
 - register_batch: call ducklake_add_data_files for a batch
 """
 import os
+import re
 from typing import Iterator
 
 import duckdb
+
+
+def _natural_sort_key(s: str) -> list:
+    """Sort key that handles numbers naturally (part_9 < part_10)."""
+    return [int(c) if c.isdigit() else c for c in re.split(r'(\d+)', s)]
 
 
 def get_ducklake_connection() -> duckdb.DuckDBPyConnection:
@@ -28,11 +34,17 @@ def get_ducklake_connection() -> duckdb.DuckDBPyConnection:
     s3_secret = os.environ.get("S3_SECRET_ACCESS_KEY", "")
     s3_endpoint = os.environ.get("S3_ENDPOINT", "")
 
-    conn.execute(f"SET s3_access_key_id='{s3_key}';")
-    conn.execute(f"SET s3_secret_access_key='{s3_secret}';")
-    conn.execute(f"SET s3_endpoint='{s3_endpoint}';")
-    conn.execute("SET s3_use_ssl=false;")
-    conn.execute("SET s3_url_style='path';")
+    # DuckLake uses CREATE SECRET, not SET s3_* commands
+    conn.execute(f"""
+        CREATE SECRET s3_secret (
+            TYPE S3,
+            KEY_ID '{s3_key}',
+            SECRET '{s3_secret}',
+            ENDPOINT '{s3_endpoint}',
+            USE_SSL false,
+            URL_STYLE 'path'
+        )
+    """)
 
     pg_host = os.environ.get("DUCKLAKE_DB_HOST", "ducklake-db-rw.lotus-lake.svc.cluster.local")
     pg_pass = os.environ.get("DUCKLAKE_DB_PASSWORD", "")
@@ -170,14 +182,15 @@ def get_files_after_cursor(
                     # Partition might not exist yet
                     pass
 
-            # Filter to files strictly after cursor (same-day precision)
-            files = sorted(f for f in files if f > cursor)
+            # Filter to files strictly after cursor (natural sort for part_9 < part_10)
+            cursor_key = _natural_sort_key(cursor)
+            files = sorted([f for f in files if _natural_sort_key(f) > cursor_key], key=_natural_sort_key)
             return files
 
     # No cursor or couldn't parse - fall back to full glob
     s3_path = f"s3://landing/raw/{source}/{stream}/**/*.parquet"
     s3_files = conn.execute(f"SELECT file FROM glob('{s3_path}')").fetchall()
-    return sorted(row[0] for row in s3_files)
+    return sorted((row[0] for row in s3_files), key=_natural_sort_key)
 
 
 # =============================================================================

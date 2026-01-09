@@ -452,9 +452,8 @@ def make_feeder_sensor(source: str, stream: str):
             if files:
                 latest_file = files[-1]
                 context.log.info(f"Detected {len(files)} new files for {source}/{stream}, latest: {latest_file}")
-                # No run_key - allows retry after failure
-                # Duplicate prevention: in_progress_runs check above
                 yield RunRequest(
+                    run_key=f"{source}/{stream}/{latest_file}",
                     tags={"feeder": f"{source}/{stream}"},
                 )
 
