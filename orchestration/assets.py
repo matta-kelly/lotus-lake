@@ -1,10 +1,14 @@
 """
 Unified Asset Definitions
 
-Three asset types:
+Four asset types:
 1. Landing - DDL reconciliation (creates/updates DuckLake tables from SQL files)
-2. Feeder - one per stream, registers files + runs processed dbt inline
-3. Enriched - single asset for all enriched models, auto-materializes on upstream changes
+2. Feeder - one per stream, registers files, runs dbt, emits AssetMaterialization
+3. Processed - dbt models (int_*) defined for Dagster awareness, executed by feeders
+4. Enriched - dbt models (fct_*) auto-materialize when processed updates
+
+Feeders emit AssetMaterialization for processed models so Dagster knows when to
+auto-materialize enriched models.
 
 Plus sensors that trigger feeders when new S3 files arrive.
 """
@@ -19,6 +23,7 @@ from dagster import (
     sensor,
     AssetExecutionContext,
     AssetKey,
+    AssetMaterialization,
     AutomationCondition,
     DagsterRunStatus,
     DefaultSensorStatus,
@@ -281,22 +286,41 @@ def make_feeder_asset(source: str, stream: str):
             context.log.info(f"[{source}/{stream}] Running dbt models (tag:{dbt_tag})...")
             dbt_result = dbt.cli(["run", "--select", f"tag:{dbt_tag}"])
 
-            models_run = []
+            models_succeeded = []
+            models_failed = []
             for event in dbt_result.stream():
                 yield event
-                # Try to capture model names from dbt events
+                # Capture model results from dbt events
                 if hasattr(event, 'raw_event'):
                     raw = event.raw_event
                     if isinstance(raw, dict) and raw.get('info', {}).get('name') == 'LogModelResult':
                         model_name = raw.get('data', {}).get('node_info', {}).get('node_name', '')
                         status = raw.get('data', {}).get('status', '')
-                        if model_name:
-                            models_run.append(f"{model_name}:{status}")
+                        if model_name and status == 'success':
+                            models_succeeded.append(model_name)
+                        elif model_name:
+                            models_failed.append(f"{model_name}:{status}")
 
-            if models_run:
-                context.log.info(f"[{source}/{stream}] dbt results: {', '.join(models_run)}")
-            else:
-                context.log.info(f"[{source}/{stream}] dbt run complete")
+            # Log results
+            if models_succeeded:
+                context.log.info(f"[{source}/{stream}] dbt succeeded: {', '.join(models_succeeded)}")
+            if models_failed:
+                context.log.warning(f"[{source}/{stream}] dbt issues: {', '.join(models_failed)}")
+
+            # Emit AssetMaterialization for each successful model
+            # This notifies Dagster that the processed assets have been updated,
+            # which triggers enriched auto-materialization
+            for model_name in models_succeeded:
+                yield AssetMaterialization(
+                    asset_key=AssetKey(model_name),
+                    metadata={
+                        "source": source,
+                        "stream": stream,
+                        "batch": batch_num,
+                        "total_batches": total_batches,
+                    }
+                )
+                context.log.info(f"[{source}/{stream}] Emitted materialization for {model_name}")
 
             # Update cursor to last file in batch
             last_file = batch[-1]
@@ -373,7 +397,38 @@ def make_feeder_sensor(source: str, stream: str):
 
 
 # =============================================================================
-# Enriched Factory - Single asset for all enriched models
+# Processed dbt Assets - Defined for Dagster awareness, executed by feeders
+# =============================================================================
+
+class ProcessedDbtTranslator(DagsterDbtTranslator):
+    """Translator for processed layer models."""
+
+    def get_group_name(self, dbt_resource_props):
+        return "processed"
+
+    # NO automation condition - feeders control execution
+
+
+@dbt_assets(
+    manifest=DBT_MANIFEST,
+    select="tag:processed",
+    dagster_dbt_translator=ProcessedDbtTranslator(),
+)
+def processed_dbt_models(context: AssetExecutionContext, dbt: DbtCliResource):
+    """
+    Processed dbt models - defined here for Dagster's asset graph awareness.
+
+    These are NOT run directly by Dagster. Instead, feeders:
+    1. Run dbt via CLI (dbt run --select tag:source__stream)
+    2. Emit AssetMaterialization events for these asset keys
+
+    This allows enriched models to auto-materialize when processed updates.
+    """
+    yield from dbt.cli(["run"], context=context).stream()
+
+
+# =============================================================================
+# Enriched dbt Assets - Auto-materializes when processed updates
 # =============================================================================
 
 class EnrichedDbtTranslator(DagsterDbtTranslator):
