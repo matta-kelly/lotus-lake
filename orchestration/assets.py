@@ -306,10 +306,11 @@ def make_feeder_asset(source: str, stream: str):
         # Log current cursor position
         current_cursor = get_cursor(conn, source, stream)
         if current_cursor:
+            cursor_file = current_cursor.split("/")[-1]
             cursor_date = _extract_date_from_path(current_cursor)
-            context.log.info(f"[{source}/{stream}] Current cursor: {cursor_date}")
+            context.log.info(f"[{source}/{stream}] Current cursor: {cursor_date} ({cursor_file})")
         else:
-            context.log.info(f"[{source}/{stream}] No cursor - starting fresh")
+            context.log.info(f"[{source}/{stream}] No cursor - will process all files")
 
         files = get_files_after_cursor(conn, source, stream)
 
@@ -393,17 +394,19 @@ def make_feeder_asset(source: str, stream: str):
             # Update cursor to last file in batch
             last_file = batch[-1]
             set_cursor(conn, source, stream, last_file)
+            new_cursor_file = last_file.split("/")[-1]
             new_cursor_date = _extract_date_from_path(last_file)
             context.log.info(
-                f"[{source}/{stream}] Cursor updated to {new_cursor_date} "
-                f"(batch {batch_num}/{total_batches} complete)"
+                f"[{source}/{stream}] Cursor updated to {new_cursor_date} ({new_cursor_file}) "
+                f"- batch {batch_num}/{total_batches} complete"
             )
 
         conn.close()
 
+        final_cursor_file = last_file.split("/")[-1]
         context.log.info(
-            f"[{source}/{stream}] COMPLETE: {total_registered} files processed "
-            f"in {total_batches} batches, cursor now at {_extract_date_from_path(last_file)}"
+            f"[{source}/{stream}] COMPLETE: {total_registered} files in {total_batches} batches, "
+            f"cursor now at {final_cursor_file}"
         )
         yield Output({
             "status": "complete",
