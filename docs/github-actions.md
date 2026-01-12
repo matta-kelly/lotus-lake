@@ -20,8 +20,8 @@ Push to main
     ↓
 GitHub Actions builds Docker image
     ↓
-Push to ghcr.io/lotusandluna/lotus-lake:latest
-Push to ghcr.io/lotusandluna/lotus-lake:<sha>
+Push to ghcr.io/matta-kelly/lotus-lake:latest
+Push to ghcr.io/matta-kelly/lotus-lake:<sha>
     ↓
 Flux detects new image (ImagePolicy) or new deploy/ changes
     ↓
@@ -49,7 +49,7 @@ Catches errors before they reach the cluster:
 
 ### 3. Push to Registry (Main Only)
 
-- Pushes to `ghcr.io/lotusandluna/lotus-lake`
+- Pushes to `ghcr.io/matta-kelly/lotus-lake`
 - PR builds verify but don't push
 
 ## Image Tags
@@ -152,7 +152,7 @@ updates:
 │                              ▼                                   │
 │  ┌──────────────────────────────────────────────────────────┐   │
 │  │ HelmRelease: dagster                                      │   │
-│  │   image: ghcr.io/lotusandluna/lotus-lake:latest          │   │
+│  │   image: ghcr.io/matta-kelly/lotus-lake:latest           │   │
 │  │   pullPolicy: Always                                      │   │
 │  └──────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘

@@ -5,7 +5,7 @@
 Dagster deployment is automated via GitOps:
 
 1. Push to `main` branch
-2. GitHub Actions builds `ghcr.io/lotusandluna/lotus-lake` image
+2. GitHub Actions builds `ghcr.io/matta-kelly/lotus-lake` image
 3. Flux detects new image and updates the user-deployment
 
 ## Components
@@ -14,7 +14,7 @@ Dagster deployment is automated via GitOps:
 |-----------|--------|-------|
 | Webserver | Dagster Helm chart | `dagster/dagster` (official) |
 | Daemon | Dagster Helm chart | `dagster/dagster` (official) |
-| User Deployment | `lotus-lake/deploy/dagster/` | `ghcr.io/lotusandluna/lotus-lake` |
+| User Deployment | `lotus-lake/deploy/dagster/` | `ghcr.io/matta-kelly/lotus-lake` |
 | Database | `lotus-lake/deploy/dagster/database.yaml` | CNPG Postgres |
 
 ## Files

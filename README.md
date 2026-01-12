@@ -1,93 +1,118 @@
 # Lotus Lake
 
-Data platform for Lotus & Luna e-commerce. Lakehouse architecture on k3s.
+Data platform for Lotus & Luna e-commerce. Lakehouse architecture on k3s with GitOps deployment.
 
 ## Stack
 
 ```
-Shopify/Klaviyo → Airbyte → Iceberg/Nessie/MinIO → dbt-trino → Trino → Cube.js
+Shopify/Klaviyo → Airbyte → SeaweedFS (S3) → Dagster → DuckLake/dbt-duckdb
+```
+
+| Layer | Tool | Purpose |
+|-------|------|---------|
+| Ingestion | Airbyte | Incremental sync from sources to S3 Parquet |
+| Storage | SeaweedFS | S3-compatible object storage |
+| Catalog | DuckLake + Postgres | SQL metadata catalog with ACID, time travel |
+| Transform | dbt-duckdb | SQL transforms on DuckLake tables |
+| Orchestration | Dagster | Asset-based orchestration with sensors |
+
+## Data Flow
+
+```
+Sources (Shopify, Klaviyo)
+    ↓
+Airbyte syncs to S3 Parquet (Hive partitioned)
+    ↓
+Dagster sensor detects new files
+    ↓
+Feeder asset: batch → register → dbt run → update cursor
+    ↓
+Landing (stg_*) → Processed (int_*) → Enriched (fct_*)
 ```
 
 ## Directory Structure
 
 ```
 lotus-lake/
-├── infrastructure/           # Helm values + service configs
+├── deploy/                      # Kubernetes manifests (Flux deploys these)
+│   └── dagster/                 # Dagster Helm release + CNPG database
+├── docs/                        # Detailed documentation
+├── orchestration/               # Dagster + dbt unified workspace
+│   ├── definitions.py           # Dagster entry point
+│   ├── assets.py                # All asset definitions
+│   ├── dbt_project.yml          # dbt configuration
 │   ├── airbyte/
-│   │   ├── values.yaml
-│   │   ├── terraform/        # Sources, destinations, connections
-│   │   ├── streams/          # Airbyte stream configs
-│   │   └── export-streams.py
-│   ├── minio/
-│   ├── nessie/
-│   └── trino/
-│
-├── orchestration/            # dbt + dagster (unified)
-│   ├── dbt_project.yml
-│   ├── profiles.yml
-│   ├── definitions.py        # Dagster entry point
-│   ├── assets/
-│   │   ├── streams/          # JSON schemas + staging SQL
-│   │   │   ├── shopify/      # orders.json, stg_shopify__orders.sql
-│   │   │   └── klaviyo/
-│   │   ├── core/             # Transform SQL + dagster assets
-│   │   │   ├── shopify/      # int_shopify__orders.sql, shopify.py
-│   │   │   └── klaviyo/
-│   │   └── marts/            # Business aggregations
-│   ├── resources/
-│   └── sensors/
-│
-├── helmfile.yaml.gotmpl
-└── .env                      # Secrets (not committed)
+│   │   └── terraform/           # Airbyte sources/destinations/connections
+│   └── dag/
+│       ├── streams/             # Stream configs (source of truth)
+│       ├── landing/             # DDL + Duck Feeder library
+│       ├── processed/           # dbt int_* models
+│       └── enriched/            # dbt fct_* models
+├── .github/workflows/           # CI/CD pipeline
+├── CLAUDE.md                    # AI assistant quick reference
+└── Dockerfile                   # Dagster user code image
 ```
 
-## Data Layers
+## Deployment
 
-| Layer | Location | Prefix | Purpose |
-|-------|----------|--------|---------|
-| Bronze | Airbyte → Iceberg | - | Raw ingested data |
-| Streams | `assets/streams/` | `stg_` | 1:1 views, rename/cast |
-| Core | `assets/core/` | `int_` | Flatten, filter, join |
-| Marts | `assets/marts/` | `fct_`, `dim_` | Business aggregations |
+This repo is deployed via **GitOps** through the [h-kube](../h-kube) cluster:
+
+- **Dagster**: Flux HelmRelease from `deploy/dagster/`
+- **Airbyte config**: tofu-controller applies `orchestration/airbyte/terraform/`
+
+**All changes go through git push.** Do not run terraform locally.
+
+## Documentation
+
+| Doc | Purpose |
+|-----|---------|
+| [CLAUDE.md](CLAUDE.md) | Quick reference for AI assistants |
+| [docs/architecture.md](docs/architecture.md) | System design, Duck Feeder pattern |
+| [docs/adding-a-source.md](docs/adding-a-source.md) | Add new Airbyte sources |
+| [docs/adding-a-flow.md](docs/adding-a-flow.md) | Add landing DDL + dbt models |
+| [docs/adding-a-destination.md](docs/adding-a-destination.md) | Configure destinations |
+| [docs/deploying-dagster.md](docs/deploying-dagster.md) | Dagster deployment details |
+| [docs/github-actions.md](docs/github-actions.md) | CI/CD pipeline |
+| [docs/secrets.md](docs/secrets.md) | Secret management with SOPS |
+| [docs/tickets.md](docs/tickets.md) | Known issues and limitations |
 
 ## Quick Start
 
+### View Dagster UI
+
 ```bash
-# 1. Create cluster
-k3d cluster create lotus-dev
-
-# 2. Deploy infrastructure
-set -a && source .env && set +a
-helmfile sync
-
-# 3. Wait for pods
-kubectl get pods -A -w
-
-# 4. Port forwards
-kubectl port-forward -n airbyte deployment/airbyte-server 8080:8001 &
-kubectl port-forward -n nessie svc/nessie 19120:19120 &
-
-# 5. Get workspace ID (update .env with TF_VAR_workspace_id)
-curl -s http://localhost:8080/api/public/v1/workspaces | \
-  python3 -c "import sys,json; print(json.load(sys.stdin)['data'][0]['workspaceId'])"
-
-# 6. Apply Airbyte config
-cd infrastructure/airbyte/terraform
-set -a && source ../../../.env && set +a
-terraform init && terraform apply
+# Port forward (or use ingress if configured)
+kubectl port-forward -n lotus-lake svc/dagster-webserver 3000:80
+# Open http://localhost:3000
 ```
+
+### Add a New Stream
+
+```bash
+# 1. Create stream config
+vim orchestration/dag/streams/SOURCE/STREAM.json
+
+# 2. Regenerate Airbyte catalog
+python orchestration/airbyte/generate-catalog.py
+
+# 3. Create landing DDL
+vim orchestration/dag/landing/SOURCE/stg_SOURCE__STREAM.sql
+
+# 4. Create processed model
+vim orchestration/dag/processed/SOURCE/int_SOURCE__STREAM.sql
+
+# 5. Regenerate dbt manifest
+cd orchestration && dbt parse
+
+# 6. Push
+git add . && git commit -m "Add SOURCE/STREAM" && git push
+```
+
+See [docs/adding-a-source.md](docs/adding-a-source.md) and [docs/adding-a-flow.md](docs/adding-a-flow.md) for details.
 
 ## Data Sources
 
-**Shopify:** orders, customers, products, product_variants, order_refunds, discount_codes
-
-**Klaviyo:** profiles, events, campaigns, flows, metrics, lists
-
-## Services
-
-| Service | Port | Access |
-|---------|------|--------|
-| Airbyte | 8080 | `kubectl port-forward -n airbyte deployment/airbyte-server 8080:8001` |
-| Trino | 8081 | `kubectl port-forward -n trino svc/trino 8081:8080` |
-| Nessie | 19120 | `kubectl port-forward -n nessie svc/nessie 19120:19120` |
-| MinIO | 9000 | `kubectl port-forward -n minio svc/minio 9000:9000` |
+| Source | Streams |
+|--------|---------|
+| Shopify | orders, customers, order_refunds |
+| Klaviyo | profiles, events, campaigns, flows, metrics, lists |
