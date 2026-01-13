@@ -56,6 +56,18 @@ jobs:
           cd orchestration && dbt parse --profiles-dir . --project-dir .
           echo "dbt validation passed"
 
+      # Validate Airbyte catalogs are up to date
+      - name: Check Airbyte catalogs are current
+        run: |
+          python orchestration/airbyte/generate-catalog.py
+          if ! git diff --quiet orchestration/dag/streams/; then
+            echo "::error::Airbyte catalogs are out of date. Run: python orchestration/airbyte/generate-catalog.py"
+            echo "::error::Then commit the updated _catalog.json files"
+            git diff orchestration/dag/streams/
+            exit 1
+          fi
+          echo "Airbyte catalogs are up to date"
+
       # Validate Dagster Python code syntax
       - name: Validate Dagster Python syntax
         run: |

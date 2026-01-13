@@ -92,11 +92,15 @@ Create `{stream}.json` for each stream to sync:
 
 ### 4. Generate Catalog
 
+Run the catalog generator locally (CI will validate it's up to date):
+
 ```bash
 python orchestration/airbyte/generate-catalog.py
 ```
 
 Creates `dag/streams/{source}/_catalog.json` for Airbyte.
+
+**Note:** CI will fail if you forget this step, ensuring catalogs are always current.
 
 ### 5. Add Connection
 
@@ -176,7 +180,7 @@ kubectl exec -n airbyte deploy/airbyte-server -- curl -s \
 
 | Task | Command |
 |------|---------|
-| Discover streams | `make discover` |
+| Discover streams | `cd orchestration/airbyte && python discover-source.py` |
 | Generate catalog | `python orchestration/airbyte/generate-catalog.py` |
 | Check terraform | `kubectl get terraform -n lotus-lake` |
 | Force reconcile | See above |

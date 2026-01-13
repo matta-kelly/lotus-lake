@@ -9,12 +9,12 @@ resource "airbyte_connection" "shopify_to_lake" {
   notify_schema_changes           = true
   notify_schema_changes_by_email  = false
   prefix                          = ""
-  schedule_type                   = "basic"
+  schedule_type                   = "cron"
 
   schedule_data = {
-    basic_schedule = {
-      time_unit = "hours"
-      units     = 1
+    cron_schedule = {
+      cron_expression = "0,20,40 * * * *"
+      cron_timezone   = "UTC"
     }
   }
 
@@ -32,12 +32,12 @@ resource "airbyte_connection" "klaviyo_to_lake" {
   notify_schema_changes           = true
   notify_schema_changes_by_email  = false
   prefix                          = ""
-  schedule_type                   = "basic"
+  schedule_type                   = "cron"
 
   schedule_data = {
-    basic_schedule = {
-      time_unit = "hours"
-      units     = 1
+    cron_schedule = {
+      cron_expression = "5,15,25,35,45,55 * * * *"
+      cron_timezone   = "UTC"
     }
   }
 

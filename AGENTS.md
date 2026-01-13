@@ -117,7 +117,7 @@ Airbyte → S3 Parquet → Sensor → Feeder → Landing → Processed → Enric
 # 1. Create stream config
 vim orchestration/dag/streams/SOURCE/STREAM.json
 
-# 2. Regenerate Airbyte catalog
+# 2. Regenerate Airbyte catalog (CI will validate this is done)
 python orchestration/airbyte/generate-catalog.py
 
 # 3. Create landing DDL
