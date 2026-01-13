@@ -12,9 +12,9 @@ resource "airbyte_connection" "shopify_to_lake" {
   schedule_type                   = "cron"
 
   schedule_data = {
-    cron_schedule = {
-      cron_expression = "0,20,40 * * * *"
-      cron_timezone   = "UTC"
+    cron = {
+      cron_expression = "0 0,20,40 * * * ?"
+      cron_time_zone  = "UTC"
     }
   }
 
@@ -35,9 +35,9 @@ resource "airbyte_connection" "klaviyo_to_lake" {
   schedule_type                   = "cron"
 
   schedule_data = {
-    cron_schedule = {
-      cron_expression = "5,15,25,35,45,55 * * * *"
-      cron_timezone   = "UTC"
+    cron = {
+      cron_expression = "0 5,15,25,35,45,55 * * * ?"
+      cron_time_zone  = "UTC"
     }
   }
 
