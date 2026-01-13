@@ -75,7 +75,7 @@ This repo is deployed via **GitOps** through the [h-kube](../h-kube) cluster:
 | [Troubleshooting](docs/troubleshooting.md) | Common issues and debugging |
 | [Known Issues](docs/tickets.md) | Tracked issues and workarounds |
 
-For AI assistants, see [CLAUDE.md](CLAUDE.md).
+For AI assistants, see [AGENTS.md](AGENTS.md).
 
 ## Quick Start
 
