@@ -64,17 +64,18 @@ This repo is deployed via **GitOps** through the [h-kube](../h-kube) cluster:
 
 ## Documentation
 
-| Doc | Purpose |
-|-----|---------|
-| [CLAUDE.md](CLAUDE.md) | Quick reference for AI assistants |
-| [docs/architecture.md](docs/architecture.md) | System design, Duck Feeder pattern |
-| [docs/adding-a-source.md](docs/adding-a-source.md) | Add new Airbyte sources |
-| [docs/adding-a-flow.md](docs/adding-a-flow.md) | Add landing DDL + dbt models |
-| [docs/adding-a-destination.md](docs/adding-a-destination.md) | Configure destinations |
-| [docs/deploying-dagster.md](docs/deploying-dagster.md) | Dagster deployment details |
-| [docs/github-actions.md](docs/github-actions.md) | CI/CD pipeline |
-| [docs/secrets.md](docs/secrets.md) | Secret management with SOPS |
-| [docs/tickets.md](docs/tickets.md) | Known issues and limitations |
+| Doc | Description |
+|-----|-------------|
+| [Architecture](docs/architecture.md) | System design, Duck Feeder pattern, data flow |
+| [Adding Sources](docs/adding-a-source.md) | Add new Airbyte sources and streams |
+| [Adding Flows](docs/adding-a-flow.md) | Add landing DDL and dbt models |
+| [Adding Destinations](docs/adding-a-destination.md) | Configure S3 or other destinations |
+| [Deployment](docs/deployment.md) | CI/CD pipeline and Kubernetes deployment |
+| [Secrets](docs/secrets.md) | SOPS encryption and credential management |
+| [Troubleshooting](docs/troubleshooting.md) | Common issues and debugging |
+| [Known Issues](docs/tickets.md) | Tracked issues and workarounds |
+
+For AI assistants, see [CLAUDE.md](CLAUDE.md).
 
 ## Quick Start
 
