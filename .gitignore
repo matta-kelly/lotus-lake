@@ -12,3 +12,4 @@ orchestration/target/
 orchestration/logs/
 orchestration/.user.yml
 .claude/
+AGENTS.md
