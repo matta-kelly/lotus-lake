@@ -130,7 +130,7 @@ module.exports = processedModels.map(model => {
 
   return {
     name: model.name,
-    sql_table: `lakehouse.main_main.${model.name}`,
+    sql_table: `lakehouse.main.${model.name}`,
 
     dimensions: columns.map(colName => ({
       name: colName,

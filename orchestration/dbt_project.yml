@@ -15,7 +15,7 @@ clean-targets:
   - "dbt_packages"
 
 # Write all models to DuckLake (lakehouse database)
+# DuckLake default schema is 'main', so don't set +schema to avoid 'main_main'
 models:
   lotus_lake:
     +database: lakehouse
-    +schema: main
