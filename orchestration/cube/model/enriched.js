@@ -4,8 +4,7 @@
  * Auto-generates Cube.js cubes for all dbt models tagged 'enriched'.
  * These are the fct_* fact tables (1 currently, scales as you add more).
  *
- * Reads from dbt manifest.json to discover models, then defines cubes
- * that query lakehouse.main.{model_name}.
+ * Parses column names directly from dbt model SQL (raw_code in manifest).
  */
 
 const fs = require('fs');
@@ -21,42 +20,96 @@ try {
   console.warn('Could not load manifest.json, using empty manifest:', err.message);
 }
 
-// Type mapping: DuckDB/dbt types → Cube.js types
-const TYPE_MAP = {
-  // Numeric
-  'bigint': 'number',
-  'integer': 'number',
-  'int': 'number',
-  'decimal': 'number',
-  'double': 'number',
-  'float': 'number',
-  'real': 'number',
-  'numeric': 'number',
-  // String
-  'varchar': 'string',
-  'text': 'string',
-  'string': 'string',
-  'char': 'string',
-  // Time
-  'timestamp': 'time',
-  'timestamptz': 'time',
-  'date': 'time',
-  'datetime': 'time',
-  // Boolean
-  'boolean': 'boolean',
-  'bool': 'boolean',
-};
+/**
+ * Parse column names from dbt SELECT SQL.
+ * Handles: "col", "col as alias", "expr as alias", comments, CTEs
+ */
+function parseColumnsFromSql(sql) {
+  if (!sql) return [];
 
-function toCubeType(dbtType) {
-  if (!dbtType) return 'string';
-  const normalized = dbtType.toLowerCase().split('(')[0].trim();
-  return TYPE_MAP[normalized] || 'string';
+  // Remove jinja blocks {{ ... }}
+  sql = sql.replace(/\{\{[^}]*\}\}/g, '');
+  // Remove {% ... %} blocks
+  sql = sql.replace(/\{%[^%]*%\}/g, '');
+
+  // If there's a CTE (WITH ... AS), find the final SELECT after all CTEs
+  // CTEs end with ) followed by the main SELECT
+  const cteMatch = sql.match(/\)\s*select\s+([\s\S]*?)\s+from\s+/i);
+  const regularMatch = sql.match(/select\s+([\s\S]*?)\s+from\s+/i);
+
+  // Use CTE match if available, otherwise regular match
+  const selectMatch = cteMatch || regularMatch;
+  if (!selectMatch) return [];
+
+  const selectClause = selectMatch[1];
+
+  // Split by comma, handling parentheses
+  const columns = [];
+  let current = '';
+  let parenDepth = 0;
+
+  for (const char of selectClause) {
+    if (char === '(') parenDepth++;
+    else if (char === ')') parenDepth--;
+    else if (char === ',' && parenDepth === 0) {
+      columns.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+  if (current.trim()) columns.push(current.trim());
+
+  // Extract column names (handle "x as y" → y, "x" → x)
+  return columns
+    .map(col => {
+      // Remove comments
+      col = col.replace(/--.*$/gm, '').trim();
+      if (!col) return null;
+
+      // "expr as alias" → alias
+      const asMatch = col.match(/\s+as\s+(\w+)\s*$/i);
+      if (asMatch) return asMatch[1];
+
+      // Simple column reference
+      const simpleMatch = col.match(/^(\w+)$/);
+      if (simpleMatch) return simpleMatch[1];
+
+      // table.column → column
+      const dotMatch = col.match(/\.(\w+)$/);
+      if (dotMatch) return dotMatch[1];
+
+      return null;
+    })
+    .filter(Boolean);
 }
 
-function isNumericType(dbtType) {
-  if (!dbtType) return false;
-  const normalized = dbtType.toLowerCase().split('(')[0].trim();
-  return ['bigint', 'integer', 'int', 'decimal', 'double', 'float', 'real', 'numeric'].includes(normalized);
+/**
+ * Guess type from column name (heuristic).
+ */
+function guessTypeFromName(colName) {
+  const name = colName.toLowerCase();
+
+  // Timestamps
+  if (name.includes('_at') || name.includes('date') || name.includes('timestamp')) {
+    return 'time';
+  }
+  // Counts/amounts
+  if (name.includes('count') || name.includes('amount') || name.includes('total') ||
+      name.includes('spent') || name.includes('quantity') || name.includes('price') ||
+      name.includes('revenue') || name.includes('discount')) {
+    return 'number';
+  }
+  // IDs
+  if (name.endsWith('_id') || name === 'id') {
+    return 'string';
+  }
+  // Year/month/day partitions
+  if (name === 'year' || name === 'month' || name === 'day') {
+    return 'number';
+  }
+
+  return 'string';
 }
 
 // Filter to enriched models (tagged 'enriched' OR name starts with 'fct_')
@@ -64,42 +117,35 @@ const enrichedModels = Object.values(manifest.nodes)
   .filter(node => node.resource_type === 'model')
   .filter(node =>
     (node.tags && node.tags.includes('enriched')) ||
-    node.name.startsWith('fct_')  // Fallback: naming convention
+    node.name.startsWith('fct_')
   );
 
 console.log(`[enriched.js] Found ${enrichedModels.length} enriched models`);
 
 // Generate cube definitions
 module.exports = enrichedModels.map(model => {
-  const columns = Object.entries(model.columns || {});
+  const columns = parseColumnsFromSql(model.raw_code);
   const uniqueKey = model.config?.unique_key;
 
-  console.log(`[enriched.js] Generating cube: ${model.name} (${columns.length} columns)`);
+  console.log(`[enriched.js] Generating cube: ${model.name} (${columns.length} columns: ${columns.slice(0, 5).join(', ')}${columns.length > 5 ? '...' : ''})`);
 
   return {
     name: model.name,
     sql_table: `lakehouse.main.${model.name}`,
 
-    // All columns become dimensions
-    dimensions: columns.length > 0
-      ? columns.map(([colName, colMeta]) => ({
-          name: colName,
-          sql: colName,
-          type: toCubeType(colMeta.data_type),
-          primary_key: uniqueKey === colName,
-        }))
-      : [
-          // Fallback: if no columns in manifest, at least define a count
-          { name: 'id', sql: '1', type: 'number', primary_key: true },
-        ],
+    dimensions: columns.map(colName => ({
+      name: colName,
+      sql: colName,
+      type: guessTypeFromName(colName),
+      primary_key: uniqueKey === colName,
+    })),
 
-    // Measures: count + sum for numeric columns
     measures: [
       { name: 'count', type: 'count' },
-      // Auto-add sum measures for numeric columns
+      // Sum measures for numeric columns
       ...columns
-        .filter(([_, colMeta]) => isNumericType(colMeta.data_type))
-        .map(([colName, _]) => ({
+        .filter(colName => guessTypeFromName(colName) === 'number')
+        .map(colName => ({
           name: `total_${colName}`,
           sql: colName,
           type: 'sum',
