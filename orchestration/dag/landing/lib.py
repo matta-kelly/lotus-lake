@@ -211,7 +211,7 @@ def get_file_size(conn: duckdb.DuckDBPyConnection, file_path: str) -> int:
 def batch_by_size(
     conn: duckdb.DuckDBPyConnection,
     files: list[str],
-    max_bytes: int = 2_000_000_000,  # 2GB
+    max_bytes: int = 500_000_000,  # 500MB
 ) -> Iterator[list[str]]:
     """
     Group files into batches by cumulative size.

@@ -49,5 +49,3 @@ where _airbyte_extracted_at > (select max(_airbyte_extracted_at) from {{ this }}
 {% endif %}
 
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
-
-order by updated_at

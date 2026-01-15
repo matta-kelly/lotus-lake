@@ -1,0 +1,13 @@
+{
+  "name": "lotus-lake-cube",
+  "version": "1.0.0",
+  "description": "Cube.js semantic layer for Lotus Lake data platform",
+  "private": true,
+  "dependencies": {
+    "@cubejs-backend/duckdb-driver": "^1.1.0",
+    "@cubejs-backend/server-core": "^1.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

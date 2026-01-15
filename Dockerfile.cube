@@ -1,0 +1,28 @@
+# Cube.js Semantic Layer for Lotus Lake
+#
+# Exposes DuckLake data via PostgreSQL protocol and REST API.
+# Factories auto-generate cubes from dbt manifest.
+#
+# Build: docker build -f Dockerfile.cube -t lotus-lake-cube .
+# Run:   docker run -p 4000:4000 -p 15432:15432 lotus-lake-cube
+
+FROM cubejs/cube:latest
+
+WORKDIR /cube/conf
+
+# Copy Cube.js configuration and model factories
+COPY orchestration/cube/package.json ./
+COPY orchestration/cube/cube.js ./
+COPY orchestration/cube/model/ ./model/
+
+# Copy dbt manifest (factories read this to discover models)
+# Note: manifest.json is generated during CI by `dbt parse`
+COPY orchestration/target/manifest.json ./target/
+
+# Install DuckDB driver
+RUN npm install
+
+# Cube.js ports
+# 4000 = REST API
+# 15432 = PostgreSQL protocol (SQL API)
+EXPOSE 4000 15432
