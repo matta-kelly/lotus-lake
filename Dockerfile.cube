@@ -13,7 +13,7 @@ WORKDIR /cube/conf
 # Copy Cube.js configuration and model factories
 COPY orchestration/cube/package.json ./
 COPY orchestration/cube/cube.js ./
-COPY orchestration/cube/model/ ./model/
+COPY orchestration/cube/schema/ ./schema/
 
 # Copy dbt manifest (factories read this to discover models)
 # Note: manifest.json is generated during CI by `dbt parse`
