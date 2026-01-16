@@ -115,8 +115,8 @@ spec:
         - name: lotus-lake
           image:
             repository: ghcr.io/matta-kelly/lotus-lake
-            tag: latest
-            pullPolicy: Always
+            tag: b20806d  # Auto-updated by CI
+            pullPolicy: IfNotPresent
           dagsterApiGrpcArgs:
             - "-m"
             - "orchestration.definitions"

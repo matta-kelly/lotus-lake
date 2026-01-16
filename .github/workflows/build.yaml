@@ -184,3 +184,46 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta-cube.outputs.tags }}
           labels: ${{ steps.meta-cube.outputs.labels }}
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Deploy - Update manifest with SHA tag to trigger Flux rollout
+  # ─────────────────────────────────────────────────────────────────────────
+  deploy:
+    needs: [build, build-cube]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update image tag in release.yaml
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "Updating image tag to: $SHORT_SHA"
+
+          # Update Dagster image tag
+          sed -i "s|tag: .*|tag: $SHORT_SHA|" deploy/dagster/release.yaml
+
+          echo "Updated release.yaml:"
+          grep -A2 "repository: ghcr.io" deploy/dagster/release.yaml
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          git add deploy/dagster/release.yaml
+
+          # Only commit if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "deploy: update image tag to $SHORT_SHA [skip ci]"
+            git push
+          fi
