@@ -560,6 +560,152 @@ When adding new S3 identities to h-kube:
 
 ---
 
+## TICKET-006: Cube.js Health DOWN - DuckLake S3 Access
+
+**Status:** In Progress (fix pushed, awaiting verification)
+**Priority:** Critical
+**Discovered:** 2026-01-15
+**Component:** Cube.js / DuckDB / DuckLake
+
+### Problem Statement
+
+Cube.js pods start but immediately fail health checks, returning `{"health":"DOWN"}`. This causes:
+- Restart loops on the Cube.js deployment
+- Flux dependency chain blocked (infrastructure-services → lotus-lake-deploy → pods)
+- Entire lotus-lake namespace stuck waiting for Cube to be healthy
+
+### Root Cause
+
+**DuckLake requires `CREATE SECRET` for S3 access** - environment variables alone don't work.
+
+When DuckDB attaches a DuckLake catalog with `DATA_PATH 's3://...'`, it needs S3 credentials configured via SQL `CREATE SECRET`, not just env vars. The Cube.js config was missing this.
+
+**Working pattern (from Dagster's `lib.py`):**
+```python
+conn.execute(f"""
+    CREATE SECRET s3_secret (
+        TYPE S3,
+        KEY_ID '{s3_key}',
+        SECRET '{s3_secret}',
+        ENDPOINT '{s3_endpoint}',
+        USE_SSL false,
+        URL_STYLE 'path'
+    )
+""")
+```
+
+**Broken Cube.js config (before fix):**
+```javascript
+// Relied on CUBEJS_DB_DUCKDB_S3_* env vars
+// These work for direct DuckDB S3 access but NOT for DuckLake attach
+```
+
+### The Fix
+
+**Commit:** `eed6ca8` (pushed to main, awaiting CI build)
+**File:** `orchestration/cube/cube.js`
+
+Added `CREATE SECRET` and `LOAD httpfs` to the `initSql`:
+
+```javascript
+return new DuckDBDriver({
+  database: ':memory:',
+  initSql: `
+    INSTALL ducklake; LOAD ducklake;
+    INSTALL httpfs; LOAD httpfs;
+
+    CREATE SECRET s3_secret (
+      TYPE S3,
+      KEY_ID '${s3Key}',
+      SECRET '${s3Secret}',
+      ENDPOINT '${s3Endpoint}',
+      USE_SSL false,
+      URL_STYLE 'path'
+    );
+
+    ATTACH 'ducklake:postgres:host=${pgHost} port=5432 dbname=ducklake user=ducklake password=${pgPass}'
+    AS lakehouse (DATA_PATH 's3://landing/raw/');
+  `,
+});
+```
+
+### Current Status
+
+- ✅ Fix committed and pushed (commit `eed6ca8`)
+- ⏳ Waiting for CI to build new `lotus-lake-cube` image
+- ⏳ Once image is built, Flux will deploy automatically
+- ⏳ Need to verify health endpoint returns `{"health":"UP"}`
+
+### Verification Steps
+
+Once CI builds the new image:
+
+```bash
+# 1. Check if new image is deployed
+kubectl get pods -n lotus-lake -l app=cube -o jsonpath='{.items[0].spec.containers[0].image}'
+
+# 2. Check pod status (should be Running, not CrashLoopBackOff)
+kubectl get pods -n lotus-lake -l app=cube
+
+# 3. Check health endpoint
+kubectl exec -n lotus-lake deploy/cube -- curl -s http://localhost:4000/readiness
+
+# 4. Check logs for successful DuckLake attach
+kubectl logs -n lotus-lake -l app=cube --tail=100 | grep -i "lakehouse\|ducklake\|s3"
+
+# 5. Verify Flux dependency chain unblocks
+kubectl get kustomization -n flux-system infrastructure-services
+kubectl get helmrelease -n lotus-lake
+```
+
+### Key Cube.js Configuration Facts
+
+Learned during investigation - document for future reference:
+
+| Aspect | Value/Notes |
+|--------|-------------|
+| **Version** | 1.6.3 (DuckLake support added in 1.3.26) |
+| **REST API Port** | 4000 |
+| **PostgreSQL Protocol** | 5432 (for BI tools like Power BI) |
+| **Health Endpoints** | `/livez`, `/readiness` |
+| **Config File** | `orchestration/cube/cube.js` |
+| **Models** | Auto-discovered from `model/` folder |
+| **DuckLake Catalog** | Attached as `lakehouse` alias |
+
+**Environment Variables:**
+| Variable | Purpose |
+|----------|---------|
+| `CUBEJS_DB_DUCKDB_S3_ACCESS_KEY_ID` | S3 access key (for CREATE SECRET) |
+| `CUBEJS_DB_DUCKDB_S3_SECRET_ACCESS_KEY` | S3 secret key (for CREATE SECRET) |
+| `CUBEJS_DB_DUCKDB_S3_ENDPOINT` | SeaweedFS endpoint |
+| `DUCKLAKE_DB_HOST` | PostgreSQL catalog host |
+| `DUCKLAKE_DB_PASSWORD` | PostgreSQL catalog password |
+| `CUBEJS_API_SECRET` | API authentication |
+| `CUBEJS_SQL_USER` | PostgreSQL protocol username (default: `cube`) |
+| `CUBEJS_SQL_PASSWORD` | PostgreSQL protocol password (defaults to API_SECRET) |
+
+### Related Changes (Same Session)
+
+Also completed in this session:
+- Renamed `minio_*` secrets to `s3_*` across both repos
+- Added separate `cubejs_api_secret` (was sharing `minio_password`)
+- Updated 9 files total (h-kube + lotus-lake)
+
+### Action Items
+
+- [ ] Verify Cube.js health goes UP after new image deploys
+- [ ] Test PostgreSQL protocol connection from laptop
+- [ ] Test REST API via HTTPS (Traefik ingress)
+- [ ] Document connection instructions once verified working
+
+### References
+
+- Cube.js DuckDB Driver: https://cube.dev/docs/product/configuration/data-sources/duckdb
+- DuckLake Extension: https://duckdb.org/docs/extensions/ducklake
+- Working example: `orchestration/dag/landing/lib.py` (Dagster's DuckLake access)
+
+---
+
 ## Template for New Tickets
 
 ```markdown
