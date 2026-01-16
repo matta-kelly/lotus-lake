@@ -26,6 +26,6 @@ select
     month,
     day
 
-from read_parquet('{{ var("file") }}', filename=true, hive_partitioning=true)
+from read_parquet({{ var("files") }}, filename=true, hive_partitioning=true)
 
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1

@@ -129,19 +129,24 @@ def make_feeder_asset(source: str, stream: str):
         last_date = _extract_date_from_path(files[-1])
         context.log.info(f"[{source}/{stream}] Found {len(files)} files spanning {first_date} to {last_date}")
 
+        # Batch files to reduce dbt startup overhead
+        # DuckDB streams through files one at a time - memory stays bounded
+        BATCH_SIZE = 10
         total_files = len(files)
         processed_count = 0
         last_file = None
 
-        for file_num, file_path in enumerate(files, 1):
-            file_date = _extract_date_from_path(file_path)
-            file_name = file_path.split("/")[-1]
+        for batch_start in range(0, total_files, BATCH_SIZE):
+            batch = files[batch_start:batch_start + BATCH_SIZE]
+            batch_num = (batch_start // BATCH_SIZE) + 1
+            total_batches = (total_files + BATCH_SIZE - 1) // BATCH_SIZE
 
-            context.log.info(f"[{source}/{stream}] Processing file {file_num}/{total_files}: {file_date} ({file_name})")
+            first_date = _extract_date_from_path(batch[0])
+            last_date = _extract_date_from_path(batch[-1])
+            context.log.info(f"[{source}/{stream}] Batch {batch_num}/{total_batches}: {len(batch)} files ({first_date} to {last_date})")
 
-            # Run dbt with file path as var - dbt reads parquet directly
-            vars_json = json.dumps({"file": file_path})
-            context.log.info(f"[{source}/{stream}] Running dbt (tag:{dbt_tag}) with file={file_path}")
+            # Run dbt with file list - read_parquet streams through one at a time
+            vars_json = json.dumps({"files": batch})
             dbt_result = dbt.cli(["run", "--select", f"tag:{dbt_tag}", "--vars", vars_json])
 
             models_succeeded = []
@@ -170,17 +175,17 @@ def make_feeder_asset(source: str, stream: str):
                     metadata={
                         "source": source,
                         "stream": stream,
-                        "file": file_path,
-                        "file_num": file_num,
-                        "total_files": total_files,
+                        "batch_num": batch_num,
+                        "total_batches": total_batches,
+                        "files_in_batch": len(batch),
                     }
                 )
 
-            # Update cursor after each file
-            set_cursor(conn, source, stream, file_path)
-            processed_count += 1
-            last_file = file_path
-            context.log.info(f"[{source}/{stream}] Cursor updated - file {file_num}/{total_files} complete")
+            # Update cursor to last file in batch
+            last_file = batch[-1]
+            set_cursor(conn, source, stream, last_file)
+            processed_count += len(batch)
+            context.log.info(f"[{source}/{stream}] Batch {batch_num}/{total_batches} complete, cursor at {last_file.split('/')[-1]}")
 
         conn.close()
 
