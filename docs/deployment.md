@@ -9,18 +9,20 @@ How code changes get from git push to running in the cluster.
 ```
 Push to main
     ↓
-GitHub Actions: validate → build → push image
+GitHub Actions: validate → build → push image (tagged with SHA)
     ↓
-ghcr.io/matta-kelly/lotus-lake:latest
+GitHub Actions: deploy job updates release.yaml with SHA tag
     ↓
-Flux GitRepository detects changes (5m interval)
+GitHub Actions: commits change with [skip ci]
+    ↓
+Flux GitRepository detects manifest change
     ↓
 Flux Kustomization applies deploy/
     ↓
-HelmRelease reconciles (pullPolicy: Always)
-    ↓
-Dagster pods restart with new image
+HelmRelease reconciles → pods restart with new image
 ```
+
+**Key insight:** Flux watches for *manifest* changes, not image changes. By having CI update the image tag in `release.yaml`, we trigger Flux automatically.
 
 ---
 
@@ -74,20 +76,22 @@ Catches errors before they reach the cluster:
 - Tags with SHA and `latest` (main only)
 - Cube factories auto-generate cubes from dbt manifest
 
-#### 5. Push to Registry (Main Only)
+#### 4. Deploy - Update Manifest (Main Only)
 
-- Pushes both images to `ghcr.io/matta-kelly/`:
-  - `lotus-lake` (Dagster)
-  - `lotus-lake-cube` (Cube.js)
-- Tags: `latest` + `<commit-sha>`
-- PR builds verify but don't push
+After images are pushed, CI automatically updates the deployment:
+
+1. Updates `deploy/dagster/release.yaml` with the new SHA tag
+2. Commits with `[skip ci]` to prevent infinite loops
+3. Pushes to main
+
+This manifest change triggers Flux to deploy the new image.
 
 ### Image Tags
 
 | Tag | When | Use |
 |-----|------|-----|
-| `latest` | Every push to main | Default for Dagster deployment |
-| `<sha>` | Every push to main | Rollback, pinned deployments |
+| `<sha>` | Every push to main | **Used in release.yaml** - triggers Flux deploy |
+| `latest` | Every push to main | Convenience tag for manual testing |
 
 ---
 
@@ -120,10 +124,14 @@ deploy/dagster/
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        GitHub Actions                           │
-│  ┌──────────┐    ┌──────────┐    ┌──────────────────────────┐  │
-│  │ Validate │ →  │  Build   │ →  │  Push to ghcr.io         │  │
-│  │ tf, dbt  │    │ (docker) │    │  (main branch only)      │  │
-│  └──────────┘    └──────────┘    └──────────────────────────┘  │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐  │
+│  │ Validate │ →  │  Build   │ →  │  Push to │ →  │  Deploy  │  │
+│  │ tf, dbt  │    │ (docker) │    │ ghcr.io  │    │ (update  │  │
+│  └──────────┘    └──────────┘    └──────────┘    │  manifest)│  │
+│                                                   └──────────┘  │
+│                                                        │        │
+│                                          commits release.yaml   │
+│                                          with new SHA tag       │
 └─────────────────────────────────────────────────────────────────┘
                                               │
                                               ▼
@@ -132,7 +140,7 @@ deploy/dagster/
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │ GitRepository: lotus-lake                                 │  │
 │  │   watches: github.com/matta-kelly/lotus-lake             │  │
-│  │   interval: 5m                                            │  │
+│  │   detects: release.yaml changed (new image tag)          │  │
 │  └──────────────────────────────────────────────────────────┘  │
 │                              │                                  │
 │              ┌───────────────┴───────────────┐                 │
@@ -146,8 +154,8 @@ deploy/dagster/
 │              ▼                               │                  │
 │  ┌─────────────────────────┐                ▼                  │
 │  │ HelmRelease: dagster    │    ┌─────────────────────────┐   │
-│  │   image: latest         │    │ Airbyte sources,        │   │
-│  │   pullPolicy: Always    │    │ destinations,           │   │
+│  │   image: <sha>          │    │ Airbyte sources,        │   │
+│  │   (auto-updated by CI)  │    │ destinations,           │   │
 │  └─────────────────────────┘    │ connections             │   │
 │                                  └─────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
@@ -198,6 +206,8 @@ Edit files in `orchestration/airbyte/terraform/`, push. tofu-controller applies.
 
 ## Force Reconciliation
 
+> **Note:** With SHA-tagged images, manual restarts should rarely be needed. CI automatically updates the manifest, triggering Flux to deploy.
+
 **Kubeconfig path:** `/home/mkultra/bode/h-kube/generated/kubeconfig.yaml`
 
 ```bash
@@ -205,6 +215,8 @@ export KUBECONFIG=/home/mkultra/bode/h-kube/generated/kubeconfig.yaml
 ```
 
 ### Force GitRepository Fetch
+
+If Flux hasn't picked up changes yet:
 
 ```bash
 kubectl annotate gitrepository -n lotus-lake lotus-lake \
@@ -218,7 +230,9 @@ kubectl annotate terraform -n lotus-lake lotus-lake-airbyte \
   reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite
 ```
 
-### Force Pod Restart
+### Force Pod Restart (Emergency Only)
+
+Only needed if something is stuck - normal deploys are automatic:
 
 ```bash
 kubectl rollout restart deployment -n lotus-lake -l component=user-deployments
