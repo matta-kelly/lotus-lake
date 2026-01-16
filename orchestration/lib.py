@@ -1,19 +1,14 @@
 """
-Duck Feeder Library
+Feeder Library
 
 Core functions for the feeder system. No Dagster dependencies.
 
 Cursor-based processing:
 - get_cursor / set_cursor: track processing progress
 - get_files_after_cursor: only fetch new files (partition-aware)
-
-Batching:
-- batch_by_size: chunk files into ~500MB batches
-- register_batch: call ducklake_add_data_files for a batch
 """
 import os
 import re
-from typing import Iterator
 
 import duckdb
 
@@ -193,87 +188,3 @@ def get_files_after_cursor(
     return sorted((row[0] for row in s3_files), key=_natural_sort_key)
 
 
-# =============================================================================
-# Batching
-# =============================================================================
-
-def get_file_size(conn: duckdb.DuckDBPyConnection, file_path: str) -> int:
-    """Get file size in bytes from parquet metadata."""
-    try:
-        result = conn.execute(f"""
-            SELECT file_size_bytes FROM parquet_file_metadata('{file_path}')
-        """).fetchone()
-        return result[0] if result else 0
-    except Exception:
-        return 50_000_000  # 50MB default estimate
-
-
-def batch_by_size(
-    conn: duckdb.DuckDBPyConnection,
-    files: list[str],
-    max_bytes: int = 500_000_000,  # 500MB
-) -> Iterator[list[str]]:
-    """
-    Group files into batches by cumulative size.
-
-    Iterates through files, accumulating into a batch until
-    adding another file would exceed max_bytes. Yields batch,
-    starts fresh.
-    """
-    if not files:
-        return
-
-    current_batch = []
-    current_size = 0
-
-    for file_path in files:
-        file_size = get_file_size(conn, file_path)
-
-        if current_batch and (current_size + file_size) > max_bytes:
-            yield current_batch
-            current_batch = []
-            current_size = 0
-
-        current_batch.append(file_path)
-        current_size += file_size
-
-    if current_batch:
-        yield current_batch
-
-
-# =============================================================================
-# Registration
-# =============================================================================
-
-def register_batch(
-    conn: duckdb.DuckDBPyConnection,
-    table_name: str,
-    files: list[str],
-) -> int:
-    """
-    Register a batch of files into a DuckLake staging table.
-
-    Calls ducklake_add_data_files for each file. The file metadata
-    is added to DuckLake's catalog - the staging table can now
-    see those rows. Files are not copied, just registered.
-
-    Returns count of files registered.
-    """
-    count = 0
-
-    for file_path in files:
-        try:
-            conn.execute(f"""
-                CALL ducklake_add_data_files(
-                    'lakehouse',
-                    '{table_name}',
-                    '{file_path}',
-                    schema => 'staging',
-                    hive_partitioning => true
-                )
-            """)
-            count += 1
-        except Exception as e:
-            print(f"Failed to register {file_path}: {e}")
-
-    return count

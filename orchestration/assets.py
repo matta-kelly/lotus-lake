@@ -1,23 +1,23 @@
 """
-Unified Asset Definitions
+Asset Definitions
 
-Four asset types:
-1. Landing - DDL reconciliation (creates/updates DuckLake tables from SQL files)
-2. Feeder - one per stream, registers files, runs dbt, emits AssetMaterialization
-3. Processed - dbt models (int_*) defined for Dagster awareness, executed by feeders
-4. Enriched - dbt models (fct_*) auto-materialize when processed updates
+Two asset types:
+1. Feeder - one per stream, reads parquet directly, runs dbt, emits AssetMaterialization
+2. Enriched - dbt models (fct_*) auto-materialize when processed updates
 
-Feeders emit AssetMaterialization for processed models so Dagster knows when to
-auto-materialize enriched models.
+Feeders:
+- Loop through files one at a time
+- Pass file path to dbt as a var
+- dbt reads parquet directly via read_parquet()
+- Advance cursor after each file
 
 Plus sensors that trigger feeders when new S3 files arrive.
 """
-import glob
+import json
 import re
 from pathlib import Path
 from typing import Any, Mapping, Optional
 
-import duckdb
 from dagster import (
     asset,
     sensor,
@@ -31,18 +31,15 @@ from dagster import (
     RunRequest,
     RunsFilter,
     SensorEvaluationContext,
-    get_dagster_logger,
 )
 from dagster_dbt import DbtCliResource, dbt_assets, DagsterDbtTranslator
 
 from .resources import DBT_MANIFEST
-from .dag.landing.lib import (
+from .lib import (
     get_ducklake_connection,
     get_cursor,
     get_files_after_cursor,
     set_cursor,
-    batch_by_size,
-    register_batch,
 )
 
 
@@ -51,7 +48,6 @@ from .dag.landing.lib import (
 # =============================================================================
 
 STREAMS_DIR = Path(__file__).parent / "dag" / "streams"
-LANDING_DIR = Path(__file__).parent / "dag" / "landing"
 
 
 # =============================================================================
@@ -79,193 +75,8 @@ def discover_streams() -> list[tuple[str, str]]:
 
 
 # =============================================================================
-# Landing Tables - DDL Reconciliation
-# =============================================================================
-
-def _parse_table_name(ddl: str) -> str:
-    """Extract table name from CREATE TABLE statement."""
-    match = re.search(r"CREATE TABLE IF NOT EXISTS\s+(\S+)", ddl, re.IGNORECASE)
-    if match:
-        return match.group(1)
-    raise ValueError(f"Could not parse table name from DDL: {ddl[:100]}...")
-
-
-def _parse_columns_from_ddl(ddl: str) -> dict[str, str]:
-    """Extract column names and types from DDL."""
-    match = re.search(r"\(\s*\n?(.*)\s*\);?\s*$", ddl, re.DOTALL)
-    if not match:
-        return {}
-
-    # Strip comments from each line first
-    content_lines = []
-    for line in match.group(1).split('\n'):
-        # Remove inline comments
-        if '--' in line:
-            line = line[:line.index('--')]
-        line = line.strip()
-        if line:
-            content_lines.append(line)
-    content = ' '.join(content_lines)
-
-    columns = {}
-    depth = 0
-    current = ""
-    for char in content:
-        if char in "([":
-            depth += 1
-        elif char in ")]":
-            depth -= 1
-        elif char == "," and depth == 0:
-            col_def = current.strip()
-            if col_def:
-                parts = col_def.split(None, 2)
-                if len(parts) >= 2:
-                    col_name = parts[0]
-                    col_type = " ".join(parts[1:]) if len(parts) > 2 else parts[1]
-                    columns[col_name] = col_type
-            current = ""
-            continue
-        current += char
-
-    # Handle last column (no trailing comma)
-    col_def = current.strip()
-    if col_def:
-        parts = col_def.split(None, 2)
-        if len(parts) >= 2:
-            columns[parts[0]] = " ".join(parts[1:]) if len(parts) > 2 else parts[1]
-
-    return columns
-
-
-def _get_existing_columns(conn: duckdb.DuckDBPyConnection, table_name: str) -> dict[str, str]:
-    """Get existing columns from a DuckLake table."""
-    try:
-        result = conn.execute(f"DESCRIBE {table_name}").fetchall()
-        return {row[0]: row[1] for row in result}
-    except Exception:
-        return {}
-
-
-def _table_exists(conn: duckdb.DuckDBPyConnection, table_name: str) -> bool:
-    """Check if a table exists in DuckLake."""
-    try:
-        conn.execute(f"DESCRIBE {table_name}")
-        return True
-    except Exception:
-        return False
-
-
-@asset(group_name="landing")
-def landing_tables():
-    """
-    Reconcile landing DDL files to DuckLake tables.
-
-    - Creates missing tables
-    - Adds missing columns to existing tables
-    - Idempotent: safe to run on every deploy
-    """
-    logger = get_dagster_logger()
-    conn = get_ducklake_connection()
-
-    conn.execute("CREATE SCHEMA IF NOT EXISTS lakehouse.staging;")
-    logger.info("Ensured lakehouse.staging schema exists")
-
-    ddl_files = glob.glob(str(LANDING_DIR / "**/*.sql"), recursive=True)
-    logger.info(f"Found {len(ddl_files)} DDL files")
-
-    created = []
-    altered = []
-    unchanged = []
-
-    for ddl_file in ddl_files:
-        with open(ddl_file) as f:
-            ddl = f.read()
-
-        table_name = _parse_table_name(ddl)
-        logger.info(f"Processing {table_name}")
-
-        if not _table_exists(conn, table_name):
-            conn.execute(ddl)
-            created.append(table_name)
-            logger.info(f"Created {table_name}")
-        else:
-            existing_cols = _get_existing_columns(conn, table_name)
-            ddl_cols = _parse_columns_from_ddl(ddl)
-            new_cols = set(ddl_cols.keys()) - set(existing_cols.keys())
-            removed_cols = set(existing_cols.keys()) - set(ddl_cols.keys())
-
-            changed = False
-            for col_name in new_cols:
-                col_type = ddl_cols[col_name]
-                conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {col_name} {col_type};")
-                logger.info(f"Added column {col_name} to {table_name}")
-                changed = True
-
-            for col_name in removed_cols:
-                conn.execute(f"ALTER TABLE {table_name} DROP COLUMN {col_name};")
-                logger.info(f"Dropped column {col_name} from {table_name}")
-                changed = True
-
-            if changed:
-                altered.append(table_name)
-            else:
-                unchanged.append(table_name)
-                logger.info(f"{table_name} unchanged")
-
-    conn.close()
-
-    return {
-        "created": created,
-        "altered": altered,
-        "unchanged": unchanged,
-    }
-
-
-# =============================================================================
 # Feeder Factory - One asset per stream
 # =============================================================================
-
-def _ensure_landing_table(conn: duckdb.DuckDBPyConnection, source: str, stream: str, logger) -> bool:
-    """
-    Ensure landing table exists and matches DDL exactly.
-    Self-healing: creates table if missing, syncs columns if schema changed.
-    DDL is source of truth - adds new columns, drops removed columns.
-    """
-    table_name = f"lakehouse.staging.stg_{source}__{stream}"
-
-    # Find DDL file
-    ddl_file = LANDING_DIR / source / f"stg_{source}__{stream}.sql"
-    if not ddl_file.exists():
-        logger.error(f"DDL file not found: {ddl_file}")
-        return False
-
-    with open(ddl_file) as f:
-        ddl = f.read()
-
-    # Ensure schema exists
-    conn.execute("CREATE SCHEMA IF NOT EXISTS lakehouse.staging;")
-
-    if not _table_exists(conn, table_name):
-        # Create table from DDL
-        conn.execute(ddl)
-        logger.info(f"Created landing table {table_name}")
-    else:
-        # Sync columns to match DDL exactly
-        existing_cols = _get_existing_columns(conn, table_name)
-        ddl_cols = _parse_columns_from_ddl(ddl)
-        new_cols = set(ddl_cols.keys()) - set(existing_cols.keys())
-        removed_cols = set(existing_cols.keys()) - set(ddl_cols.keys())
-
-        for col_name in new_cols:
-            col_type = ddl_cols[col_name]
-            conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {col_name} {col_type};")
-            logger.info(f"Added column {col_name} to {table_name}")
-
-        for col_name in removed_cols:
-            conn.execute(f"ALTER TABLE {table_name} DROP COLUMN {col_name};")
-            logger.info(f"Dropped column {col_name} from {table_name}")
-
-    return True
 
 
 def _extract_date_from_path(path: str) -> str:
@@ -283,25 +94,18 @@ def make_feeder_asset(source: str, stream: str):
 
     The feeder:
     1. Gets files after cursor (only new files)
-    2. Processes in batches until done
-    3. Each batch: register files → run processed dbt → update cursor
+    2. Loops through files one at a time
+    3. Each file: pass to dbt as var → dbt reads parquet directly → update cursor
     """
-    asset_name = f"feeder_{source}_{stream}"
-    landing_table = f"stg_{source}__{stream}"
+    asset_name = f"{source}_{stream}"
     dbt_tag = f"{source}__{stream}"
 
     @asset(
         name=asset_name,
         group_name="feeders",
-        deps=[AssetKey("landing_tables")],
     )
-    def _feeder(context: AssetExecutionContext, dbt: DbtCliResource) -> dict:
+    def _feeder(context: AssetExecutionContext, dbt: DbtCliResource):
         conn = get_ducklake_connection()
-
-        # Ensure landing table exists (self-healing)
-        if not _ensure_landing_table(conn, source, stream, context.log):
-            conn.close()
-            raise Exception(f"Failed to ensure landing table for {source}/{stream}")
 
         # Log current cursor position
         current_cursor = get_cursor(conn, source, stream)
@@ -325,40 +129,25 @@ def make_feeder_asset(source: str, stream: str):
         last_date = _extract_date_from_path(files[-1])
         context.log.info(f"[{source}/{stream}] Found {len(files)} files spanning {first_date} to {last_date}")
 
-        # Pre-calculate batches for progress tracking
-        batches = list(batch_by_size(conn, files))
-        total_batches = len(batches)
-        context.log.info(f"[{source}/{stream}] Will process in {total_batches} batch(es)")
-
-        total_registered = 0
+        total_files = len(files)
+        processed_count = 0
         last_file = None
 
-        for batch_num, batch in enumerate(batches, 1):
-            batch_first = _extract_date_from_path(batch[0])
-            batch_last = _extract_date_from_path(batch[-1])
+        for file_num, file_path in enumerate(files, 1):
+            file_date = _extract_date_from_path(file_path)
+            file_name = file_path.split("/")[-1]
 
-            context.log.info(
-                f"[{source}/{stream}] Batch {batch_num}/{total_batches}: "
-                f"{len(batch)} files ({batch_first} to {batch_last})"
-            )
+            context.log.info(f"[{source}/{stream}] Processing file {file_num}/{total_files}: {file_date} ({file_name})")
 
-            # Register batch into landing
-            registered = register_batch(conn, landing_table, batch)
-            total_registered += registered
-            context.log.info(
-                f"[{source}/{stream}] Registered {registered} files into {landing_table}"
-            )
-
-            # Run processed dbt model(s) with this tag
-            # Note: Don't pass context=context as feeder isn't a @dbt_assets asset
-            context.log.info(f"[{source}/{stream}] Running dbt models (tag:{dbt_tag})...")
-            dbt_result = dbt.cli(["run", "--select", f"tag:{dbt_tag}"])
+            # Run dbt with file path as var - dbt reads parquet directly
+            vars_json = json.dumps({"file": file_path})
+            context.log.info(f"[{source}/{stream}] Running dbt (tag:{dbt_tag}) with file={file_path}")
+            dbt_result = dbt.cli(["run", "--select", f"tag:{dbt_tag}", "--vars", vars_json])
 
             models_succeeded = []
             models_failed = []
-            # Use stream_raw_events() - returns DbtCliEventMessage objects
             for event in dbt_result.stream_raw_events():
-                raw = event.raw_event  # Get the dict from the event object
+                raw = event.raw_event
                 if raw.get('info', {}).get('name') == 'LogModelResult':
                     model_name = raw.get('data', {}).get('node_info', {}).get('node_name', '')
                     status = raw.get('data', {}).get('status', '')
@@ -367,7 +156,6 @@ def make_feeder_asset(source: str, stream: str):
                     elif model_name:
                         models_failed.append(f"{model_name}:{status}")
 
-            # Log results
             if models_succeeded:
                 context.log.info(f"[{source}/{stream}] dbt succeeded: {', '.join(models_succeeded)}")
             if models_failed:
@@ -375,9 +163,6 @@ def make_feeder_asset(source: str, stream: str):
                 raise Exception(f"dbt failed for {source}/{stream}: {', '.join(models_failed)}")
 
             # Emit AssetMaterialization for each successful model
-            # This notifies Dagster that the processed assets have been updated,
-            # which triggers enriched auto-materialization
-            # Note: Asset keys include schema prefix ["main", "model_name"] from dbt config
             for model_name in models_succeeded:
                 asset_key = AssetKey(["main", model_name])
                 yield AssetMaterialization(
@@ -385,33 +170,25 @@ def make_feeder_asset(source: str, stream: str):
                     metadata={
                         "source": source,
                         "stream": stream,
-                        "batch": batch_num,
-                        "total_batches": total_batches,
+                        "file": file_path,
+                        "file_num": file_num,
+                        "total_files": total_files,
                     }
                 )
-                context.log.info(f"[{source}/{stream}] Emitted materialization for {asset_key.to_user_string()}")
 
-            # Update cursor to last file in batch
-            last_file = batch[-1]
-            set_cursor(conn, source, stream, last_file)
-            new_cursor_file = last_file.split("/")[-1]
-            new_cursor_date = _extract_date_from_path(last_file)
-            context.log.info(
-                f"[{source}/{stream}] Cursor updated to {new_cursor_date} ({new_cursor_file}) "
-                f"- batch {batch_num}/{total_batches} complete"
-            )
+            # Update cursor after each file
+            set_cursor(conn, source, stream, file_path)
+            processed_count += 1
+            last_file = file_path
+            context.log.info(f"[{source}/{stream}] Cursor updated - file {file_num}/{total_files} complete")
 
         conn.close()
 
         final_cursor_file = last_file.split("/")[-1]
-        context.log.info(
-            f"[{source}/{stream}] COMPLETE: {total_registered} files in {total_batches} batches, "
-            f"cursor now at {final_cursor_file}"
-        )
+        context.log.info(f"[{source}/{stream}] COMPLETE: {processed_count} files, cursor now at {final_cursor_file}")
         yield Output({
             "status": "complete",
-            "processed": total_registered,
-            "batches": total_batches,
+            "processed": processed_count,
             "cursor": last_file,
         })
 
@@ -425,7 +202,7 @@ def make_feeder_sensor(source: str, stream: str):
     Skips if feeder is already running (no queue buildup).
     """
     sensor_name = f"{source}_{stream}_sensor"
-    feeder_key = AssetKey(f"feeder_{source}_{stream}")
+    feeder_key = AssetKey(f"{source}_{stream}")
 
     @sensor(
         name=sensor_name,
@@ -466,37 +243,6 @@ def make_feeder_sensor(source: str, stream: str):
             context.log.error(f"Sensor error for {source}/{stream}: {e}")
 
     return _sensor
-
-
-# =============================================================================
-# Processed dbt Assets - Defined for Dagster awareness, executed by feeders
-# =============================================================================
-
-class ProcessedDbtTranslator(DagsterDbtTranslator):
-    """Translator for processed layer models."""
-
-    def get_group_name(self, dbt_resource_props):
-        return "processed"
-
-    # NO automation condition - feeders control execution
-
-
-@dbt_assets(
-    manifest=DBT_MANIFEST,
-    select="tag:processed",
-    dagster_dbt_translator=ProcessedDbtTranslator(),
-)
-def processed_dbt_models(context: AssetExecutionContext, dbt: DbtCliResource):
-    """
-    Processed dbt models - defined here for Dagster's asset graph awareness.
-
-    These are NOT run directly by Dagster. Instead, feeders:
-    1. Run dbt via CLI (dbt run --select tag:source__stream)
-    2. Emit AssetMaterialization events for these asset keys
-
-    This allows enriched models to auto-materialize when processed updates.
-    """
-    yield from dbt.cli(["run"], context=context).stream()
 
 
 # =============================================================================

@@ -2,9 +2,7 @@
 Lotus Lake Dagster Definitions
 
 Asset layers:
-- Landing: DDL reconciliation (landing_tables)
-- Feeders: One per stream - registers files, runs dbt, emits AssetMaterialization
-- Processed: dbt models (int_*) - defined for Dagster awareness, executed by feeders
+- Feeders: One per stream - reads parquet directly, runs dbt, emits AssetMaterialization
 - Enriched: dbt models (fct_*) - auto-materializes when processed updates
 
 Sensors:
@@ -19,16 +17,14 @@ from dagster import (
 )
 
 from .assets import (
-    landing_tables,
     feeder_assets,
     feeder_sensors,
-    processed_dbt_models,
     enriched_dbt_models,
 )
 from .resources import dbt_resource
 
-# All assets: landing + feeders + processed + enriched
-all_assets = [landing_tables, *feeder_assets, processed_dbt_models, enriched_dbt_models]
+# All assets: feeders + enriched
+all_assets = [*feeder_assets, enriched_dbt_models]
 
 # Automation sensor for auto-materializing enriched models
 automation_sensor = AutomationConditionSensorDefinition(

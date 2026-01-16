@@ -6,6 +6,9 @@
 ) }}
 
 select
+    -- source file
+    filename as _source_file,
+
     -- identifiers
     id as order_id,
     cast(customer::JSON->>'$.id' as bigint) as customer_id,
@@ -33,10 +36,6 @@ select
     month,
     day
 
-from lakehouse.staging.stg_shopify__orders
-
-{% if is_incremental() %}
-where _airbyte_extracted_at > (select max(_airbyte_extracted_at) from {{ this }})
-{% endif %}
+from read_parquet('{{ var("file") }}', filename=true, hive_partitioning=true)
 
 qualify row_number() over (partition by id order by _airbyte_extracted_at desc) = 1
