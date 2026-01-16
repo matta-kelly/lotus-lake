@@ -41,7 +41,7 @@ SeaweedFS uses identity-based access. Each service has its own identity.
 
 | Identity | Used By | Bucket Access |
 |----------|---------|---------------|
-| `lotus-lake-s3` | Airbyte destinations, Dagster sensors | `airbyte-landing/*` |
+| `lotus-lake-s3` | Airbyte destinations, Dagster, Cube.js | `landing/*` |
 | `rubberducky` | DuckLake CNPG backups | `cnpg-backups/*` |
 | `daggy` | Dagster CNPG backups | `cnpg-backups/*` |
 
@@ -59,11 +59,14 @@ These credentials **must match** across files:
 ```
 seaweedfs-s3-config (master)
     │
-    ├── lotus-lake-s3 ──→ lotus-lake-terraform-vars (minio_user/minio_password)
+    ├── lotus-lake-s3 ──→ lotus-lake-terraform-vars (s3_access_key_id/s3_secret_access_key)
     │
     ├── rubberducky ────→ ducklake-db-backup-creds (ACCESS_KEY_ID/SECRET_ACCESS_KEY)
     │
     └── daggy ──────────→ dagster-db-backup-creds (ACCESS_KEY_ID/SECRET_ACCESS_KEY)
+
+lotus-lake-terraform-vars also contains:
+    └── cubejs_api_secret ──→ Cube.js PostgreSQL authentication (separate from S3 creds)
 ```
 
 If credentials don't match, services will get S3 403 errors.

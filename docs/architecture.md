@@ -9,6 +9,7 @@
 | Catalog | DuckLake + Postgres | SQL-based metadata catalog with ACID, time travel |
 | Transform | dbt-duckdb | SQL transforms reading from DuckLake tables |
 | Orchestration | Dagster | Asset-based orchestration with sensors |
+| Semantic | Cube.js | PostgreSQL protocol + REST API for BI tools |
 | Query | DuckDB | Embedded OLAP, queries DuckLake tables |
 
 ## Data Flow
@@ -91,8 +92,8 @@ CREATE TABLE lakehouse.meta.feeder_cursors (
     source VARCHAR,
     stream VARCHAR,
     cursor_path VARCHAR,  -- e.g., s3://landing/raw/shopify/orders/year=2026/month=01/day=09/file.parquet
-    updated_at TIMESTAMP,
-    PRIMARY KEY (source, stream)
+    updated_at TIMESTAMP
+    -- Note: DuckLake doesn't support PRIMARY KEY syntax, composite key is (source, stream)
 )
 ```
 
@@ -230,4 +231,49 @@ ATTACH 'ducklake:postgres:host=... dbname=ducklake ...'
 | CNPG `ducklake-db` | `lotus-lake` | DuckLake metadata catalog |
 | CNPG `dagster-db` | `lotus-lake` | Dagster run/event storage |
 | Airbyte | `airbyte` | Data ingestion |
+| Cube.js | `lotus-lake` | Semantic layer (PostgreSQL protocol + REST API) |
 | tofu-controller | `flux-system` | GitOps for Terraform |
+
+## Cube.js Semantic Layer
+
+Cube.js exposes DuckLake tables via PostgreSQL protocol (port 15432) and REST API for BI tools.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Cube.js Pod                               │
+│                                                              │
+│  ┌────────────────┐         ┌────────────────────────────┐  │
+│  │ REST API :4000 │────────▶│ DuckDB (in-process)        │  │
+│  │ SQL :15432     │         │ + DuckLake attached        │  │
+│  └────────────────┘         │ + S3 credentials           │  │
+│                              └────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+            ┌─────────────────┴─────────────────┐
+            ▼                                   ▼
+    DuckLake Catalog (Postgres)         S3 Parquet Files
+```
+
+### Auto-Generated Cubes
+
+Cube definitions are auto-generated from dbt manifest at build time:
+
+| File | Pattern | Models |
+|------|---------|--------|
+| `orchestration/cube/model/processed.js` | `int_*` | All intermediate models |
+| `orchestration/cube/model/enriched.js` | `fct_*` | All fact tables |
+
+Column types are inferred from column names (heuristic-based).
+
+### Connection
+
+```
+# Power BI, DBeaver, etc.
+Host: 100.64.0.5 (Tailscale) or traefik node
+Port: 15432
+Database: cube
+User: cube
+Password: <from CUBEJS_API_SECRET>
+```

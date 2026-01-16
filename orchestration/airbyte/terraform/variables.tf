@@ -13,7 +13,7 @@ variable "shopify_api_password" {}
 # Klaviyo
 variable "klaviyo_api_key" {}
 
-# MinIO / S3
-variable "minio_user" {}
-variable "minio_password" {}
-variable "minio_endpoint" {}
+# S3 (SeaweedFS)
+variable "s3_access_key_id" {}
+variable "s3_secret_access_key" {}
+variable "s3_endpoint" {}

@@ -31,6 +31,7 @@ Dagster pods restart with new image
 | Webserver | Dagster Helm chart | `dagster/dagster` (official) |
 | Daemon | Dagster Helm chart | `dagster/dagster` (official) |
 | User Deployment | `lotus-lake/deploy/dagster/` | `ghcr.io/matta-kelly/lotus-lake` |
+| Cube.js | `lotus-lake/orchestration/cube/` | `ghcr.io/matta-kelly/lotus-lake-cube` |
 | Dagster DB | `deploy/dagster/database.yaml` | CNPG Postgres |
 | Airbyte Config | `orchestration/airbyte/terraform/` | tofu-controller (no image) |
 
@@ -60,15 +61,24 @@ Catches errors before they reach the cluster:
 | Terraform validate | `terraform validate` | Broken HCL syntax |
 | dbt parse | `dbt parse` | Invalid SQL, broken refs |
 
-#### 2. Build Image (PR + Push)
+#### 2. Build Dagster Image (PR + Push)
 
 - Builds `Dockerfile`
 - Runs `dbt parse` to bake manifest into image
 - Tags with SHA and `latest` (main only)
 
-#### 3. Push to Registry (Main Only)
+#### 3. Build Cube.js Image (PR + Push)
 
-- Pushes to `ghcr.io/matta-kelly/lotus-lake`
+- Builds `Dockerfile.cube`
+- Copies `orchestration/cube/` + `target/manifest.json`
+- Tags with SHA and `latest` (main only)
+- Cube factories auto-generate cubes from dbt manifest
+
+#### 5. Push to Registry (Main Only)
+
+- Pushes both images to `ghcr.io/matta-kelly/`:
+  - `lotus-lake` (Dagster)
+  - `lotus-lake-cube` (Cube.js)
 - Tags: `latest` + `<commit-sha>`
 - PR builds verify but don't push
 
@@ -187,6 +197,12 @@ Edit files in `orchestration/airbyte/terraform/`, push. tofu-controller applies.
 ---
 
 ## Force Reconciliation
+
+**Kubeconfig path:** `/home/mkultra/bode/h-kube/generated/kubeconfig.yaml`
+
+```bash
+export KUBECONFIG=/home/mkultra/bode/h-kube/generated/kubeconfig.yaml
+```
 
 ### Force GitRepository Fetch
 

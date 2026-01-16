@@ -31,12 +31,12 @@ resource "airbyte_destination" "s3" {
   workspace_id              = var.workspace_id
   destination_definition_id = "4816b78f-1489-44c1-9060-4b19d5fa9362"
   connection_configuration  = jsonencode({
-    access_key_id     = var.minio_user
-    secret_access_key = var.minio_password
+    access_key_id     = var.s3_access_key_id
+    secret_access_key = var.s3_secret_access_key
     s3_bucket_name    = "landing"
     s3_bucket_path    = "raw"
     s3_bucket_region  = "us-west-1"
-    s3_endpoint       = var.minio_endpoint
+    s3_endpoint       = var.s3_endpoint
     # Hive-partitioned paths: raw/{namespace}/{stream}/year=YYYY/month=MM/day=DD/part_0.parquet
     # CRITICAL: Use Hive format (key=value) for DuckDB partition pruning
     s3_path_format    = "$${NAMESPACE}/$${STREAM_NAME}/year=$${YEAR}/month=$${MONTH}/day=$${DAY}"
@@ -137,7 +137,7 @@ Destination credentials must be in the terraform vars secret in h-kube:
 sops cluster/namespaces/lotus-lake/lotus-lake-secrets.yaml
 ```
 
-Add variables (e.g., `minio_user`, `minio_password`), then commit and push h-kube.
+Add variables (e.g., `s3_access_key_id`, `s3_secret_access_key`), then commit and push h-kube.
 
 ## S3 Path Format Variables
 

@@ -4,7 +4,7 @@ resource "airbyte_source" "shopify" {
   source_definition_id = "9da77001-af33-4bcd-be46-6252bf9342b9"
   connection_configuration = jsonencode({
     shop       = var.shopify_store
-    start_date = "2025-01-01"
+    start_date = "2026-01-01"
     credentials = {
       auth_method  = "api_password"
       api_password = var.shopify_api_password
@@ -23,7 +23,7 @@ resource "airbyte_source" "klaviyo" {
   source_definition_id = "95e8cffd-b8c4-4039-968e-d32fb4a69bde"
   connection_configuration = jsonencode({
     api_key     = var.klaviyo_api_key
-    start_date  = "2025-01-01T00:00:00Z"
+    start_date  = "2026-01-01T00:00:00Z"
     num_workers = 10
   })
 }

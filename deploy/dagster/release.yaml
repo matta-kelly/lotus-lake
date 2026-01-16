@@ -144,12 +144,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: lotus-lake-terraform-vars
-                  key: minio_user
+                  key: s3_access_key_id
             - name: S3_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: lotus-lake-terraform-vars
-                  key: minio_password
+                  key: s3_secret_access_key
 
     # -------------------------------------------------------------------------
     # Ingress

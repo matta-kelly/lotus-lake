@@ -37,7 +37,7 @@ kubectl logs -n lotus-lake -l component=user-deployments --tail=100 | grep -i se
 Connect to DuckLake and query cursor positions:
 
 ```sql
-SELECT source, stream, cursor_value, updated_at
+SELECT source, stream, cursor_path, updated_at
 FROM lakehouse.meta.feeder_cursors
 ORDER BY updated_at DESC;
 ```
@@ -230,6 +230,43 @@ kubectl logs -n lotus-lake -l cnpg.io/cluster=dagster-db --tail=50
 - Credential mismatch with SeaweedFS
 - Bucket doesn't exist
 - S3 endpoint unreachable
+
+---
+
+### DuckLake Metadata Errors
+
+**Symptoms**: "Unknown name map id X" errors, queries failing
+
+DuckLake stores metadata in PostgreSQL. These errors mean parquet files reference metadata entries that no longer exist.
+
+**Check for orphaned files**:
+```bash
+kubectl exec -n lotus-lake deploy/dagster-dagster-user-deployments-lotus-lake -- python3 -c "
+from orchestration.dag.landing.lib import get_ducklake_connection
+
+conn = get_ducklake_connection()
+orphans = conn.execute(\"CALL ducklake_delete_orphaned_files('lakehouse', dry_run => true)\").fetchall()
+print(f'Orphaned files: {len(orphans)}')
+conn.close()
+"
+```
+
+**Drop and recreate a corrupted table**:
+```bash
+kubectl exec -n lotus-lake deploy/dagster-dagster-user-deployments-lotus-lake -- python3 -c "
+from orchestration.dag.landing.lib import get_ducklake_connection
+
+conn = get_ducklake_connection()
+conn.execute('DROP TABLE IF EXISTS lakehouse.staging.stg_shopify__order_refunds')
+conn.execute('DROP TABLE IF EXISTS lakehouse.main.int_shopify__order_refunds')
+conn.close()
+print('Tables dropped - resync from Airbyte to recreate')
+"
+```
+
+**Important**: Always use DuckDB's DDL commands (via `get_ducklake_connection()`) to modify tables. Never manually edit PostgreSQL catalog tables.
+
+See [ducklake-metadata.md](ducklake-metadata.md) for complete DuckLake catalog reference and runbook.
 
 ---
 
