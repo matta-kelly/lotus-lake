@@ -2,7 +2,7 @@
     tags=['processed', 'shopify__order_refunds'],
     materialized='incremental',
     unique_key='order_id',
-    incremental_strategy='merge'
+    incremental_strategy='delete+insert'
 ) }}
 
 with deduped as (

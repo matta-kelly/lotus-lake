@@ -25,10 +25,12 @@ Airbyte syncs to S3 Parquet (Hive partitioned)
     ↓
 Dagster sensor detects new files
     ↓
-Feeder asset: batch → register → dbt run → update cursor
+Feeder asset: dbt run with file paths → update cursor
     ↓
-Landing (stg_*) → Processed (int_*) → Enriched (fct_*)
+dbt reads parquet directly → Processed (int_*) → Enriched (fct_*)
 ```
+
+**Key insight**: No staging layer. dbt reads S3 parquet directly via `read_parquet()`. Memory stays bounded to ~1 file (DuckDB streams through the file list).
 
 ## Directory Structure
 
@@ -40,13 +42,13 @@ lotus-lake/
 ├── orchestration/               # Dagster + dbt unified workspace
 │   ├── definitions.py           # Dagster entry point
 │   ├── assets.py                # All asset definitions
+│   ├── lib.py                   # Core functions (cursor, file discovery)
 │   ├── dbt_project.yml          # dbt configuration
 │   ├── airbyte/
 │   │   └── terraform/           # Airbyte sources/destinations/connections
 │   └── dag/
 │       ├── streams/             # Stream configs (source of truth)
-│       ├── landing/             # DDL + Duck Feeder library
-│       ├── processed/           # dbt int_* models
+│       ├── processed/           # dbt int_* models (read parquet directly)
 │       └── enriched/            # dbt fct_* models
 ├── .github/workflows/           # CI/CD pipeline
 ├── CLAUDE.md                    # AI assistant quick reference
@@ -66,9 +68,9 @@ This repo is deployed via **GitOps** through the [h-kube](../h-kube) cluster:
 
 | Doc | Description |
 |-----|-------------|
-| [Architecture](docs/architecture.md) | System design, Duck Feeder pattern, data flow |
+| [Architecture](docs/architecture.md) | System design, feeder pattern, data flow |
 | [Adding Sources](docs/adding-a-source.md) | Add new Airbyte sources and streams |
-| [Adding Flows](docs/adding-a-flow.md) | Add landing DDL and dbt models |
+| [Adding Flows](docs/adding-a-flow.md) | Add dbt models for new streams |
 | [Adding Destinations](docs/adding-a-destination.md) | Configure S3 or other destinations |
 | [Deployment](docs/deployment.md) | CI/CD pipeline and Kubernetes deployment |
 | [Secrets](docs/secrets.md) | SOPS encryption and credential management |
@@ -96,16 +98,13 @@ vim orchestration/dag/streams/SOURCE/STREAM.json
 # 2. Regenerate Airbyte catalog (CI will validate this is done)
 python orchestration/airbyte/generate-catalog.py
 
-# 3. Create landing DDL
-vim orchestration/dag/landing/SOURCE/stg_SOURCE__STREAM.sql
-
-# 4. Create processed model
+# 3. Create processed model (reads parquet directly, no landing DDL needed)
 vim orchestration/dag/processed/SOURCE/int_SOURCE__STREAM.sql
 
-# 5. Regenerate dbt manifest
+# 4. Regenerate dbt manifest
 cd orchestration && dbt parse
 
-# 6. Push
+# 5. Push
 git add . && git commit -m "Add SOURCE/STREAM" && git push
 ```
 

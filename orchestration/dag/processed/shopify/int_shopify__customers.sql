@@ -2,7 +2,7 @@
     tags=['processed', 'shopify__customers'],
     materialized='incremental',
     unique_key='customer_id',
-    incremental_strategy='merge'
+    incremental_strategy='delete+insert'
 ) }}
 
 select

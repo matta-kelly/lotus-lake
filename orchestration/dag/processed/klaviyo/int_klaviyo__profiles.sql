@@ -2,7 +2,7 @@
     tags=['processed', 'klaviyo__profiles'],
     materialized='incremental',
     unique_key='profile_id',
-    incremental_strategy='merge'
+    incremental_strategy='delete+insert'
 ) }}
 
 select

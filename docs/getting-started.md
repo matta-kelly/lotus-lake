@@ -34,12 +34,10 @@ lotus-lake/
 ├── orchestration/
 │   ├── definitions.py          # Dagster entry point
 │   ├── assets.py               # All asset definitions
+│   ├── lib.py                  # Core functions (cursor, file discovery)
 │   ├── dag/
-│   │   ├── landing/            # DDL files + lib.py (feeder library)
-│   │   │   ├── lib.py          # get_ducklake_connection(), feeder functions
-│   │   │   ├── shopify/stg_*.sql
-│   │   │   └── klaviyo/stg_*.sql
-│   │   ├── processed/          # dbt models (int_*)
+│   │   ├── streams/            # Stream configs (source of truth)
+│   │   ├── processed/          # dbt models (int_*) - read parquet directly
 │   │   └── enriched/           # dbt models (fct_*)
 │   ├── airbyte/terraform/      # Airbyte sources, destinations, connections
 │   ├── cube/                   # Cube.js semantic layer
@@ -59,10 +57,12 @@ lotus-lake/
 ```
 Shopify/Klaviyo → Airbyte → S3 Parquet → Sensor detects → Feeder processes
                                                               ↓
-                                         DuckLake staging (stg_*) → processed (int_*) → enriched (fct_*)
+                                         dbt reads parquet directly → processed (int_*) → enriched (fct_*)
                                                                                               ↓
                                                                               Cube.js exposes via PostgreSQL
 ```
+
+**Key insight**: No staging layer. dbt reads S3 parquet directly via `read_parquet()`. Memory stays bounded to ~1 file.
 
 ---
 
@@ -70,7 +70,7 @@ Shopify/Klaviyo → Airbyte → S3 Parquet → Sensor detects → Feeder process
 
 | File | Purpose |
 |------|---------|
-| `orchestration/dag/landing/lib.py` | **Core library** - `get_ducklake_connection()`, feeder functions |
+| `orchestration/lib.py` | **Core library** - `get_ducklake_connection()`, cursor, file discovery |
 | `orchestration/assets.py` | All Dagster assets - feeders, sensors, dbt integration |
 | `orchestration/airbyte/terraform/sources.tf` | Airbyte source configurations |
 | `orchestration/cube/cube.js` | Cube.js DuckLake connection |
@@ -80,10 +80,10 @@ Shopify/Klaviyo → Airbyte → S3 Parquet → Sensor detects → Feeder process
 
 ## DuckLake Connection
 
-Always use `get_ducklake_connection()` from `orchestration/dag/landing/lib.py`:
+Always use `get_ducklake_connection()` from `orchestration/lib.py`:
 
 ```python
-from orchestration.dag.landing.lib import get_ducklake_connection
+from orchestration.lib import get_ducklake_connection
 
 conn = get_ducklake_connection()
 result = conn.execute("SELECT * FROM lakehouse.main.int_shopify__orders LIMIT 5").fetchall()
@@ -101,8 +101,7 @@ This properly configures:
 
 | Schema | Purpose |
 |--------|---------|
-| `lakehouse.staging` | Raw data from Airbyte (stg_* tables) |
-| `lakehouse.main` | Transformed data (int_*, fct_* tables) |
+| `lakehouse.main` | All tables (int_*, fct_*) |
 | `lakehouse.meta` | Metadata (feeder_cursors table) |
 
 ---
@@ -117,7 +116,7 @@ The Dagster pod has all credentials configured. Use it for DuckDB/DuckLake opera
 export KUBECONFIG=/home/mkultra/bode/h-kube/generated/kubeconfig.yaml
 
 kubectl exec -n lotus-lake deploy/dagster-dagster-user-deployments-lotus-lake -- python3 -c "
-from orchestration.dag.landing.lib import get_ducklake_connection
+from orchestration.lib import get_ducklake_connection
 
 conn = get_ducklake_connection()
 # Your DuckDB/DuckLake commands here

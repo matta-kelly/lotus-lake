@@ -2,7 +2,7 @@
     tags=['processed', 'klaviyo__events'],
     materialized='incremental',
     unique_key='event_id',
-    incremental_strategy='merge'
+    incremental_strategy='delete+insert'
 ) }}
 
 select

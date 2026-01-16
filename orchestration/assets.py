@@ -168,8 +168,9 @@ def make_feeder_asset(source: str, stream: str):
                 raise Exception(f"dbt failed for {source}/{stream}: {', '.join(models_failed)}")
 
             # Emit AssetMaterialization for each successful model
+            # Key must match dagster-dbt's asset key format (just model name, no schema prefix)
             for model_name in models_succeeded:
-                asset_key = AssetKey(["main", model_name])
+                asset_key = AssetKey([model_name])
                 yield AssetMaterialization(
                     asset_key=asset_key,
                     metadata={

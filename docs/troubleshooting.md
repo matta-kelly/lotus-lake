@@ -270,6 +270,31 @@ See [ducklake-metadata.md](ducklake-metadata.md) for complete DuckLake catalog r
 
 ---
 
+### Drop All Tables (Fresh Start)
+
+To rebuild all tables from scratch without full-refresh:
+
+```sql
+-- Drop all processed and enriched tables
+DROP TABLE IF EXISTS lakehouse.main.int_shopify__orders;
+DROP TABLE IF EXISTS lakehouse.main.int_shopify__customers;
+DROP TABLE IF EXISTS lakehouse.main.int_shopify__order_refunds;
+DROP TABLE IF EXISTS lakehouse.main.int_klaviyo__profiles;
+DROP TABLE IF EXISTS lakehouse.main.int_klaviyo__events;
+DROP TABLE IF EXISTS lakehouse.main.int_klaviyo__campaigns;
+DROP TABLE IF EXISTS lakehouse.main.int_klaviyo__flows;
+DROP TABLE IF EXISTS lakehouse.main.int_klaviyo__metrics;
+DROP TABLE IF EXISTS lakehouse.main.int_klaviyo__lists;
+DROP TABLE IF EXISTS lakehouse.main.fct_sales;
+
+-- Reset cursors so feeders reprocess all files
+DELETE FROM lakehouse.meta.feeder_cursors;
+```
+
+New data will flow into fresh tables on next sensor trigger.
+
+---
+
 ## Debugging Commands
 
 ### View Logs

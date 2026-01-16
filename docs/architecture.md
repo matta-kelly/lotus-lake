@@ -15,7 +15,7 @@
 ## Data Flow
 
 ```
-sources → streams → landing → processed → enriched
+sources → streams → processed → enriched
 ```
 
 ```
@@ -29,20 +29,19 @@ Sensor detects new files
     ↓
 Feeder asset:
     ├── 1. Get files after cursor (partition-aware)
-    ├── 2. Batch by size (~500MB)
-    ├── 3. Register batch → ducklake_add_data_files()
-    ├── 4. Run processed dbt model (merge into DuckLake)
-    ├── 5. Update cursor
-    └── 6. Cleanup old S3 files (trails cursor by 7 days)
-    ↓
-DuckLake landing table (stg_shopify__orders)
+    ├── 2. Batch files (10 per dbt run)
+    ├── 3. Run dbt with file paths as var
+    ├── 4. dbt reads parquet directly via read_parquet()
+    └── 5. Update cursor
     ↓
 DuckLake processed table (int_shopify__orders)
     ↓
 Enriched auto-materializes (fct_sales)
 ```
 
-## The Duck Feeder Pattern
+**Key insight**: No staging layer. dbt reads S3 parquet directly. Memory stays bounded to ~1 file (DuckDB streams through the file list).
+
+## The Feeder Pattern
 
 The feeder solves OOM issues from large Airbyte backfills by processing files incrementally.
 
@@ -52,9 +51,8 @@ The feeder solves OOM issues from large Airbyte backfills by processing files in
 |---------|------|-----|
 | **Cursor** | Last processed S3 file path | Resume from where we left off |
 | **Partition-aware discovery** | Only glob from cursor date forward | Avoid scanning all historical partitions |
-| **Batch by size** | Group files into ~500MB chunks | Stay within memory limits |
-| **Register, don't copy** | `ducklake_add_data_files()` adds metadata only | Files stay in S3, no duplication |
-| **Trailing cleanup** | Delete S3 files older than cursor - 7 days | Prevent unbounded storage growth |
+| **Batch by count** | Group files (10 per dbt run) | Reduce dbt startup overhead |
+| **Direct parquet read** | `read_parquet()` in dbt models | No staging tables, memory bounded |
 
 ### Processing Loop
 
@@ -67,21 +65,19 @@ The feeder solves OOM issues from large Airbyte backfills by processing files in
 │       ↓                                                     │
 │  files = get_files_after_cursor()  ← partition-aware        │
 │       ↓                                                     │
-│  for batch in batch_by_size(files, 500MB):                  │
-│       │                                                     │
-│       ├── register_batch(landing_table, batch)              │
-│       │        └── ducklake_add_data_files() for each file  │
+│  for batch in chunks(files, 10):                            │
 │       │                                                     │
 │       ├── dbt run --select tag:{source}__{stream}           │
-│       │        └── merge into processed table               │
+│       │        --vars '{"files": [...]}'                    │
+│       │        └── read_parquet() streams through files     │
+│       │        └── delete+insert into DuckLake table                │
 │       │                                                     │
 │       └── set_cursor(last_file_in_batch)                    │
 │                                                             │
-│  cleanup_old_files(buffer_days=7)                           │
-│       └── delete S3 files older than cursor - 7 days        │
-│                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+DuckDB streams through the file list one at a time, so memory is bounded to ~1 file regardless of batch size.
 
 ### Cursor Table
 
@@ -97,44 +93,24 @@ CREATE TABLE lakehouse.meta.feeder_cursors (
 )
 ```
 
-## Three Asset Layers
+## Two Asset Layers
 
 Assets defined in `orchestration/assets.py`, data in `orchestration/dag/`
 
-### 1. Landing (DDL Reconciliation)
+### 1. Feeders (One Per Stream)
 
-**Asset:** `landing_tables`
-
-Reconciles SQL DDL files to DuckLake tables:
-- Creates missing tables
-- Adds missing columns to existing tables
-- Idempotent - safe to run on every deploy
-
-**Files:** `orchestration/dag/landing/{source}/stg_{source}__{stream}.sql`
-
-```sql
-CREATE TABLE IF NOT EXISTS lakehouse.staging.stg_shopify__orders (
-    _airbyte_raw_id VARCHAR,
-    _airbyte_extracted_at TIMESTAMP WITH TIME ZONE,
-    id BIGINT,
-    ...
-);
-```
-
-### 2. Feeders (One Per Stream)
-
-**Assets:** `feeder_{source}_{stream}` (auto-generated from stream configs)
+**Assets:** `{source}_{stream}` (auto-generated from stream configs)
 
 Each feeder:
 1. Discovers new S3 files after cursor
-2. Registers them into landing table via DuckLake
-3. Runs the corresponding processed dbt model
-4. Updates cursor
-5. Cleans up old files
+2. Batches files (10 per dbt run)
+3. Runs dbt with file paths as `--vars '{"files": [...]}'`
+4. dbt model reads parquet directly and upserts into DuckLake
+5. Updates cursor
 
 **Sensors:** `{source}_{stream}_sensor` triggers feeder when new files arrive
 
-### 3. Enriched (Auto-Materialize)
+### 2. Enriched (Auto-Materialize)
 
 **Asset:** `enriched_dbt_models`
 
@@ -149,6 +125,7 @@ orchestration/
 ├── definitions.py              # Dagster entry point
 ├── resources.py                # dbt resource config
 ├── assets.py                   # ALL asset definitions (unified)
+├── lib.py                      # Core functions (cursor, file discovery)
 ├── dag/
 │   ├── sources/                # Discovered schemas (reference)
 │   │   ├── shopify/*.json
@@ -158,11 +135,7 @@ orchestration/
 │   │   │   ├── orders.json
 │   │   │   └── _catalog.json   # Generated for Airbyte
 │   │   └── klaviyo/
-│   ├── landing/                # DDL files for DuckLake tables
-│   │   ├── lib.py              # Duck Feeder library
-│   │   ├── shopify/stg_*.sql
-│   │   └── klaviyo/stg_*.sql
-│   ├── processed/              # dbt intermediate models
+│   ├── processed/              # dbt models - read parquet directly
 │   │   ├── shopify/int_*.sql
 │   │   └── klaviyo/int_*.sql
 │   └── enriched/               # dbt fact/dimension models
@@ -176,10 +149,9 @@ orchestration/
 | Layer | Pattern | Example |
 |-------|---------|---------|
 | S3 Raw | `raw/{source}/{stream}/` | `raw/shopify/orders/` |
-| Landing DDL | `stg_{source}__{stream}` | `stg_shopify__orders` |
 | Processed Model | `int_{source}__{stream}` | `int_shopify__orders` |
 | Enriched Model | `fct_{domain}` / `dim_{entity}` | `fct_sales` |
-| Feeder Asset | `feeder_{source}_{stream}` | `feeder_shopify_orders` |
+| Feeder Asset | `{source}_{stream}` | `shopify_orders` |
 | Sensor | `{source}_{stream}_sensor` | `shopify_orders_sensor` |
 
 ## DuckLake Setup
@@ -192,9 +164,8 @@ ATTACH 'ducklake:postgres:host=... dbname=ducklake ...'
 ```
 
 **Schemas:**
-- `lakehouse.staging` - Raw data registered from S3
-- `lakehouse.main` - Transformed processed/enriched tables
-- `lakehouse.meta` - Metadata (cursors, etc.)
+- `lakehouse.main` - All tables (processed int_*, enriched fct_*)
+- `lakehouse.meta` - Metadata (feeder_cursors)
 
 ## Dagster Architecture
 

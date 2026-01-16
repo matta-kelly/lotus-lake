@@ -2,7 +2,7 @@
     tags=['processed', 'klaviyo__campaigns'],
     materialized='incremental',
     unique_key='campaign_id',
-    incremental_strategy='merge'
+    incremental_strategy='delete+insert'
 ) }}
 
 select

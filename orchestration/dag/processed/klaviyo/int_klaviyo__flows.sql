@@ -2,7 +2,7 @@
     tags=['processed', 'klaviyo__flows'],
     materialized='incremental',
     unique_key='flow_id',
-    incremental_strategy='merge'
+    incremental_strategy='delete+insert'
 ) }}
 
 select
