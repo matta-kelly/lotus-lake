@@ -307,11 +307,11 @@
         ]
       },
       "config": {
-        "sync_mode": "incremental",
+        "sync_mode": "full_refresh",
         "cursor_field": [
           "updated"
         ],
-        "destination_sync_mode": "append",
+        "destination_sync_mode": "overwrite",
         "primary_key": [
           [
             "id"
