@@ -121,38 +121,43 @@ const processedModels = Object.values(manifest.nodes)
 
 console.log(`[processed.js] Found ${processedModels.length} processed models`);
 
-// Generate cube definitions using global cube() function
-processedModels.forEach(model => {
-  const columns = parseColumnsFromSql(model.raw_code);
-  const uniqueKey = model.config?.unique_key;
+// Use asyncModule for dynamic cube generation (required by Cube.js)
+// See: https://cube.dev/docs/product/data-modeling/dynamic/javascript
+asyncModule(async () => {
+  processedModels.forEach(model => {
+    const columns = parseColumnsFromSql(model.raw_code);
+    const uniqueKey = model.config?.unique_key;
 
-  console.log(`[processed.js] Generating cube: ${model.name} (${columns.length} columns: ${columns.slice(0, 5).join(', ')}${columns.length > 5 ? '...' : ''})`);
+    console.log(`[processed.js] Generating cube: ${model.name} (${columns.length} columns)`);
 
-  cube(model.name, {
-    sql_table: `lakehouse.main.${model.name}`,
+    // Build dimensions object with sql as functions (required for dynamic generation)
+    const dimensions = {};
+    columns.forEach(colName => {
+      dimensions[colName] = {
+        sql: () => `${colName}`,
+        type: guessTypeFromName(colName),
+        primary_key: uniqueKey === colName,
+      };
+    });
 
-    dimensions: Object.fromEntries(
-      columns.map(colName => [
-        colName,
-        {
-          sql: () => colName,
-          type: guessTypeFromName(colName),
-          primary_key: uniqueKey === colName,
-        },
-      ])
-    ),
-
-    measures: {
+    // Build measures object with sql as functions
+    const measures = {
       count: { type: 'count' },
-      // Sum measures for numeric columns
-      ...Object.fromEntries(
-        columns
-          .filter(colName => guessTypeFromName(colName) === 'number')
-          .map(colName => [
-            `total_${colName}`,
-            { sql: () => colName, type: 'sum' },
-          ])
-      ),
-    },
+    };
+    // Add sum measures for numeric columns
+    columns
+      .filter(colName => guessTypeFromName(colName) === 'number')
+      .forEach(colName => {
+        measures[`total_${colName}`] = {
+          sql: () => `${colName}`,
+          type: 'sum',
+        };
+      });
+
+    cube(model.name, {
+      sql_table: `lakehouse.main.${model.name}`,
+      dimensions,
+      measures,
+    });
   });
 });
