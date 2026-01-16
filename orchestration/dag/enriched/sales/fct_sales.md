@@ -9,18 +9,26 @@ Track revenue across all dimensions - by day, hour, product, customer. Filter by
 ## Lineage
 
 ```
-streams/shopify/orders.json          →  shopify.orders (Airbyte)
-streams/shopify/order_refunds.json   →  shopify.order_refunds (Airbyte)
+S3 parquet (Airbyte)     →  processed/shopify/int_shopify__orders.sql
+                             processed/shopify/int_shopify__refunds.sql
                                               ↓
-                                     core/shopify/int_shopify__orders.sql
-                                     core/shopify/int_shopify__refunds.sql
-                                              ↓
-                                     marts/fct_sales.sql
+                             enriched/sales/fct_sales.sql
 ```
 
 ## Grain
 
 One row per order.
+
+## Incremental Strategy
+
+Uses `delete+insert` on `order_id` - memory efficient upsert:
+
+| Scenario | What Happens |
+|----------|--------------|
+| New order | No match → inserts new row |
+| Order updated (e.g., refund added) | Deletes old row → inserts updated row |
+
+Incremental filter uses `_airbyte_extracted_at` from both upstream tables - catches new orders AND orders with new refunds.
 
 ## Status Fields (for filtering)
 
