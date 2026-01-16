@@ -20,11 +20,12 @@ from .assets import (
     feeder_assets,
     feeder_sensors,
     enriched_dbt_models,
+    processed_asset_specs,
 )
 from .resources import dbt_resource
 
-# All assets: feeders + enriched
-all_assets = [*feeder_assets, enriched_dbt_models]
+# All assets: feeders + processed (external) + enriched
+all_assets = [*feeder_assets, *processed_asset_specs, enriched_dbt_models]
 
 # Automation sensor for auto-materializing enriched models
 automation_sensor = AutomationConditionSensorDefinition(
