@@ -8,10 +8,10 @@
  */
 
 const fs = require('fs');
-const path = require('path');
 
 // Load dbt manifest (copied into image at build time)
-const manifestPath = path.join(__dirname, '..', 'target', 'manifest.json');
+// Note: __dirname not available in Cube.js model context, use absolute path
+const manifestPath = '/cube/conf/target/manifest.json';
 let manifest = { nodes: {} };
 
 try {
