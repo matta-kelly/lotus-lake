@@ -24,9 +24,11 @@ from dagster import (
     AssetExecutionContext,
     AssetKey,
     AssetMaterialization,
+    AssetSpec,
     AutomationCondition,
     DagsterRunStatus,
     DefaultSensorStatus,
+    external_assets_from_specs,
     Output,
     RunRequest,
     RunsFilter,
@@ -275,6 +277,39 @@ class EnrichedDbtTranslator(DagsterDbtTranslator):
 def enriched_dbt_models(context: AssetExecutionContext, dbt: DbtCliResource):
     """All enriched layer dbt models - auto-materialize when upstream updates."""
     yield from dbt.cli(["run"], context=context).stream()
+
+
+# =============================================================================
+# Processed External Assets - Required for enriched auto-materialize
+# =============================================================================
+
+def get_processed_model_specs() -> list[AssetSpec]:
+    """
+    Create AssetSpecs for processed models (int_*) from dbt manifest.
+    These external assets let enriched models depend on them via AutomationCondition.
+    Feeders emit AssetMaterialization events that Dagster recognizes as materializations
+    of these external assets.
+    """
+    manifest_path = DBT_MANIFEST
+    if not manifest_path.exists():
+        return []
+
+    with open(manifest_path) as f:
+        manifest = json.load(f)
+
+    specs = []
+    for key, node in manifest["nodes"].items():
+        if node["resource_type"] == "model" and node["name"].startswith("int_"):
+            specs.append(
+                AssetSpec(
+                    key=AssetKey([node["name"]]),
+                    group_name="processed",
+                )
+            )
+    return specs
+
+
+processed_external_assets = external_assets_from_specs(get_processed_model_specs())
 
 
 # =============================================================================
