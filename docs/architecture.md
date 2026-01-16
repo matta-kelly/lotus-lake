@@ -236,44 +236,50 @@ ATTACH 'ducklake:postgres:host=... dbname=ducklake ...'
 
 ## Cube.js Semantic Layer
 
-Cube.js exposes DuckLake tables via PostgreSQL protocol (port 15432) and REST API for BI tools.
+Cube.js exposes DuckLake tables via PostgreSQL protocol (port 5432) and REST API (port 4000) for BI tools.
 
-### Architecture
+See [cube.md](cube.md) for detailed documentation.
+
+### Production Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Cube.js Pod                               │
+│                 CUBE.JS PRODUCTION ARCHITECTURE              │
+├─────────────────────────────────────────────────────────────┤
 │                                                              │
-│  ┌────────────────┐         ┌────────────────────────────┐  │
-│  │ REST API :4000 │────────▶│ DuckDB (in-process)        │  │
-│  │ SQL :15432     │         │ + DuckLake attached        │  │
-│  └────────────────┘         │ + S3 credentials           │  │
-│                              └────────────────────────────┘  │
+│  ┌──────────────┐                                           │
+│  │  Cube API    │   ← Deployment                            │
+│  │  :4000 REST  │     Handles API requests                  │
+│  │  :5432 SQL   │     Connects to Cube Store                │
+│  └──────┬───────┘                                           │
+│         │                                                    │
+│         ▼                                                    │
+│  ┌──────────────────────────┐                               │
+│  │  Cube Store Router       │   ← StatefulSet               │
+│  │  Coordinates queries     │     Stable DNS required       │
+│  └──────────┬───────────────┘                               │
+│             │                                                │
+│             ▼                                                │
+│  ┌──────────────────────────┐                               │
+│  │  Cube Store Worker       │   ← StatefulSet               │
+│  │  Executes queries        │     Scalable horizontally     │
+│  └──────────────────────────┘                               │
+│                                                              │
+│  ┌──────────────────────────┐                               │
+│  │  Refresh Worker          │   ← Deployment                │
+│  │  Builds pre-aggregations │                               │
+│  └──────────────────────────┘                               │
+│                                                              │
 └─────────────────────────────────────────────────────────────┘
-                              ↓
-            ┌─────────────────┴─────────────────┐
-            ▼                                   ▼
-    DuckLake Catalog (Postgres)         S3 Parquet Files
 ```
-
-### Auto-Generated Cubes
-
-Cube definitions are auto-generated from dbt manifest at build time:
-
-| File | Pattern | Models |
-|------|---------|--------|
-| `orchestration/cube/model/processed.js` | `int_*` | All intermediate models |
-| `orchestration/cube/model/enriched.js` | `fct_*` | All fact tables |
-
-Column types are inferred from column names (heuristic-based).
 
 ### Connection
 
-```
-# Power BI, DBeaver, etc.
-Host: 100.64.0.5 (Tailscale) or traefik node
-Port: 15432
+```bash
+# PostgreSQL protocol (Power BI, DBeaver, psql, etc.)
+Host: 100.64.0.5 (Tailscale/Traefik node)
+Port: 5432
 Database: cube
 User: cube
-Password: <from CUBEJS_API_SECRET>
+Password: <CUBEJS_API_SECRET from lotus-lake-terraform-vars>
 ```
