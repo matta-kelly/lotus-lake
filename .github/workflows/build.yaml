@@ -254,8 +254,8 @@ jobs:
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           echo "Updating image tags to: $SHORT_SHA"
 
-          # Update user deployment image tag
-          sed -i "s|tag: .*# Auto-updated by CI$|tag: $SHORT_SHA  # Auto-updated by CI|" deploy/dagster/release.yaml
+          # Update user deployment image tag (matches 7-char SHA with or without comment)
+          sed -i "s|\(tag: \)[a-f0-9]\{7\}.*|\1$SHORT_SHA  # Auto-updated by CI|" deploy/dagster/release.yaml
 
           # Update dlt image tag in perTagConfig
           sed -i "s|image: ghcr.io/matta-kelly/lotus-lake-dlt:.*|image: ghcr.io/matta-kelly/lotus-lake-dlt:$SHORT_SHA  # Auto-updated by CI|" deploy/dagster/release.yaml
