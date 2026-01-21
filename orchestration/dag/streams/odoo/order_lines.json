@@ -1,0 +1,21 @@
+{
+  "stream": "order_lines",
+  "connector": "dlt",
+  "schedule": "0 * * * *",
+  "initial_value": "2020-01-01T00:00:00",
+  "selected": true,
+  "fields": {
+    "id": {"type": "integer"},
+    "write_date": {"type": "string", "format": "date-time"},
+    "order_reference": {"type": "string"},
+    "sales_team": {"type": "string"},
+    "salesperson": {"type": "string"},
+    "product_category": {"type": "string"},
+    "sku": {"type": "string"},
+    "quantity": {"type": "number"},
+    "subtotal": {"type": "number"},
+    "unit_cost": {"type": "number"},
+    "unit_price": {"type": "number"},
+    "sales_date": {"type": "string", "format": "date-time"}
+  }
+}

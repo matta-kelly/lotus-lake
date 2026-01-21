@@ -1,0 +1,57 @@
+{
+  "stream": "order_lines",
+  "options": {
+    "sync_modes": [
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "append",
+      "merge"
+    ]
+  },
+  "defaults": {
+    "cursor_field": [
+      "write_date"
+    ]
+  },
+  "fields": {
+    "id": {
+      "type": "integer"
+    },
+    "write_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "order_reference": {
+      "type": "string"
+    },
+    "sales_team": {
+      "type": "string"
+    },
+    "salesperson": {
+      "type": "string"
+    },
+    "product_category": {
+      "type": "string"
+    },
+    "sku": {
+      "type": "string"
+    },
+    "quantity": {
+      "type": "number"
+    },
+    "subtotal": {
+      "type": "number"
+    },
+    "unit_cost": {
+      "type": "number"
+    },
+    "unit_price": {
+      "type": "number"
+    },
+    "sales_date": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -2,6 +2,8 @@
 
 How to add a new data source (Shopify, Klaviyo, etc.) to Airbyte.
 
+> **Custom APIs:** For sources not in the Airbyte catalog (custom APIs, complex auth, rate limiting), see [Custom Ingestion with dlt](custom-ingestion-dlt.md).
+
 ## Overview
 
 ```

@@ -55,11 +55,14 @@ STREAMS_DIR = Path(__file__).parent / "dag" / "streams"
 # Stream Discovery - Single source of truth
 # =============================================================================
 
-def discover_streams() -> list[tuple[str, str]]:
+def discover_streams(connector: str = None) -> list[tuple[str, str, dict]]:
     """
-    Scan streams/ directory, return [(source, stream), ...]
+    Scan streams/ directory, return [(source, stream, config), ...]
 
-    streams/shopify/orders.json → ("shopify", "orders")
+    streams/shopify/orders.json → ("shopify", "orders", {...})
+
+    Args:
+        connector: Filter by connector type ("dlt", "airbyte", or None for all)
     """
     if not STREAMS_DIR.exists():
         return []
@@ -71,8 +74,12 @@ def discover_streams() -> list[tuple[str, str]]:
         for stream_file in source_dir.glob("*.json"):
             if stream_file.name.startswith("_"):
                 continue
-            streams.append((source_dir.name, stream_file.stem))
-    return sorted(streams)
+            with open(stream_file) as f:
+                config = json.load(f)
+            stream_connector = config.get("connector", "airbyte")
+            if connector is None or stream_connector == connector:
+                streams.append((source_dir.name, stream_file.stem, config))
+    return sorted(streams, key=lambda x: (x[0], x[1]))
 
 
 # =============================================================================
@@ -104,6 +111,7 @@ def make_feeder_asset(source: str, stream: str):
     @asset(
         name=asset_name,
         group_name="feeders",
+        tags={"workload": "feeder"},
     )
     def _feeder(context: AssetExecutionContext, dbt: DbtCliResource):
         conn = get_ducklake_connection()
@@ -305,10 +313,52 @@ processed_asset_specs = get_processed_asset_specs()
 
 
 # =============================================================================
+# DLT Asset Factory - Scheduled extraction
+# =============================================================================
+
+
+def make_dlt_asset(source: str, stream: str, config: dict):
+    """
+    Factory to create a dlt extraction asset.
+
+    Runs on schedule defined in stream config, writes to S3.
+    Existing sensor/feeder handles downstream processing.
+    """
+    asset_name = f"dlt_{source}_{stream}"
+    schedule = config.get("schedule", "0 * * * *")  # default hourly
+
+    @asset(
+        name=asset_name,
+        group_name="dlt_ingestion",
+        tags={"workload": "dlt"},
+        automation_condition=AutomationCondition.cron(schedule),
+    )
+    def _dlt_extract(context: AssetExecutionContext):
+        from .dlt.pipeline import run_stream
+
+        context.log.info(f"[dlt/{source}/{stream}] Starting extraction")
+        result = run_stream(source, stream)
+        context.log.info(f"[dlt/{source}/{stream}] {result}")
+        return result
+
+    return _dlt_extract
+
+
+# =============================================================================
 # Generate all assets and sensors
 # =============================================================================
 
-_streams = discover_streams()
+# Airbyte streams: feeders + sensors
+_airbyte_streams = discover_streams(connector="airbyte")
+feeder_assets = [make_feeder_asset(src, strm) for src, strm, _ in _airbyte_streams]
+feeder_sensors = [make_feeder_sensor(src, strm) for src, strm, _ in _airbyte_streams]
 
-feeder_assets = [make_feeder_asset(src, strm) for src, strm in _streams]
-feeder_sensors = [make_feeder_sensor(src, strm) for src, strm in _streams]
+# DLT streams: extraction assets + feeders + sensors
+_dlt_streams = discover_streams(connector="dlt")
+dlt_assets = [make_dlt_asset(src, strm, cfg) for src, strm, cfg in _dlt_streams]
+dlt_feeder_assets = [make_feeder_asset(src, strm) for src, strm, _ in _dlt_streams]
+dlt_feeder_sensors = [make_feeder_sensor(src, strm) for src, strm, _ in _dlt_streams]
+
+# Combine
+feeder_assets = feeder_assets + dlt_feeder_assets
+feeder_sensors = feeder_sensors + dlt_feeder_sensors

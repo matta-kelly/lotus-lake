@@ -1,0 +1,33 @@
+{
+  "stream": "orders",
+  "connector": "dlt",
+  "schedule": "0 * * * *",
+  "initial_value": "2020-01-01T00:00:00",
+  "selected": true,
+  "fields": {
+    "id": {"type": "integer"},
+    "order_reference": {"type": "string"},
+    "create_date": {"type": "string", "format": "date-time"},
+    "write_date": {"type": "string", "format": "date-time"},
+    "sales_date": {"type": "string", "format": "date-time"},
+    "order_date": {"type": "string", "format": "date-time"},
+    "delivery_date": {"type": "string", "format": "date-time"},
+    "sales_team": {"type": "string"},
+    "salesperson": {"type": "string"},
+    "amount_untaxed": {"type": "number"},
+    "amount_tax": {"type": "number"},
+    "amount_total": {"type": "number"},
+    "payment_terms": {"type": "string"},
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "status": {"type": "string"},
+    "invoice_status": {"type": "string"},
+    "customer": {"type": "string"},
+    "shipping_policy": {"type": "string"},
+    "f_order_id": {"type": "string"},
+    "delivery_status": {"type": "string"},
+    "delivery_country": {"type": "string"},
+    "delivery_state": {"type": "string"},
+    "delivery_city": {"type": "string"},
+    "delivery_zip": {"type": "string"}
+  }
+}

@@ -66,7 +66,14 @@ spec:
         type: QueuedRunCoordinator
         config:
           queuedRunCoordinator:
-            maxConcurrentRuns: 2
+            maxConcurrentRuns: 5
+            tagConcurrencyLimits:
+              - key: "workload"
+                value: "feeder"
+                limit: 2
+              - key: "workload"
+                value: "dlt"
+                limit: 3
       nodeSelector:
         kubernetes.io/hostname: monkeybusiness
       env:
@@ -88,6 +95,7 @@ spec:
       type: K8sRunLauncher
       config:
         k8sRunLauncher:
+          # Default config for all runs (feeders)
           runK8sConfig:
             podSpecConfig:
               nodeSelector:
@@ -98,6 +106,18 @@ spec:
                   memory: "15Gi"
                 requests:
                   memory: "2Gi"
+          # Per-tag overrides for different workloads
+          perTagConfig:
+            - tags:
+                workload: dlt
+              runK8sConfig:
+                containerConfig:
+                  image: ghcr.io/matta-kelly/lotus-lake-dlt:b20806d  # Auto-updated by CI
+                  resources:
+                    limits:
+                      memory: "4Gi"
+                    requests:
+                      memory: "512Mi"
           envSecrets:
             - name: dagster-db-app
             - name: lotus-lake-terraform-vars

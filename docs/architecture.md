@@ -5,6 +5,7 @@
 | Layer | Tool | Purpose |
 |-------|------|---------|
 | Ingestion | Airbyte | Incremental sync from Shopify, Klaviyo → S3 Parquet |
+| Ingestion | dlt | Custom APIs not in Airbyte catalog → S3 Parquet |
 | Storage | SeaweedFS (S3) | S3-compatible object storage for raw Parquet files |
 | Catalog | DuckLake + Postgres | SQL-based metadata catalog with ACID, time travel |
 | Transform | dbt-duckdb | SQL transforms reading from DuckLake tables |
@@ -19,9 +20,9 @@ sources → streams → processed → enriched
 ```
 
 ```
-Sources (Shopify, Klaviyo)
+Sources (Shopify, Klaviyo, Odoo, etc.)
     ↓
-Airbyte (incremental append to S3)
+Airbyte or dlt (incremental append to S3)
     ↓
 S3: raw/{source}/{stream}/year=YYYY/month=MM/day=DD/*.parquet
     ↓                      └── Hive partition format

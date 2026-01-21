@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: odoo
+    database: lakehouse
+    schema: odoo
+    tables:
+      - name: orders
+      - name: order_lines
+      - name: order_tags
