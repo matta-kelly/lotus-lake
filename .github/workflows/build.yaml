@@ -96,11 +96,6 @@ jobs:
           fi
           echo "User deployment image OK: $USER_IMAGE"
 
-          # Check dlt image in perTagConfig
-          DLT_IMAGE=$(grep 'lotus-lake-dlt' deploy/dagster/release.yaml | head -1 || true)
-          if [ -n "$DLT_IMAGE" ]; then
-            echo "DLT image found: $DLT_IMAGE"
-          fi
 
   # ─────────────────────────────────────────────────────────────────────────
   # Build - Only runs if validation passes
@@ -140,46 +135,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-  # ─────────────────────────────────────────────────────────────────────────
-  # Build DLT - Custom ingestion image
-  # ─────────────────────────────────────────────────────────────────────────
-  build-dlt:
-    needs: validate
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Log in to Container Registry
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata (DLT)
-        id: meta-dlt
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-dlt
-          tags: |
-            type=sha,prefix=
-            type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: Build and push DLT image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: Dockerfile.dlt
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta-dlt.outputs.tags }}
-          labels: ${{ steps.meta-dlt.outputs.labels }}
 
   # ─────────────────────────────────────────────────────────────────────────
   # Build Cube.js - Semantic layer image
@@ -237,7 +192,7 @@ jobs:
   # Deploy - Update manifest with SHA tag to trigger Flux rollout
   # ─────────────────────────────────────────────────────────────────────────
   deploy:
-    needs: [build, build-dlt, build-cube]
+    needs: [build, build-cube]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -256,8 +211,6 @@ jobs:
 
           # Update user deployment image tag (matches 7-char SHA with or without comment)
           sed -i "s|\(tag: \)[a-f0-9]\{7\}.*|\1$SHORT_SHA  # Auto-updated by CI|" deploy/dagster/release.yaml
-
-          # Note: dlt image uses :latest tag, configured in assets.py via dagster-k8s/config
 
           echo "Updated release.yaml:"
           grep "tag:" deploy/dagster/release.yaml
