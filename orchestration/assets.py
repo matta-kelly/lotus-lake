@@ -342,7 +342,7 @@ def make_dlt_asset(source: str, stream: str, config: dict):
                 },
             },
         },
-        automation_condition=AutomationCondition.cron(schedule),
+        automation_condition=AutomationCondition.on_cron(schedule),
     )
     def _dlt_extract(context: AssetExecutionContext):
         from .dlt.pipeline import run_stream
