@@ -10,7 +10,7 @@ dependencies = [
     "dagster-dbt>=0.27",
     "dbt-duckdb>=1.8",
     # dlt ingestion
-    "dlt[filesystem,parquet]==1.21.0",
+    "dlt[filesystem,parquet]",
     "requests>=2.28",
 ]
 

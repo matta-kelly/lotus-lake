@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install Python dependencies
 COPY pyproject.toml .
-RUN pip install --no-cache-dir .
+RUN pip install --upgrade pip && pip install --no-cache-dir .
 
 # Copy orchestration code
 COPY orchestration/ orchestration/
