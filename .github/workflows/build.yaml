@@ -257,11 +257,10 @@ jobs:
           # Update user deployment image tag (matches 7-char SHA with or without comment)
           sed -i "s|\(tag: \)[a-f0-9]\{7\}.*|\1$SHORT_SHA  # Auto-updated by CI|" deploy/dagster/release.yaml
 
-          # Update dlt image tag in perTagConfig
-          sed -i "s|image: ghcr.io/matta-kelly/lotus-lake-dlt:.*|image: ghcr.io/matta-kelly/lotus-lake-dlt:$SHORT_SHA  # Auto-updated by CI|" deploy/dagster/release.yaml
+          # Note: dlt image uses :latest tag, configured in assets.py via dagster-k8s/config
 
           echo "Updated release.yaml:"
-          grep -E "(tag:|lotus-lake-dlt:)" deploy/dagster/release.yaml
+          grep "tag:" deploy/dagster/release.yaml
 
       - name: Commit and push
         run: |
