@@ -7,7 +7,6 @@ dependencies = [
     "dagster>=1.11",
     "dagster-webserver>=1.11",
     "dagster-postgres>=0.27",
-    "dagster-aws>=0.27",
     "dagster-dbt>=0.27",
     "dbt-duckdb>=1.8",
     "boto3>=1.34",
