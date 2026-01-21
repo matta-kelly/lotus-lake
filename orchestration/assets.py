@@ -330,18 +330,7 @@ def make_dlt_asset(source: str, stream: str, config: dict):
     @asset(
         name=asset_name,
         group_name="dlt_ingestion",
-        tags={
-            "workload": "dlt",
-            "dagster-k8s/config": json.dumps({
-                "container_config": {
-                    "image": "ghcr.io/matta-kelly/lotus-lake-dlt:latest",
-                    "resources": {
-                        "requests": {"memory": "512Mi"},
-                        "limits": {"memory": "4Gi"},
-                    },
-                },
-            }),
-        },
+        tags={"workload": "dlt"},
         automation_condition=AutomationCondition.on_cron(schedule),
     )
     def _dlt_extract(context: AssetExecutionContext):
