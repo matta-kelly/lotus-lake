@@ -124,7 +124,7 @@ spec:
         - name: lotus-lake
           image:
             repository: ghcr.io/matta-kelly/lotus-lake
-            tag: eca35be  # Auto-updated by CI
+            tag: 98e072f  # Auto-updated by CI
             pullPolicy: IfNotPresent
           dagsterApiGrpcArgs:
             - "-m"
