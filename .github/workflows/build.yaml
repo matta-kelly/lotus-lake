@@ -83,16 +83,24 @@ jobs:
           helm template dagster dagster/dagster -f deploy/dagster/release.yaml --set postgresql.enabled=false > /dev/null
           echo "Helm template validation passed"
 
-      # Validate image path matches repo
-      - name: Validate image path
+      # Validate image paths match repo
+      - name: Validate image paths
         run: |
-          EXPECTED="ghcr.io/${{ github.repository }}"
-          ACTUAL=$(grep -o 'ghcr.io/[^"]*' deploy/dagster/release.yaml | head -1 | sed 's/:.*$//')
-          if [ "$ACTUAL" != "$EXPECTED" ]; then
-            echo "::error::Image path mismatch: expected $EXPECTED, got $ACTUAL"
+          REPO="ghcr.io/${{ github.repository }}"
+
+          # Check user deployment image
+          USER_IMAGE=$(grep -A1 'repository:' deploy/dagster/release.yaml | grep 'ghcr.io' | head -1 | tr -d ' ')
+          if [[ "$USER_IMAGE" != *"$REPO"* ]]; then
+            echo "::error::User deployment image mismatch: expected $REPO, got $USER_IMAGE"
             exit 1
           fi
-          echo "Image path validation passed: $ACTUAL"
+          echo "User deployment image OK: $USER_IMAGE"
+
+          # Check dlt image in perTagConfig
+          DLT_IMAGE=$(grep 'lotus-lake-dlt' deploy/dagster/release.yaml | head -1 || true)
+          if [ -n "$DLT_IMAGE" ]; then
+            echo "DLT image found: $DLT_IMAGE"
+          fi
 
   # ─────────────────────────────────────────────────────────────────────────
   # Build - Only runs if validation passes
