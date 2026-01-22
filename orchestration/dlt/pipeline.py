@@ -157,11 +157,9 @@ def run_stream(source_name: str, stream_name: str, dry_run: bool = False) -> dic
         print(f"  Initial value: {initial_value}")
         return {"status": "dry_run", "fields": selected_fields, "initial_value": initial_value}
 
-    # Get the resource with incremental loading
+    # Get the resource
     resource_func = get_resource(source_name, stream_name)
-    resource = resource_func(
-        updated_at=dlt.sources.incremental("write_date", initial_value=initial_value)
-    )
+    resource = resource_func(since=initial_value)
 
     # Apply field filter if configured
     if selected_fields:
