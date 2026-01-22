@@ -5,7 +5,7 @@ from .client import OdooAPI
 
 @dlt.resource(write_disposition="merge", primary_key="id")
 def orders(
-    updated_at=dlt.sources.incremental("write_date", initial_value="2020-01-01T00:00:00Z"),
+    updated_at=dlt.sources.incremental("write_date", initial_value="2020-01-01 00:00:00"),
     limit: int = 100,
 ):
     """Sales orders stream with incremental loading."""
@@ -32,7 +32,7 @@ def orders(
 
 @dlt.resource(write_disposition="merge", primary_key="id")
 def order_lines(
-    updated_at=dlt.sources.incremental("write_date", initial_value="2020-01-01T00:00:00Z"),
+    updated_at=dlt.sources.incremental("write_date", initial_value="2020-01-01 00:00:00"),
     limit: int = 1000,
 ):
     """Sale order lines stream with incremental loading."""

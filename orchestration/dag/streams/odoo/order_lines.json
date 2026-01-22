@@ -2,7 +2,7 @@
   "stream": "order_lines",
   "connector": "dlt",
   "schedule": "0 * * * *",
-  "initial_value": "2020-01-01T00:00:00",
+  "initial_value": "2020-01-01 00:00:00",
   "selected": true,
   "fields": {
     "id": {"type": "integer"},
