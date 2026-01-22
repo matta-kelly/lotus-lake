@@ -23,7 +23,7 @@ with source as (
 unnested as (
     select
         order_id,
-        unnest(from_json(tags, '[""]')) as tag,
+        unnest(from_json(tags, '["VARCHAR"]')) as tag,
         _dlt_load_id
     from source
 )
