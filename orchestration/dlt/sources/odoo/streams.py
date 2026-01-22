@@ -5,10 +5,10 @@ from .client import OdooAPI
 
 @dlt.resource(write_disposition="merge", primary_key="id")
 def orders(
-    since: str,
+    updated_at=dlt.sources.incremental("write_date", initial_value="2020-01-01T00:00:00Z"),
     limit: int = 100,
 ):
-    """Sales orders stream."""
+    """Sales orders stream with incremental loading."""
     api = OdooAPI()
     offset = 0
 
@@ -16,7 +16,7 @@ def orders(
         params = {
             "limit": limit,
             "offset": offset,
-            "last_sync_date": since,
+            "last_sync_date": updated_at.last_value,
         }
         batch = api.get("api/sales", params=params)
 
@@ -32,10 +32,10 @@ def orders(
 
 @dlt.resource(write_disposition="merge", primary_key="id")
 def order_lines(
-    since: str,
+    updated_at=dlt.sources.incremental("write_date", initial_value="2020-01-01T00:00:00Z"),
     limit: int = 1000,
 ):
-    """Sale order lines stream."""
+    """Sale order lines stream with incremental loading."""
     api = OdooAPI()
     offset = 0
 
@@ -43,7 +43,7 @@ def order_lines(
         params = {
             "limit": limit,
             "offset": offset,
-            "start_date": since,
+            "start_date": updated_at.last_value,
         }
         batch = api.get("api/sale_order_lines", params=params)
 

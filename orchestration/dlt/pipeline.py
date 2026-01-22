@@ -95,7 +95,13 @@ def create_pipeline(source_name: str) -> dlt.Pipeline:
         S3_ENDPOINT: S3 endpoint for non-AWS (SeaweedFS, MinIO)
         S3_ACCESS_KEY_ID: S3 access key
         S3_SECRET_ACCESS_KEY: S3 secret key
+
+    File size config (matches Airbyte destinations.tf block_size_mb=128):
+        - file_max_bytes: 128MB per parquet file before rotation
     """
+    # Configure file rotation to match Airbyte's 128MB block_size_mb
+    dlt.config["normalize.data_writer.file_max_bytes"] = 134217728  # 128MB
+
     bucket_url = os.environ.get("DLT_BUCKET_URL", "s3://landing/raw")
 
     # Build credentials config for non-AWS S3 (SeaweedFS, MinIO)
@@ -157,9 +163,9 @@ def run_stream(source_name: str, stream_name: str, dry_run: bool = False) -> dic
         print(f"  Initial value: {initial_value}")
         return {"status": "dry_run", "fields": selected_fields, "initial_value": initial_value}
 
-    # Get the resource
+    # Get the resource - dlt manages incremental state automatically
     resource_func = get_resource(source_name, stream_name)
-    resource = resource_func(since=initial_value)
+    resource = resource_func()
 
     # Apply field filter if configured
     if selected_fields:
