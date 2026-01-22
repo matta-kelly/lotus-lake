@@ -69,9 +69,9 @@ def field_filter(selected_fields: list[str]):
 def get_resource(source_name: str, stream_name: str) -> Any:
     """Dynamically import and get a resource function from a source module."""
     try:
-        source_module = importlib.import_module(f"sources.{source_name}")
+        source_module = importlib.import_module(f"orchestration.dlt.sources.{source_name}")
     except ImportError as e:
-        raise ImportError(f"Could not import source 'sources.{source_name}': {e}")
+        raise ImportError(f"Could not import source 'orchestration.dlt.sources.{source_name}': {e}")
 
     if not hasattr(source_module, stream_name):
         available = [
