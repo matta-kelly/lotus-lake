@@ -159,6 +159,27 @@ spec:
                 secretKeyRef:
                   name: lotus-lake-terraform-vars
                   key: s3_secret_access_key
+            # Odoo
+            - name: ODOO_URL
+              valueFrom:
+                secretKeyRef:
+                  name: lotus-lake-terraform-vars
+                  key: ODOO_URL
+            - name: ODOO_DB
+              valueFrom:
+                secretKeyRef:
+                  name: lotus-lake-terraform-vars
+                  key: ODOO_DB
+            - name: ODOO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: lotus-lake-terraform-vars
+                  key: ODOO_USER
+            - name: ODOO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: lotus-lake-terraform-vars
+                  key: ODOO_PASSWORD
 
     # -------------------------------------------------------------------------
     # Ingress

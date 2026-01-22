@@ -102,6 +102,9 @@ def create_pipeline(source_name: str) -> dlt.Pipeline:
     credentials = None
     endpoint_url = os.environ.get("S3_ENDPOINT")
     if endpoint_url:
+        # Ensure protocol prefix for s3fs/dlt
+        if not endpoint_url.startswith(("http://", "https://")):
+            endpoint_url = f"http://{endpoint_url}"
         credentials = {
             "aws_access_key_id": os.environ.get("S3_ACCESS_KEY_ID"),
             "aws_secret_access_key": os.environ.get("S3_SECRET_ACCESS_KEY"),
