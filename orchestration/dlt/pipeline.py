@@ -9,10 +9,19 @@ Usage:
 import argparse
 import importlib
 import json
+import logging
 import os
 import sys
+import time
 from pathlib import Path
 from typing import Any, Iterator
+
+# Configure logging for Dagster visibility
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 env_file = Path(__file__).parent.parent.parent / ".env"
 if env_file.exists():
@@ -135,35 +144,38 @@ def create_pipeline(source_name: str) -> dlt.Pipeline:
 
 def run_stream(source_name: str, stream_name: str, dry_run: bool = False) -> dict:
     """Run a single stream with optional field filtering based on stream config."""
-    print(f"\n{'[DRY RUN] ' if dry_run else ''}Running {source_name}/{stream_name}")
+    logger.info(f"{'[DRY RUN] ' if dry_run else ''}Starting {source_name}/{stream_name}")
+    start_time = time.time()
 
     # Load stream config
     config = load_stream_config(source_name, stream_name)
     if config:
-        print(f"  Loaded config from dag/streams/{source_name}/{stream_name}.json")
+        logger.info(f"Loaded config from dag/streams/{source_name}/{stream_name}.json")
         if not config.get("selected", True):
-            print(f"  Stream is not selected, skipping")
+            logger.info(f"Stream is not selected, skipping")
             return {"status": "skipped", "reason": "not selected"}
     else:
-        print(f"  No stream config found, using defaults")
+        logger.warning(f"No stream config found, using defaults")
 
     # Get selected fields from config
     selected_fields = None
     if config and "fields" in config:
         selected_fields = list(config["fields"].keys())
-        print(f"  Filtering to {len(selected_fields)} fields")
+        logger.info(f"Field filter: {len(selected_fields)} fields selected")
 
     # Get initial_value from config (required for incremental loading)
     if not config or "initial_value" not in config:
         raise ValueError(f"Missing 'initial_value' in stream config for {source_name}/{stream_name}")
     initial_value = config["initial_value"]
+    logger.info(f"Config initial_value: {initial_value}")
 
     if dry_run:
-        print(f"  Would run with fields: {selected_fields or 'all'}")
-        print(f"  Initial value: {initial_value}")
+        logger.info(f"[DRY RUN] Would run with fields: {selected_fields or 'all'}")
+        logger.info(f"[DRY RUN] Initial value: {initial_value}")
         return {"status": "dry_run", "fields": selected_fields, "initial_value": initial_value}
 
     # Get the resource - dlt manages incremental state automatically
+    logger.info(f"Initializing resource {stream_name}...")
     resource_func = get_resource(source_name, stream_name)
     resource = resource_func()
 
@@ -175,11 +187,13 @@ def run_stream(source_name: str, stream_name: str, dry_run: bool = False) -> dic
     resource.max_table_nesting = 0
 
     # Create and run pipeline
+    logger.info(f"Running dlt pipeline...")
     pipeline = create_pipeline(source_name)
     load_info = pipeline.run(resource, table_name=stream_name, loader_file_format="parquet")
 
-    print(f"  {load_info}")
-    return {"status": "success", "load_info": str(load_info)}
+    elapsed = time.time() - start_time
+    logger.info(f"Pipeline complete in {elapsed:.1f}s: {load_info}")
+    return {"status": "success", "load_info": str(load_info), "elapsed_seconds": elapsed}
 
 
 def run_streams(
@@ -191,7 +205,7 @@ def run_streams(
         try:
             results[stream_name] = run_stream(source_name, stream_name, dry_run)
         except Exception as e:
-            print(f"  Error: {e}")
+            logger.error(f"Error running {stream_name}: {e}", exc_info=True)
             results[stream_name] = {"status": "error", "error": str(e)}
     return results
 
