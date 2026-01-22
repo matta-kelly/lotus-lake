@@ -299,6 +299,30 @@ After setting up a new dlt source:
 
 ---
 
+## Source-Specific Notes
+
+### Odoo
+
+**Date format:** Odoo's `fields.Datetime.from_string()` expects `YYYY-MM-DD HH:MM:SS` format (space-separated, no timezone). **Do not use ISO 8601** (`2020-01-01T00:00:00Z`).
+
+```python
+# WRONG - causes 500 error on order_lines endpoint
+initial_value="2020-01-01T00:00:00Z"
+
+# CORRECT - Odoo's expected format
+initial_value="2020-01-01 00:00:00"
+```
+
+**Note:** The `/api/sales` endpoint silently ignores invalid date formats, but `/api/sale_order_lines` raises a 500 error. Both should use Odoo's format for consistency.
+
+**Endpoint parameter names differ:**
+| Endpoint | Date Parameter |
+|----------|---------------|
+| `/api/sales` | `last_sync_date` |
+| `/api/sale_order_lines` | `start_date` |
+
+---
+
 ## References
 
 - [DLT Documentation](https://dlthub.com/docs/intro)
