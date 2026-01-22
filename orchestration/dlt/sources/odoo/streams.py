@@ -20,13 +20,15 @@ def orders(
     offset = 0
     total_records = 0
 
-    _log(f"[orders] cursor={updated_at.last_value}")
+    # Capture cursor ONCE - it changes as we yield records
+    cursor = updated_at.last_value
+    _log(f"[orders] cursor={cursor}")
 
     while True:
         params = {
             "limit": limit,
             "offset": offset,
-            "last_sync_date": updated_at.last_value,
+            "last_sync_date": cursor,
         }
         batch = api.get("api/sales", params=params)
 
@@ -63,13 +65,15 @@ def order_lines(
     offset = 0
     total_records = 0
 
-    _log(f"[order_lines] cursor={updated_at.last_value}")
+    # Capture cursor ONCE - it changes as we yield records
+    cursor = updated_at.last_value
+    _log(f"[order_lines] cursor={cursor}")
 
     while True:
         params = {
             "limit": limit,
             "offset": offset,
-            "start_date": updated_at.last_value,
+            "start_date": cursor,
         }
         batch = api.get("api/sale_order_lines", params=params)
 
