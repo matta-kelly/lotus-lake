@@ -134,39 +134,44 @@ def create_pipeline(source_name: str) -> dlt.Pipeline:
     )
 
 
-def run_stream(source_name: str, stream_name: str, dry_run: bool = False) -> dict:
+def run_stream(source_name: str, stream_name: str, dry_run: bool = False, log=None) -> dict:
     """Run a single stream with optional field filtering based on stream config."""
-    print(f"[dlt/{source_name}/{stream_name}] Starting extraction")
+    def _log(msg):
+        if log:
+            log.info(msg)
+        else:
+            print(msg)
+
+    _log(f"Starting {source_name}/{stream_name}")
     start_time = time.time()
 
     # Load stream config
     config = load_stream_config(source_name, stream_name)
-    if config:
-        if not config.get("selected", True):
-            print(f"[dlt/{source_name}/{stream_name}] Stream not selected, skipping")
-            return {"status": "skipped", "reason": "not selected"}
-    else:
-        print(f"[dlt/{source_name}/{stream_name}] WARNING: No stream config found")
+    if not config:
+        _log("WARNING: No stream config found")
+    if config and not config.get("selected", True):
+        _log("Stream not selected, skipping")
+        return {"status": "skipped", "reason": "not selected"}
 
     # Get selected fields from config
     selected_fields = None
     if config and "fields" in config:
         selected_fields = list(config["fields"].keys())
-        print(f"[dlt/{source_name}/{stream_name}] Filtering to {len(selected_fields)} fields")
+        _log(f"Filtering to {len(selected_fields)} fields")
 
     # Get initial_value from config (required for incremental loading)
     if not config or "initial_value" not in config:
         raise ValueError(f"Missing 'initial_value' in stream config for {source_name}/{stream_name}")
     initial_value = config["initial_value"]
-    print(f"[dlt/{source_name}/{stream_name}] Config initial_value: {initial_value}")
+    _log(f"Config initial_value: {initial_value}")
 
     if dry_run:
-        print(f"[dlt/{source_name}/{stream_name}] DRY RUN - would extract from {initial_value}")
+        _log(f"DRY RUN - would extract from {initial_value}")
         return {"status": "dry_run", "fields": selected_fields, "initial_value": initial_value}
 
-    # Get the resource - dlt manages incremental state automatically
+    # Get the resource with logger for batch progress
     resource_func = get_resource(source_name, stream_name)
-    resource = resource_func()
+    resource = resource_func(log=log)
 
     # Apply field filter if configured
     if selected_fields:
@@ -187,17 +192,12 @@ def run_stream(source_name: str, stream_name: str, dry_run: bool = False) -> dic
         for job in package.jobs.get("completed_jobs", []):
             jobs_info.append(job.file_path)
 
-    print(f"[dlt/{source_name}/{stream_name}] DONE in {elapsed:.1f}s")
-    print(f"[dlt/{source_name}/{stream_name}] Load ID: {load_info.loads_ids}")
-    print(f"[dlt/{source_name}/{stream_name}] Destination: {load_info.destination_name}")
+    _log(f"DONE in {elapsed:.1f}s")
+    _log(f"Load ID: {load_info.loads_ids}")
     if jobs_info:
-        print(f"[dlt/{source_name}/{stream_name}] Files written: {len(jobs_info)}")
-        for f in jobs_info[:5]:  # Show first 5 files
-            print(f"  - {f}")
-        if len(jobs_info) > 5:
-            print(f"  ... and {len(jobs_info) - 5} more")
+        _log(f"Files written: {len(jobs_info)}")
 
-    return {"status": "success", "load_info": str(load_info), "elapsed_seconds": elapsed}
+    return {"status": "success", "load_info": str(load_info), "elapsed_seconds": elapsed, "files": len(jobs_info)}
 
 
 def run_streams(

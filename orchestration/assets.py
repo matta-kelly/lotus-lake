@@ -336,9 +336,7 @@ def make_dlt_asset(source: str, stream: str, config: dict):
     def _dlt_extract(context: AssetExecutionContext):
         from .dlt.pipeline import run_stream
 
-        context.log.info(f"[dlt/{source}/{stream}] Starting extraction")
-        result = run_stream(source, stream)
-        context.log.info(f"[dlt/{source}/{stream}] {result}")
+        result = run_stream(source, stream, log=context.log)
         return result
 
     return _dlt_extract
