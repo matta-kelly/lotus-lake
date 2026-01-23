@@ -88,7 +88,7 @@ def get_resource(source_name: str, stream_name: str) -> Any:
     return getattr(source_module, stream_name)
 
 
-def create_pipeline(source_name: str) -> dlt.Pipeline:
+def create_pipeline(source_name: str, stream_name: str) -> dlt.Pipeline:
     """Create a dlt pipeline with S3 filesystem destination.
 
     Environment variables (matches lib.py/profiles.yml):
@@ -124,7 +124,7 @@ def create_pipeline(source_name: str) -> dlt.Pipeline:
     layout = "{table_name}/year={YYYY}/month={MM}/day={DD}/{load_id}.{file_id}.{ext}"
 
     return dlt.pipeline(
-        pipeline_name=source_name,
+        pipeline_name=f"{source_name}_{stream_name}",
         destination=dlt.destinations.filesystem(
             bucket_url=bucket_url,
             layout=layout,
@@ -181,7 +181,7 @@ def run_stream(source_name: str, stream_name: str, dry_run: bool = False, log=No
     resource.max_table_nesting = 0
 
     # Create and run pipeline
-    pipeline = create_pipeline(source_name)
+    pipeline = create_pipeline(source_name, stream_name)
     load_info = pipeline.run(resource, table_name=stream_name, loader_file_format="parquet")
 
     elapsed = time.time() - start_time
