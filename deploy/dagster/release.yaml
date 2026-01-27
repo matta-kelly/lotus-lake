@@ -59,6 +59,14 @@ spec:
       auto_materialize:
         enabled: true
         use_sensors: true
+      retention:
+        schedule:
+          purge_after_days: 7
+        sensor:
+          purge_after_days:
+            skipped: 7
+            failure: 30
+            success: 7
 
     dagsterDaemon:
       runCoordinator:
@@ -97,6 +105,8 @@ spec:
         k8sRunLauncher:
           # Default config for all runs
           runK8sConfig:
+            jobSpecConfig:
+              ttlSecondsAfterFinished: 86400  # 24 hours - auto-delete completed jobs
             podSpecConfig:
               nodeSelector:
                 kubernetes.io/hostname: monkeybusiness
