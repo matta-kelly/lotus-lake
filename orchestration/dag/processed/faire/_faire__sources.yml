@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: faire
+    database: lakehouse
+    schema: faire
+    tables:
+      - name: order_lines

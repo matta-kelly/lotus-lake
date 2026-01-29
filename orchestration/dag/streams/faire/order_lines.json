@@ -1,0 +1,32 @@
+{
+  "stream": "order_lines",
+  "connector": "dlt",
+  "schedule": "0 * * * *",
+  "selected": true,
+  "initial_value": "2020-01-01T00:00:00.000Z",
+  "sync_mode": "incremental",
+  "destination_sync_mode": "merge",
+  "primary_key": [["id"]],
+  "cursor_field": ["order_updated_at"],
+  "fields": {
+    "id": {"type": "string"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "product_id": {"type": "string"},
+    "variant_id": {"type": "string"},
+    "quantity": {"type": "integer"},
+    "sku": {"type": "string"},
+    "includes_tester": {"type": "boolean"},
+    "state": {"type": "string"},
+    "price_amount_minor": {"type": "integer"},
+    "price_currency": {"type": "string"},
+    "order_id": {"type": "string"},
+    "order_created_at": {"type": "string", "format": "date-time"},
+    "order_updated_at": {"type": "string", "format": "date-time"},
+    "order_state": {"type": "string"},
+    "retailer_name": {"type": "string"},
+    "retailer_city": {"type": "string"},
+    "retailer_state": {"type": "string"},
+    "retailer_country": {"type": "string"}
+  }
+}

@@ -1,0 +1,207 @@
+name: Build and Push
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: forgejo.datamountainsolutions.com
+  IMAGE_NAME: mkultra/lotus-lake
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────
+  # Validate - Catch errors before they hit the cluster
+  # ─────────────────────────────────────────────────────────────────────────
+  validate:
+    runs-on: docker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # TICKET-003: Block commits with local terraform state
+      - name: Check for terraform state files
+        run: |
+          if find . -name "*.tfstate*" -o -name ".terraform" -type d | grep -q .; then
+            echo "::error::Found terraform state files. These should not be committed."
+            echo "Run: rm -f orchestration/airbyte/terraform/terraform.tfstate*"
+            echo "Run: rm -rf orchestration/airbyte/terraform/.terraform"
+            exit 1
+          fi
+          echo "No terraform state files found"
+
+      # TICKET-001: Validate terraform before push
+      - name: Setup Terraform
+        uses: https://github.com/hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5"
+
+      - name: Terraform validate
+        working-directory: orchestration/airbyte/terraform
+        run: |
+          terraform init -backend=false
+          terraform validate
+          echo "Terraform validation passed"
+
+      # Validate dbt SQL
+      - name: Setup Python
+        uses: https://github.com/actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate dbt
+        run: |
+          pip install dbt-duckdb
+          cd orchestration && dbt parse --profiles-dir . --project-dir .
+          echo "dbt validation passed"
+
+      # Validate Airbyte catalogs are up to date
+      - name: Check Airbyte catalogs are current
+        run: |
+          python orchestration/airbyte/generate-catalog.py
+          if ! git diff --quiet orchestration/dag/streams/; then
+            echo "::error::Airbyte catalogs are out of date. Run: python orchestration/airbyte/generate-catalog.py"
+            echo "::error::Then commit the updated _catalog.json files"
+            git diff orchestration/dag/streams/
+            exit 1
+          fi
+          echo "Airbyte catalogs are up to date"
+
+      # Validate Dagster Python code syntax
+      - name: Validate Dagster Python syntax
+        run: |
+          pip install dagster dagster-dbt dagster-postgres boto3 duckdb
+          cd orchestration
+          python -m py_compile definitions.py resources.py assets.py
+          echo "Python syntax validation passed"
+
+      # Validate Helm values render correctly
+      - name: Validate Helm release
+        run: |
+          helm repo add dagster https://dagster-io.github.io/helm
+          helm template dagster dagster/dagster -f deploy/dagster/release.yaml --set postgresql.enabled=false > /dev/null
+          echo "Helm template validation passed"
+
+      # Validate image paths match repo
+      - name: Validate image paths
+        run: |
+          REPO="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+
+          # Check user deployment image
+          USER_IMAGE=$(grep -A1 'repository:' deploy/dagster/release.yaml | grep 'forgejo\|ghcr' | head -1 | tr -d ' ')
+          if [[ "$USER_IMAGE" != *"$REPO"* ]] && [[ "$USER_IMAGE" != *"ghcr.io"* ]]; then
+            echo "::warning::User deployment image may need updating to $REPO"
+          fi
+          echo "Image path check complete"
+
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Build - Only runs if validation passes
+  # ─────────────────────────────────────────────────────────────────────────
+  build:
+    needs: validate
+    runs-on: docker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        if: gitea.event_name != 'pull_request'
+        run: |
+          echo "${{ secrets.REGISTRY_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ gitea.actor }} --password-stdin
+
+      - name: Build image
+        run: |
+          SHORT_SHA=$(echo "${{ gitea.sha }}" | cut -c1-7)
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${SHORT_SHA} .
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${SHORT_SHA} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Push image
+        if: gitea.event_name != 'pull_request'
+        run: |
+          SHORT_SHA=$(echo "${{ gitea.sha }}" | cut -c1-7)
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${SHORT_SHA}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Build Cube.js - Semantic layer image
+  # ─────────────────────────────────────────────────────────────────────────
+  build-cube:
+    needs: validate
+    runs-on: docker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Generate dbt manifest (needed by Cube.js factories)
+      - name: Setup Python
+        uses: https://github.com/actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate dbt manifest
+        run: |
+          pip install dbt-duckdb
+          cd orchestration && dbt parse --profiles-dir . --project-dir .
+          echo "manifest.json generated for Cube.js"
+
+      - name: Log in to Container Registry
+        if: gitea.event_name != 'pull_request'
+        run: |
+          echo "${{ secrets.REGISTRY_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ gitea.actor }} --password-stdin
+
+      - name: Build Cube.js image
+        run: |
+          SHORT_SHA=$(echo "${{ gitea.sha }}" | cut -c1-7)
+          docker build -f Dockerfile.cube -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-cube:${SHORT_SHA} .
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-cube:${SHORT_SHA} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-cube:latest
+
+      - name: Push Cube.js image
+        if: gitea.event_name != 'pull_request'
+        run: |
+          SHORT_SHA=$(echo "${{ gitea.sha }}" | cut -c1-7)
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-cube:${SHORT_SHA}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-cube:latest
+
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Deploy - Update manifest with SHA tag to trigger Flux rollout
+  # ─────────────────────────────────────────────────────────────────────────
+  deploy:
+    needs: [build, build-cube]
+    if: gitea.event_name == 'push' && gitea.ref == 'refs/heads/main'
+    runs-on: docker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.REPO_TOKEN }}
+
+      - name: Update image tags in release.yaml
+        run: |
+          SHORT_SHA=$(echo "${{ gitea.sha }}" | cut -c1-7)
+          echo "Updating image tags to: $SHORT_SHA"
+
+          # Update user deployment image tag (matches 7-char SHA with or without comment)
+          sed -i "s|\(tag: \)[a-f0-9]\{7\}.*|\1$SHORT_SHA  # Auto-updated by CI|" deploy/dagster/release.yaml
+
+          echo "Updated release.yaml:"
+          grep "tag:" deploy/dagster/release.yaml
+
+      - name: Commit and push
+        run: |
+          git config user.name "forgejo-actions[bot]"
+          git config user.email "forgejo-actions[bot]@forgejo.datamountainsolutions.com"
+
+          SHORT_SHA=$(echo "${{ gitea.sha }}" | cut -c1-7)
+          git add deploy/dagster/release.yaml
+
+          # Only commit if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "deploy: update image tag to $SHORT_SHA [skip ci]"
+            git push
+          fi

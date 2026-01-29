@@ -1,0 +1,89 @@
+{
+  "stream": "order_lines",
+  "options": {
+    "sync_modes": [
+      "incremental"
+    ],
+    "destination_sync_modes": [
+      "append",
+      "merge"
+    ]
+  },
+  "defaults": {
+    "cursor_field": [
+      "order_updated_at"
+    ]
+  },
+  "fields": {
+    "id": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "product_id": {
+      "type": "string"
+    },
+    "variant_id": {
+      "type": "string"
+    },
+    "quantity": {
+      "type": "integer"
+    },
+    "sku": {
+      "type": "string"
+    },
+    "product_name": {
+      "type": "string"
+    },
+    "variant_name": {
+      "type": "string"
+    },
+    "includes_tester": {
+      "type": "boolean"
+    },
+    "state": {
+      "type": "string"
+    },
+    "price_cents": {
+      "type": "integer"
+    },
+    "price_amount_minor": {
+      "type": "integer"
+    },
+    "price_currency": {
+      "type": "string"
+    },
+    "order_id": {
+      "type": "string"
+    },
+    "order_created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "order_updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "order_state": {
+      "type": "string"
+    },
+    "retailer_name": {
+      "type": "string"
+    },
+    "retailer_city": {
+      "type": "string"
+    },
+    "retailer_state": {
+      "type": "string"
+    },
+    "retailer_country": {
+      "type": "string"
+    }
+  }
+}
