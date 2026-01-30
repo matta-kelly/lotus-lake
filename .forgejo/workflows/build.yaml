@@ -79,7 +79,10 @@ jobs:
       # Validate Helm values render correctly
       - name: Setup Helm
         run: |
-          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          apt-get install -y curl
+          curl -fsSL -o helm.tar.gz https://get.helm.sh/helm-v3.14.0-linux-amd64.tar.gz
+          tar -zxvf helm.tar.gz
+          mv linux-amd64/helm /usr/local/bin/helm
           helm version
 
       - name: Validate Helm release
