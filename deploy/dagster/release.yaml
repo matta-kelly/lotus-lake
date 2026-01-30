@@ -192,21 +192,11 @@ spec:
                   key: ODOO_PASSWORD
 
     # -------------------------------------------------------------------------
-    # Ingress
+    # Ingress - disabled, using manually-managed ingress in h-kube repo
+    # The Helm chart creates a wildcard ingress that conflicts with routing
     # -------------------------------------------------------------------------
     ingress:
-      enabled: true
-      ingressClassName: traefik
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-prod
-        traefik.ingress.kubernetes.io/router.middlewares: kube-system-authentik-lotus-lake@kubernetescrd
-      webserver:
-        host: dagster.landl.datamountainsolutions.com
-        path: /
-        pathType: Prefix
-        tls:
-          enabled: true
-          secretName: dagster-tls
+      enabled: false
 
     # -------------------------------------------------------------------------
     # Storage config
