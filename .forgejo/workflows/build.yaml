@@ -77,6 +77,11 @@ jobs:
           echo "Python syntax validation passed"
 
       # Validate Helm values render correctly
+      - name: Setup Helm
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          helm version
+
       - name: Validate Helm release
         run: |
           helm repo add dagster https://dagster-io.github.io/helm
