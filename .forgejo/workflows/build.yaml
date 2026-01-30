@@ -20,6 +20,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup CI tools
+        run: ./ci/setup.sh
+
       # TICKET-003: Block commits with local terraform state
       - name: Check for terraform state files
         run: |
@@ -44,15 +47,8 @@ jobs:
           terraform validate
           echo "Terraform validation passed"
 
-      # Validate dbt SQL
-      - name: Setup Python
-        run: |
-          apt-get update && apt-get install -y python3 python3-pip python3-venv
-          python3 --version
-
       - name: Validate dbt
         run: |
-          pip3 install --break-system-packages dbt-duckdb
           cd orchestration && dbt parse --profiles-dir . --project-dir .
           echo "dbt validation passed"
 
@@ -71,20 +67,11 @@ jobs:
       # Validate Dagster Python code syntax
       - name: Validate Dagster Python syntax
         run: |
-          pip3 install --break-system-packages dagster dagster-dbt dagster-postgres boto3 duckdb
           cd orchestration
           python3 -m py_compile definitions.py resources.py assets.py
           echo "Python syntax validation passed"
 
       # Validate Helm values render correctly
-      - name: Setup Helm
-        run: |
-          apt-get install -y curl
-          curl -fsSL -o helm.tar.gz https://get.helm.sh/helm-v3.14.0-linux-amd64.tar.gz
-          tar -zxvf helm.tar.gz
-          mv linux-amd64/helm /usr/local/bin/helm
-          helm version
-
       - name: Validate Helm release
         run: |
           helm repo add dagster https://dagster-io.github.io/helm
@@ -143,15 +130,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Generate dbt manifest (needed by Cube.js factories)
-      - name: Setup Python
-        run: |
-          apt-get update && apt-get install -y python3 python3-pip python3-venv
-          python3 --version
+      - name: Setup CI tools
+        run: ./ci/setup.sh --python-only
 
       - name: Generate dbt manifest
         run: |
-          pip3 install --break-system-packages dbt-duckdb
           cd orchestration && dbt parse --profiles-dir . --project-dir .
           echo "manifest.json generated for Cube.js"
 

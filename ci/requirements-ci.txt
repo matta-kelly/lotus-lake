@@ -1,0 +1,13 @@
+# ==============================================================================
+# CI Python Dependencies
+# ==============================================================================
+# Update via PR when new packages needed.
+# Used by: ci/setup.sh
+# ==============================================================================
+
+dbt-duckdb
+dagster
+dagster-dbt
+dagster-postgres
+boto3
+duckdb
