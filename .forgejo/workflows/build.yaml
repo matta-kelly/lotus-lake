@@ -46,20 +46,20 @@ jobs:
 
       # Validate dbt SQL
       - name: Setup Python
-        uses: https://github.com/actions/setup-python@v5
-        with:
-          python-version: '3.11'
+        run: |
+          apt-get update && apt-get install -y python3 python3-pip python3-venv
+          python3 --version
 
       - name: Validate dbt
         run: |
-          pip install dbt-duckdb
+          pip3 install dbt-duckdb
           cd orchestration && dbt parse --profiles-dir . --project-dir .
           echo "dbt validation passed"
 
       # Validate Airbyte catalogs are up to date
       - name: Check Airbyte catalogs are current
         run: |
-          python orchestration/airbyte/generate-catalog.py
+          python3 orchestration/airbyte/generate-catalog.py
           if ! git diff --quiet orchestration/dag/streams/; then
             echo "::error::Airbyte catalogs are out of date. Run: python orchestration/airbyte/generate-catalog.py"
             echo "::error::Then commit the updated _catalog.json files"
@@ -71,9 +71,9 @@ jobs:
       # Validate Dagster Python code syntax
       - name: Validate Dagster Python syntax
         run: |
-          pip install dagster dagster-dbt dagster-postgres boto3 duckdb
+          pip3 install dagster dagster-dbt dagster-postgres boto3 duckdb
           cd orchestration
-          python -m py_compile definitions.py resources.py assets.py
+          python3 -m py_compile definitions.py resources.py assets.py
           echo "Python syntax validation passed"
 
       # Validate Helm values render correctly
@@ -137,13 +137,13 @@ jobs:
 
       # Generate dbt manifest (needed by Cube.js factories)
       - name: Setup Python
-        uses: https://github.com/actions/setup-python@v5
-        with:
-          python-version: '3.11'
+        run: |
+          apt-get update && apt-get install -y python3 python3-pip python3-venv
+          python3 --version
 
       - name: Generate dbt manifest
         run: |
-          pip install dbt-duckdb
+          pip3 install dbt-duckdb
           cd orchestration && dbt parse --profiles-dir . --project-dir .
           echo "manifest.json generated for Cube.js"
 
