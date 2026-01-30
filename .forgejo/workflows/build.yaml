@@ -15,13 +15,12 @@ jobs:
   # Validate - Catch errors before they hit the cluster
   # ─────────────────────────────────────────────────────────────────────────
   validate:
-    runs-on: docker
+    runs-on: lotus-lake-ci
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup CI tools
-        run: ./ci/setup.sh
+      # Tools are pre-installed in lotus-lake-ci image (dbt, helm, terraform)
 
       # TICKET-003: Block commits with local terraform state
       - name: Check for terraform state files
@@ -34,12 +33,7 @@ jobs:
           fi
           echo "No terraform state files found"
 
-      # TICKET-001: Validate terraform before push
-      - name: Setup Terraform
-        uses: https://github.com/hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.5"
-
+      # TICKET-001: Validate terraform before push (terraform pre-installed in image)
       - name: Terraform validate
         working-directory: orchestration/airbyte/terraform
         run: |
@@ -96,7 +90,7 @@ jobs:
   # ─────────────────────────────────────────────────────────────────────────
   build:
     needs: validate
-    runs-on: docker
+    runs-on: lotus-lake-ci
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -125,13 +119,12 @@ jobs:
   # ─────────────────────────────────────────────────────────────────────────
   build-cube:
     needs: validate
-    runs-on: docker
+    runs-on: lotus-lake-ci
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup CI tools
-        run: ./ci/setup.sh --python-only
+      # dbt is pre-installed in lotus-lake-ci image
 
       - name: Generate dbt manifest
         run: |
@@ -163,7 +156,7 @@ jobs:
   deploy:
     needs: [build, build-cube]
     if: gitea.event_name == 'push' && gitea.ref == 'refs/heads/main'
-    runs-on: docker
+    runs-on: lotus-lake-ci
     steps:
       - name: Checkout
         uses: actions/checkout@v4
