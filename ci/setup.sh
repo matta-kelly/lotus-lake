@@ -32,7 +32,11 @@ if [[ "${1:-}" == "--python-only" ]]; then
 fi
 
 echo "=== Installing Helm ${HELM_VERSION} ==="
-curl -fsSL -o /tmp/helm.tar.gz "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz"
+# Try GitHub releases (often more reliable than get.helm.sh CDN)
+curl -fsSL --retry 3 --retry-delay 5 -o /tmp/helm.tar.gz \
+    "https://github.com/helm/helm/releases/download/v${HELM_VERSION}/helm-v${HELM_VERSION}-linux-amd64.tar.gz" || \
+    curl -fsSL --retry 3 --retry-delay 5 -o /tmp/helm.tar.gz \
+    "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz"
 tar -zxf /tmp/helm.tar.gz -C /tmp
 mv /tmp/linux-amd64/helm /usr/local/bin/helm
 rm -rf /tmp/helm.tar.gz /tmp/linux-amd64
